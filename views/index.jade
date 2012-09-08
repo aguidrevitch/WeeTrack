@@ -1,4 +1,18 @@
-extends base
-
-block content
-  div Hello world !
+doctype html
+html(lang='en')
+  head
+    title Weetrack
+    meta(name="viewport", content="width=device-width, maximum-scale=1")
+    meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    - if (env.NODE_ENV == 'production')
+      link(rel="stylesheet", href="dist/release/index.css")
+    - else
+      link(rel="stylesheet", href="assets/css/index.css")
+      link(rel="stylesheet", href="assets/css/bootstrap.css")
+  body
+    div#main(role="main")
+    - if (env.NODE_ENV == 'production')
+      script(data-main="app/config",src="dist/release/require.js")
+    - else
+      script(data-main="app/config",src="assets/js/libs/require.js")
