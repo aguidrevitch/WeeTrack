@@ -23,11 +23,11 @@ require.config({
       deps: ["lodash", "jquery"],
       exports: "Backbone"
     },
-
     bootstrap: [ "jquery" ],
 
     // Backbone.LayoutManager depends on Backbone.
-    "plugins/backbone.layoutmanager": ["backbone"]
+    "plugins/backbone.layoutmanager": ["backbone"],
+    "plugins/backbone.syphon": ["backbone"]
   }
 
 });

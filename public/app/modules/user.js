@@ -7,18 +7,14 @@ define([
     "modules/user/views"
     ],
 
-    // Map dependencies from above array.
     function(app, router, Views) {
 
-        // Create a new module.
         var User = app.module();
 
-        // Default model.
         User.Model = Backbone.Model.extend({
-  
-            });
+            url: '/api/user'
+        });
 
-        // Default collection.
         User.Collection = Backbone.Collection.extend({
             model: User.Model
         });
@@ -30,13 +26,19 @@ define([
             },
 
             login: function () {
+                var user = new User.Model();
                 app.useLayout("main").setViews({
-                    "section": new Views.LoginForm()
+                    "section": new Views.LoginForm({
+                        model: user
+                    })
                 }).render();
             },
             register: function () {
+                var user = new User.Model();
                 app.useLayout("main").setViews({
-                    "section": new Views.RegisterForm()
+                    "section": new Views.RegisterForm({
+                        model: user
+                    })
                 }).render();
             }
         });

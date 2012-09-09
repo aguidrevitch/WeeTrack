@@ -4,8 +4,7 @@
     util = require("util"),
     express = require("express"),
     io = require("socket.io"),
-    db = require("./lib/database"),
-    User = require("./lib/models/User");
+    db = require("./lib/database");
 
     var app = express();
 
