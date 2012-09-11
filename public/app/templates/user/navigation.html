@@ -1,6 +1,6 @@
-<% if (user) { %>
+<% if (user._id) { %>
   <ul class="nav">
-    <li><a href="#">Hello, Aleksandr Guidrevitch</a></li>
+    <li><a href="#">Hello, <%= user.name %></a></li>
   </ul>
 <% } else { %>
   <ul class="nav">

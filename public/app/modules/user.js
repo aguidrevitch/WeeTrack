@@ -19,14 +19,13 @@ define([
             model: User.Model
         });
 
+        var user = new User.Model();
         var Router = Backbone.Router.extend({
             routes: {
                 "user/login": "login",
                 "user/register": "register"
             },
-
             login: function () {
-                var user = new User.Model();
                 app.useLayout("main").setViews({
                     "section": new Views.LoginForm({
                         model: user
@@ -44,7 +43,9 @@ define([
         });
 
         app.useLayout("main").setViews({
-            ".user-nav": new Views.Navigation()
+            ".user-nav": new Views.Navigation({
+                model: user
+            })
         }).render();
 
         User.Router = new Router();

@@ -12,9 +12,17 @@ define([
         
         Views.Navigation = Backbone.View.extend({
             template: "user/navigation",
+            initialize: function () {
+                var self = this;
+                this.model.on('change', function (model) {
+                    console.log(model.toJSON());
+                    self.render()
+                }, this);
+            //this.model.on('change', this.render, this);
+            },
             serialize: function () {
                 return {
-                    user: null
+                    user: this.model.toJSON()
                 };
             }
         });
@@ -24,7 +32,30 @@ define([
             events: {
                 "submit form" : "login"
             },
+            initialize: function () {
+                this.model.on('change', this.render, this);
+            },
             login: function (e) {
+                var data = Backbone.Syphon.serialize(this);
+                this.model.fetch({
+                    data: data, 
+                    processData: true,
+                    error: function (model, res) {
+                        var err;
+                        try {
+                            err = ($.parseJSON(res.responseText)).error;
+                        } catch (e) { 
+                            return;
+                        }
+                        if (err._modal) {
+                            app.showModal(err._modal.type);
+                        }
+                    },
+                    success: function () {
+                        window.history.back();
+                        //app.router.navigate('/', true)
+                    }
+                });
                 return false;
             }
         });
