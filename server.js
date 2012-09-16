@@ -4,7 +4,8 @@
     util = require("util"),
     express = require("express"),
     io = require("socket.io"),
-    db = require("./lib/database");
+    db = require("./lib/database"),
+    RedisStore = require('connect-redis')(express);
 
     var app = express();
 
@@ -13,6 +14,12 @@
             "config": config,
             "env": process.env
         });
+        app.use(express.cookieParser());
+        app.use(express.methodOverride());
+        app.use(express.session({
+            secret: config.secret,
+            store: new RedisStore()
+        }));
         app.set("views", __dirname + "/views");
         app.set("view engine", "jade");
         app.set("view options", {
@@ -20,8 +27,6 @@
             pretty: true
         });
         app.use(express.bodyParser());
-        app.use(express.cookieParser());
-        app.use(express.methodOverride());
         app.use(express.static(__dirname + "/public"));
         app.use(app.router);
         app.use(express.errorHandler({

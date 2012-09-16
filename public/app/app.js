@@ -96,10 +96,10 @@ define([
                 // Return the reference, for chainability.
                 return layout;
             },
-            showModal: function (text) {
-                $('#modal .modal-body').html();
+            showModal: function (message) {
+                $('#modal .modal-body').html(message);
                 $('#modal').modal();
             }
         }, Backbone.Events);
-    
+        
     });

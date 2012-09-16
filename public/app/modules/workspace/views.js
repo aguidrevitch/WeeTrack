@@ -6,7 +6,7 @@ define([
     "jquery"
     ],
     
-    function(app, Backbone, $) {
+    function(app, Backbone, $, Syphon) {
         
         var Views = {};
         
