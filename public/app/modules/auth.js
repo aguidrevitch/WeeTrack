@@ -62,11 +62,10 @@ define([
                 "register": "register"
             },
             login: function () {
-                app.useLayout("main").setViews({
-                    "section": new Views.LoginForm({
+                app.useLayout("main").setView(
+                    "section", new Views.LoginForm({
                         model: user
-                    })
-                }).render();
+                    })).render();
             },
             logout: function () {
                 user.deauthorize();
@@ -74,22 +73,19 @@ define([
             },
             register: function () {
                 var user = new Auth.Model();
-                app.useLayout("main").setViews({
-                    "section": new Views.RegisterForm({
+                app.useLayout("main").setView(
+                    "section", new Views.RegisterForm({
                         model: user
-                    })
-                }).render();
+                    })).render();
             }
         });
         
         Auth.Router = new Router();
         
         var updateNavigation = function () {
-            app.useLayout("main").setViews({
-                ".user-nav": new Views.Navigation({
-                    model: user
-                })
-            }).render();
+            app.useLayout("main").setView(".user-nav", new Views.Navigation({
+                model: user
+            })).render();
         }
         
         user.on('authorized', function () {
@@ -103,7 +99,6 @@ define([
         });
         
         user.on('error', function () {
-            console.log('error');
             updateNavigation();
             app.trigger('user:deauthorized');
         });

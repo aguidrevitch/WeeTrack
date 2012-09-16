@@ -18,7 +18,7 @@
         app.use(express.methodOverride());
         app.use(express.session({
             secret: config.secret,
-            store: new RedisStore()
+            store: new RedisStore(config.redis)
         }));
         app.set("views", __dirname + "/views");
         app.set("view engine", "jade");

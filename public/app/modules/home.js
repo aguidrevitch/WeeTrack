@@ -19,9 +19,9 @@ define([
             },
 
             index: function() {
-                app.useLayout("main").setViews({
-                    "section": new View({})
-                }).render();
+                app.useLayout("main").setView(
+                    "section", new View({})
+                    ).render();
             }
         });
 
