@@ -16,13 +16,6 @@ require([
         // navigation from this instance.
         app.router = new Router();
         
-        // Trigger the initial route and enable HTML5 History API support, set the
-        // root folder to '/' by default.  Change in app.js.
-        Backbone.history.start({
-            pushState: true, 
-            root: app.root
-        });
-        
         // All navigation that is relative should be passed through the navigate
         // method, to be processed by the router. If the link has a `data-bypass`
         // attribute, bypass the delegation completely.
@@ -48,14 +41,29 @@ require([
             }
         });
         
+        var startBackboneHistory = _.once(function () {
+            // Trigger the initial route and enable HTML5 History API support, set the
+            // root folder to '/' by default.  Change in app.js.
+            Backbone.history.start({
+                pushState: true, 
+                root: app.root
+            });
+        });
+        
         app.on('user:authorized', function () {
             app.router.setAuthorized(true);
+            startBackboneHistory();
         });
         
         app.on('user:deauthorized', function () {
             app.router.setAuthorized(false);
+            startBackboneHistory();
         });
         
+        Backbone.history.on('unauthorized', function () {
+            app.trigger('router:unauthorized');
+        });
+            
         // trying to authorize by session
         Auth.init();
     

@@ -103,6 +103,10 @@ define([
             app.trigger('user:deauthorized');
         });
         
+        app.on('router:unauthorized', function () {
+            Backbone.history.loadUrl('/login');
+        });
+        
         Auth.init = function () {
             user.fetch({
                 error: function () {

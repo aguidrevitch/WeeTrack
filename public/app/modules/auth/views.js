@@ -38,13 +38,16 @@ define([
                             app.showModal(err._modal.type);
                     },
                     success: function () {
-                        app.router.navigate('/', true);
+                        if (location.pathname.indexOf('/login') != 0)
+                            Backbone.history.loadUrl(location.pathname);
+                        else
+                            app.router.navigate('/', true);
                     }
                 });
                 return false;
             }
         });
-
+        
         Views.RegisterForm = Backbone.View.extend({
             template: "auth/register-form",
             
@@ -93,7 +96,7 @@ define([
                 };
             }
         });
-
+        
         return Views;
-
+    
     });

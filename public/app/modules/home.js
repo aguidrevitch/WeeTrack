@@ -1,33 +1,34 @@
 define([
     // Application.
-    "app"
+    "app",
+    // Router
+    "router",
     ],
-
+    
     // Map dependencies from above array.
-    function(app) {
-
+    function(app, router) {
+        
         // Create a new module.
         var Home = app.module();
         
-        var View = Backbone.View.extend({
+        Home.Views.Home = Backbone.View.extend({
             template: "home"
         });
-
-        var Router = Backbone.Router.extend({
+        
+        var Router = router.extend({
             routes: {
                 "": "index"
             },
-
             index: function() {
                 app.useLayout("main").setView(
-                    "section", new View({})
+                    "section", new Home.Views.Home({})
                     ).render();
             }
         });
-
+        
         Home.Router = new Router();
-
+        
         // Return the module for AMD compliance.
         return Home;
-
+    
     });

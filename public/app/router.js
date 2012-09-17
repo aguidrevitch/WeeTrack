@@ -17,7 +17,11 @@ define([
                 
                 this._bindRoutes(this.routes);
                 this._bindRoutes(this.authorized, function () {
-                    return Router._authorized
+                    if (!Router._authorized) {
+                        Backbone.history.trigger('unauthorized');
+                        return false;
+                    }
+                    return true;
                 });
                 this._bindRoutes(this.unauthorized, function () {
                     return !Router._authorized
@@ -35,11 +39,11 @@ define([
                 }
             },
             route: function(route, name, callback, check) {
-                Backbone.history || (Backbone.history = new History);
+                Backbone.history || (Backbone.history = new Backbone.History);
                 if (!_.isRegExp(route)) route = this._routeToRegExp(route);
                 if (!callback) callback = this[name];
                 Backbone.history.route(route, _.bind(function(fragment) {
-                    if (check && !check.call()) 
+                    if (check && !check.call(this))
                         return;
                     var args = this._extractParameters(route, fragment);
                     callback && callback.apply(this, args);
