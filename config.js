@@ -8,7 +8,10 @@ var config = {
             db: 1,
             ttl: 86400 * 365
         },
-        secret: "secret"
+        session: {
+            secret: "secret",
+            maxAge: 60000 * 60 * 24 * 365
+        }
     },
     production: {
         port: 3006,
@@ -20,7 +23,10 @@ var config = {
             db: 0,
             ttl: 86400 * 365
         },
-        secret: "secret"
+        session: {
+            secret: "secret",
+            maxAge: 60000 * 60 * 24 * 365
+        }
     }
 };
 

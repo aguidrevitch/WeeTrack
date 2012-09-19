@@ -17,7 +17,10 @@
         app.use(express.cookieParser());
         app.use(express.methodOverride());
         app.use(express.session({
-            secret: config.secret,
+            secret: config.session.secret,
+            cookie: {
+                maxAge: config.session.maxAge
+            },
             store: new RedisStore(config.redis)
         }));
         app.set("views", __dirname + "/views");

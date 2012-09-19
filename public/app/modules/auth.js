@@ -19,7 +19,8 @@ define([
                 this.fetch({
                     data: {
                         email: attrs.email, 
-                        password: attrs.password
+                        password: attrs.password,
+                        remember_me: attrs.remember_me
                     },
                     error: function (model, res) {
                         var err = ($.parseJSON(res.responseText)).error;
