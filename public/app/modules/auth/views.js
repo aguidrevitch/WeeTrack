@@ -35,10 +35,10 @@ define([
                 this.model.authorize(data, {
                     error: function (err) {
                         if (err._modal) 
-                            app.showModal(err._modal.type);
+                            app.showModal(err._modal.message);
                     },
                     success: function () {
-                        if (location.pathname.indexOf('/login') != 0)
+                        if (location.pathname.indexOf('/login') !== 0)
                             Backbone.history.loadUrl(location.pathname);
                         else
                             app.router.navigate('/', true);
@@ -73,7 +73,7 @@ define([
                         _.each(err, function (value, field) {
                             var selector = '[name="' + field + '"]:input';
                             $( selector, self.el).parents('.control-group').addClass('error');
-                            $( selector + ' + .error', self.el).html(value.type);
+                            $( selector + ' + .error', self.el).html(value.message);
                         });
                     },
                     success: function (model) {

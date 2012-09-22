@@ -87,7 +87,7 @@ define([
             app.useLayout("main").setView(".user-nav", new Views.Navigation({
                 model: user
             })).render();
-        }
+        };
         
         user.on('authorized', function () {
             updateNavigation();
@@ -117,7 +117,7 @@ define([
                     user.trigger('authorized');
                 }
             });
-        }
+        };
         
         // Return the module for AMD compliance.
         return Auth;

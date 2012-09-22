@@ -3,6 +3,7 @@ define([
     "jquery",
     "lodash",
     "backbone",
+    "i18next",
     "bootstrap",
     
     // Plugins.
@@ -10,7 +11,7 @@ define([
     "plugins/backbone.syphon"
     ],
     
-    function($, _, Backbone) {
+    function($, _, Backbone, i18n) {
         
         // Provide a global location to place configuration settings and module
         // creation.
@@ -18,6 +19,19 @@ define([
             // The root path to run the application.
             root: "/"
         };
+        
+        /*if (window.I18N) {
+            i18n.init({
+                resStore: window.I18N
+            }, function (t) {
+                window.t = t;
+            });
+        } else {
+            i18n.init(function (t) {
+                console.log("here");
+                window.t = t;
+            });
+        }*/
         
         // Localize or create a new JavaScript Template object.
         var JST = window.JST = window.JST || {};

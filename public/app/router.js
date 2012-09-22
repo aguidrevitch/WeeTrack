@@ -7,7 +7,7 @@ define([
         
         var Router = Backbone.Router.extend({
             constructor: function(options) {
-                options || (options = {});
+                if (!options) options = {};
                 if (options.routes)
                     this.routes = options.routes;
                 if (options.authorized)
@@ -24,7 +24,7 @@ define([
                     return true;
                 });
                 this._bindRoutes(this.unauthorized, function () {
-                    return !Router._authorized
+                    return !Router._authorized;
                 });
                 this.initialize.apply(this, arguments);
             },
@@ -39,14 +39,14 @@ define([
                 }
             },
             route: function(route, name, callback, check) {
-                Backbone.history || (Backbone.history = new Backbone.History);
+                if (!Backbone.history) Backbone.history = new Backbone.History();
                 if (!_.isRegExp(route)) route = this._routeToRegExp(route);
                 if (!callback) callback = this[name];
                 Backbone.history.route(route, _.bind(function(fragment) {
                     if (check && !check.call(this))
                         return;
                     var args = this._extractParameters(route, fragment);
-                    callback && callback.apply(this, args);
+                    if (callback) callback.apply(this, args);
                     this.trigger.apply(this, ['route:' + name].concat(args));
                     Backbone.history.trigger('route', this, name, args);
                 }, this));

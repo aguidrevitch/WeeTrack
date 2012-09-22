@@ -2,7 +2,7 @@ define([
     // Application.
     "app",
     // Router
-    "router",
+    "router"
     ],
     
     // Map dependencies from above array.
