@@ -62,6 +62,7 @@ module.exports = function(grunt) {
         src: [
           "assets/js/libs/almond.js",
           "dist/debug/templates.js",
+          "dist/debug/translations.js",
           "dist/debug/require.js"
         ],
 
@@ -192,8 +193,42 @@ module.exports = function(grunt) {
         files: ["grunt.js", "assets/css/**/*.styl"],
         tasks: "stylus:dev"
       }
+    },
+
+    i18next: {
+      "dist/debug/translations.js": [ "locales/**/*.json" ]
     }
 
+  });
+
+  grunt.registerMultiTask("i18next", "Compile i18n translations to single file", function() {
+
+    var helpers = require("grunt-contrib-lib").init(grunt);
+    var options = helpers.options(this, {namespace: "I18N"});
+    var processName = function(name) { return name.match(/\/([^\/]+)\/[^\/]+$/)[1]; };
+
+    grunt.verbose.writeflags(options, "Options");
+
+    // TODO: ditch this when grunt v0.4 is released
+    this.files = this.files || helpers.normalizeMultiTaskFiles(this.data, this.target);
+
+    var srcFiles, src, filename;
+    var output = [];
+    var nsInfo = helpers.getNamespaceDeclaration(options.namespace);
+    this.files.forEach(function(files) {
+      srcFiles = grunt.file.expandFiles(files.src);
+      srcFiles.forEach(function(file) {
+        src = grunt.file.read(file);
+        filename = processName(file);
+        output.push(nsInfo.namespace+"["+JSON.stringify(filename)+"] = " + src + ";");
+      });
+
+      if(output.length > 0) {
+        output.unshift(nsInfo.declaration);
+        grunt.file.write(files.dest, output.join("\n\n"));
+        grunt.log.writeln("File '" + files.dest + "' created.");
+      }
+    });
   });
 
   // The debug task will remove all contents inside the dist/ folder, lint
@@ -201,10 +236,10 @@ module.exports = function(grunt) {
   // dist/debug/templates.js, compile all the application code into
   // dist/debug/require.js, and then concatenate the require/define shim
   // almond.js and dist/debug/templates.js into the require.js file.
-  grunt.registerTask("debug", "clean lint jst requirejs concat styles");
+  // grunt.registerTask("debug", "clean lint jst requirejs concat styles");
+  grunt.registerTask("debug", "clean lint jst requirejs i18next concat");
 
   // The release task will run the debug tasks and then minify the
   // dist/debug/require.js file and CSS files.
   grunt.registerTask("release", "debug min mincss");
-
 };
