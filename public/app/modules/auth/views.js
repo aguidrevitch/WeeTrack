@@ -41,7 +41,7 @@ define([
                         if (location.pathname.indexOf('/login') !== 0)
                             Backbone.history.loadUrl(location.pathname);
                         else
-                            app.router.navigate('/', true);
+                            app.router.navigate('/search', true);
                     }
                 });
                 return false;

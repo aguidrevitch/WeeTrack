@@ -7,7 +7,8 @@ require([
     
     // Modules
     "modules/auth",
-    "modules/home"
+    "modules/home",
+    "modules/search"
     ],
     
     function(app, Router, Auth) {

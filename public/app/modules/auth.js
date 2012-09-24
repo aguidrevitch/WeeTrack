@@ -84,7 +84,7 @@ define([
         Auth.Router = new Router();
         
         var updateNavigation = function () {
-            app.useLayout("main").setView(".user-nav", new Views.Navigation({
+            app.useLayout("main").setView("nav", new Views.Navigation({
                 model: user
             })).render();
         };
