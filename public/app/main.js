@@ -42,23 +42,14 @@ require([
             }
         });
         
-        var startBackboneHistory = _.once(function () {
-            // Trigger the initial route and enable HTML5 History API support, set the
-            // root folder to '/' by default.  Change in app.js.
-            Backbone.history.start({
-                pushState: true, 
-                root: app.root
-            });
-        });
-        
         app.on('user:authorized', function () {
             app.router.setAuthorized(true);
-            startBackboneHistory();
+            app.start();
         });
         
         app.on('user:deauthorized', function () {
             app.router.setAuthorized(false);
-            startBackboneHistory();
+            app.start();
         });
         
         Backbone.history.on('unauthorized', function () {

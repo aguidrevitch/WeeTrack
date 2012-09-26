@@ -220,7 +220,7 @@ module.exports = function(grunt) {
       srcFiles.forEach(function(file) {
         src = grunt.file.read(file);
         filename = processName(file);
-        output.push(nsInfo.namespace+"["+JSON.stringify(filename)+"] = " + src + ";");
+        output.push(nsInfo.namespace+"["+JSON.stringify(filename)+"] = { translation : " + src + " };");
       });
 
       if(output.length > 0) {

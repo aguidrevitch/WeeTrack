@@ -73,7 +73,7 @@ define([
                         _.each(err, function (value, field) {
                             var selector = '[name="' + field + '"]:input';
                             $( selector, self.el).parents('.control-group').addClass('error');
-                            $( selector + ' + .error', self.el).html(value.message);
+                            $( selector + ' + .error', self.el).html(t(value.message));
                         });
                     },
                     success: function (model) {

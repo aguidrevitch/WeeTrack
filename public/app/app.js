@@ -20,18 +20,23 @@ define([
             root: "/"
         };
         
-        /*if (window.I18N) {
+        var ready = new $.Deferred();
+        
+        if (window.I18N) {
             i18n.init({
                 resStore: window.I18N
             }, function (t) {
+                // will be called instantly, not deferred
                 window.t = t;
+                ready.resolve();
             });
         } else {
             i18n.init(function (t) {
-                console.log("here");
+                // called after translations are loaded
                 window.t = t;
+                ready.resolve();
             });
-        }*/
+        }
         
         // Localize or create a new JavaScript Template object.
         var JST = window.JST = window.JST || {};
@@ -79,6 +84,19 @@ define([
                 }, additionalProps);
             },
             
+            start: function () {
+                ready.done(function () {
+                    _.once(function () {
+                        // Trigger the initial route and enable HTML5 History API support, set the
+                        // root folder to '/' by default.  Change in app.js.
+                        Backbone.history.start({
+                            pushState: true, 
+                            root: app.root
+                        });
+                    })();
+                });
+            },
+            
             // Helper for using layouts.
             useLayout: function(name, options) {
                 // If already using this Layout, then don't re-inject into the DOM.
@@ -115,5 +133,5 @@ define([
                 $('#modal').modal();
             }
         }, Backbone.Events);
-        
+    
     });

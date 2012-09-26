@@ -1,5 +1,8 @@
 {
-    "en-US": {
-        "key": "value"
-    }
+    "Validator \"required\" failed for path name": "Required",
+    "Validator \"required\" failed for path email": "Required",
+    "Validator \"required\" failed for path password": "Required",
+    "Validator \"required\" failed for path subdomain": "Required",
+    "Validator \"taken\" failed for path email": "Already taken",
+    "Validator \"taken\" failed for path subdomain": "Already taken"
 }
