@@ -15,7 +15,9 @@
         "bbb": ">= 0.1.11",
         "bcrypt": ">= 0.7.2",
         "connect-redis": ">= 1.4.4",
-        "nodemailer": ">= 0.3.28"
+        "nodemailer": ">= 0.3.28",
+        "async": ">= 0.1.22",
+        "chain": "git://github.com/aguidrevitch/node-chain.git"
     },
     "engines": {
         "node": ">= 0.8.8"
