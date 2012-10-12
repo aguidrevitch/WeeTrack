@@ -20,7 +20,7 @@ define([
                 "": "index"
             },
             index: function() {
-                app.useLayout("main").setView(
+                app.layout.setView(
                     "section", new Home.Views.Home({})
                     ).render();
             }

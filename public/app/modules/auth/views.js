@@ -77,7 +77,7 @@ define([
                         });
                     },
                     success: function (model) {
-                        app.useLayout("main").setViews({
+                        app.layout.setViews({
                             "section": new Views.RegisterSuccess({
                                 model: model
                             })

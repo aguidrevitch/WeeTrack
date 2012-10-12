@@ -13,33 +13,47 @@ define([
         
         Search.Model = Backbone.Model.extend({
             idAttribute: "_id",
-            url: '/api/tasks'
+            url: '/api/task'
         });
 
         Search.Collection = Backbone.Collection.extend({
             model: Search.Model,
-            url: '/api/tasks/search'
+            url: '/api/task/search'
         });
 
-        var tickets = new Search.Collection();
+        Search.Project = Backbone.Model.extend({
+            idAttribute: "_id",
+            url: '/api/project'
+        });
+
+        Search.Projects = Backbone.Collection.extend({
+            model: Search.Model,
+            url: '/api/project'
+        });
+
+        var projects = new Search.Projects();
+        var tasks = new Search.Collection();
         
         var Router = router.extend({
             authorized: {
                 "search": "search"
             },
             search: function () {
-                app.useLayout("main").setViews({
+                app.layout.setViews({
                     "section": new Views.Layout({
                         views: {
-                            "#searchresult" : new Views.SearchResult({
-                                collection: tickets
+                            "#tasks" : new Views.Tasks({
+                                collection: tasks
                             }),
                             "#projects" : new Views.Projects({
+                                collection: projects
                             })
                         }
                     })
                 }).render();
-                    
+
+                projects.fetch();
+                tasks.fetch();
             }
         });
 

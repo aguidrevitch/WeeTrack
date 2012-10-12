@@ -14,8 +14,8 @@ define([
             template: "search/layout"
         });
 
-        Views.SearchResult = Backbone.View.extend({
-            template: "search/result"
+        Views.Tasks = Backbone.View.extend({
+            template: "search/tasks"
         });
 
         Views.Projects = Backbone.View.extend({

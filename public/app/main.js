@@ -12,7 +12,10 @@ require([
     ],
     
     function(app, Router, Auth) {
-        
+
+        // Set default layout
+        app.useLayout("main");
+
         // Define your master router on the application namespace and trigger all
         // navigation from this instance.
         app.router = new Router();

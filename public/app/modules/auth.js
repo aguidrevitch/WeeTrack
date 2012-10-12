@@ -63,7 +63,7 @@ define([
                 "register": "register"
             },
             login: function () {
-                app.useLayout("main").setView(
+                app.layout.setView(
                     "section", new Views.LoginForm({
                         model: user
                     })).render();
@@ -74,7 +74,7 @@ define([
             },
             register: function () {
                 var user = new Auth.Model();
-                app.useLayout("main").setView(
+                app.layout.setView(
                     "section", new Views.RegisterForm({
                         model: user
                     })).render();
@@ -84,7 +84,7 @@ define([
         Auth.Router = new Router();
         
         var updateNavigation = function () {
-            app.useLayout("main").setView("nav", new Views.Navigation({
+            app.layout.setView("nav", new Views.Navigation({
                 model: user
             })).render();
         };
