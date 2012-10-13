@@ -2,22 +2,22 @@ define([
     // Application.
     "app",
     "router",
-    
+
     // Views
     "modules/search/views"
     ],
-    
+
     function(app, router, Views) {
-        
+
         var Search = app.module();
-        
-        Search.Model = Backbone.Model.extend({
+
+        Search.Task = Backbone.Model.extend({
             idAttribute: "_id",
             url: '/api/task'
         });
 
-        Search.Collection = Backbone.Collection.extend({
-            model: Search.Model,
+        Search.Tasks = Backbone.Collection.extend({
+            model: Search.Task,
             url: '/api/task/search'
         });
 
@@ -27,13 +27,13 @@ define([
         });
 
         Search.Projects = Backbone.Collection.extend({
-            model: Search.Model,
+            model: Search.Project,
             url: '/api/project'
         });
 
         var projects = new Search.Projects();
-        var tasks = new Search.Collection();
-        
+        var tasks = new Search.Tasks();
+
         var Router = router.extend({
             authorized: {
                 "search": "search"
@@ -42,18 +42,18 @@ define([
                 app.layout.setViews({
                     "section": new Views.Layout({
                         views: {
-                            "#tasks" : new Views.Tasks({
-                                collection: tasks
-                            }),
-                            "#projects" : new Views.Projects({
+                            "#left-sidebar" : new Views.Projects({
                                 collection: projects
+                            }),
+                            "#right-sidebar" : new Views.Tasks({
+                                collection: tasks
                             })
                         }
                     })
-                }).render();
-
-                projects.fetch();
-                tasks.fetch();
+                }).render().done(function () {
+                    projects.fetch();
+                    tasks.fetch();
+                });
             }
         });
 

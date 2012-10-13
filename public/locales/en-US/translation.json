@@ -6,5 +6,6 @@
     "Validator \"taken\" failed for path email": "Already taken",
     "Validator \"taken\" failed for path subdomain": "Already taken",
     "Validator \"valid\" failed for path email": "Invalid email",
-    "Validator \"verifyPassword\" failed for path password": "Passwords don't match"
+    "Validator \"verifyPassword\" failed for path password": "Passwords don't match",
+    "Validator \"taken\" failed for path name": "Name is already taken"
 }

@@ -1,0 +1,10 @@
+/* left sidebar */
+.projects, .projects-options {
+    margin-left: 30px;
+}
+
+.projects .icon-chevron-right {
+    float: right;
+}
+/* / left sidebar */
+

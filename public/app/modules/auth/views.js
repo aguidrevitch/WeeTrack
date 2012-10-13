@@ -1,15 +1,15 @@
 define([
     "app",
-    
+
     // Libs
     "backbone",
     "jquery"
     ],
-    
+
     function(app, Backbone, $) {
-        
+
         var Views = {};
-        
+
         Views.Navigation = Backbone.View.extend({
             template: "auth/navigation",
             initialize: function () {
@@ -21,7 +21,7 @@ define([
                 };
             }
         });
-        
+
         Views.LoginForm = Backbone.View.extend({
             template: "auth/login-form",
             events: {
@@ -34,7 +34,7 @@ define([
                 var data = Backbone.Syphon.serialize(this);
                 this.model.authorize(data, {
                     error: function (err) {
-                        if (err._modal) 
+                        if (err._modal)
                             app.showModal(err._modal.message);
                     },
                     success: function () {
@@ -47,14 +47,14 @@ define([
                 return false;
             }
         });
-        
+
         Views.RegisterForm = Backbone.View.extend({
             template: "auth/register-form",
-            
+
             events: {
                 "submit form" : "register"
             },
-            
+
             register: function (e) {
                 var self = this;
                 var data = Backbone.Syphon.serialize(this);
@@ -64,10 +64,10 @@ define([
                         var err;
                         try {
                             err = ($.parseJSON(res.responseText)).error;
-                        } catch (e) { 
+                        } catch (e) {
                             return;
                         }
-                        
+
                         $( ':input + .error', self.el).html('');
                         $( ':input', self.el).parents('.control-group').removeClass('error');
                         _.each(err, function (value, field) {
@@ -87,7 +87,7 @@ define([
                 return false;
             }
         });
-        
+
         Views.RegisterSuccess = Backbone.View.extend({
             template: "auth/register-success",
             serialize: function () {
@@ -96,7 +96,7 @@ define([
                 };
             }
         });
-        
+
         return Views;
-    
+
     });

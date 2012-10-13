@@ -2,15 +2,15 @@ define([
     // Application.
     "app",
     "router",
-    
+
     // Views
     "modules/auth/views"
     ],
-    
+
     function(app, router, Views) {
-        
+
         var Auth = app.module();
-        
+
         Auth.Model = Backbone.Model.extend({
             idAttribute: "_id",
             url: '/api/auth',
@@ -18,24 +18,24 @@ define([
                 var self = this;
                 this.fetch({
                     data: {
-                        email: attrs.email, 
+                        email: attrs.email,
                         password: attrs.password,
                         remember_me: attrs.remember_me
                     },
                     error: function (model, res) {
-                        var err = ($.parseJSON(res.responseText)).error;
-                        
+                        var error = ($.parseJSON(res.responseText)).error;
+
                         user.set({
                             _id: null
                         });
-                        
+
                         self.trigger('deauthorized');
                         if (options.error)
-                            options.error(err);
+                            options.error(error);
                     },
                     success: function (model, res) {
                         self.trigger('authorized');
-                        if (options.success) 
+                        if (options.success)
                             options.success(model, res);
                     }
                 });
@@ -52,7 +52,7 @@ define([
                 });
             }
         });
-        
+
         var user = new Auth.Model();
         var Router = router.extend({
             routes: {
@@ -80,34 +80,34 @@ define([
                     })).render();
             }
         });
-        
+
         Auth.Router = new Router();
-        
+
         var updateNavigation = function () {
             app.layout.setView("nav", new Views.Navigation({
                 model: user
             })).render();
         };
-        
+
         user.on('authorized', function () {
             updateNavigation();
             app.trigger('user:authorized');
         });
-        
+
         user.on('deauthorized', function () {
             updateNavigation();
             app.trigger('user:deauthorized');
         });
-        
+
         user.on('error', function () {
             updateNavigation();
             app.trigger('user:deauthorized');
         });
-        
+
         app.on('router:unauthorized', function () {
             Backbone.history.loadUrl('/login');
         });
-        
+
         Auth.init = function () {
             user.fetch({
                 error: function () {
@@ -118,8 +118,8 @@ define([
                 }
             });
         };
-        
+
         // Return the module for AMD compliance.
         return Auth;
-    
+
     });
