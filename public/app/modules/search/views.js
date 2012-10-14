@@ -41,7 +41,7 @@ define([
             },
             addProject: function () {
                 var self = this;
-                var project = new this.collection.model;
+                var project = new this.collection.model();
                 project.save({
                     name: $('#add-project-name').val()
                 }, {
