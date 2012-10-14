@@ -4,78 +4,133 @@ define([
     // Libs
     "backbone",
     "jquery"
-    ],
+],
 
-    function(app, Backbone, $) {
+function(app, Backbone, $) {
 
-        var Views = {};
+    var Views = {};
 
-        Views.Layout = Backbone.View.extend({
-            template: "search/layout"
-        });
+    Views.Layout = Backbone.View.extend({
+        template: "search/layout"
+    });
 
-        Views.Tasks = Backbone.View.extend({
-            template: "search/tasks"
-        });
+    Views.TaskForm = Backbone.View.extend({
+        template: "search/task-form",
+        events: {
+            'submit #form-task-add': 'addTask'
+        },
+        addTask: function () {
+            alert(1);
+            var self = this;
+            var task = new this.collection.model();
+            task.save(Backbone.Syphon.serialize(this), {
+                success: function (model) {
+                    self.collection.push(model);
+                },
+                error: function (model, res) {
+                    var error = ($.parseJSON(res.responseText)).error;
+                    $('#form-project-add [name=name]:input').tooltip({
+                        trigger: 'manual',
+                        title: t(error.name.message)
+                    }).tooltip('show');
+                    $('#form-project-add [name=name]:input').parents('.control-group').addClass('error');
+                    setTimeout(function () {
+                        $('#form-project-add [name=name]:input').parents('.control-group').removeClass('error');
+                        $('#form-project-add [name=name]:input').tooltip('hide');
+                    }, 2000);
+                }
+            });
+            return false;
+        }
+    });
 
-        Views.Projects = Backbone.View.extend({
-            template: 'search/projects',
-            events: {
-                'click #add-project-button': 'addProject'
-            },
-            // Insert all subViews prior to rendering the View.
-            initialize: function () {
-                this.collection.on("reset", this.render, this);
-                //this.collection.on("change", this.render, this);
-                this.collection.on("add", this.render, this);
-            },
-            cleanup: function () {
-                this.collection.off(null, null, this);
-            },
-            beforeRender: function() {
+    Views.Tasks = Backbone.View.extend({
+        template: "search/tasks",
+        initialize: function () {
+            this.collection.on("reset", this.render, this);
+            this.collection.on("add", this.render, this);
+            $(document).on('click', '#button-new-task', $.proxy(this.renderForm, this));
+        },
+        cleanup: function () {
+            this.collection.off(null, null, this);
+        },
+        beforeRender: function() {
+            //console.log(this.collection.length);
+            if (this.collection.length)
                 this.collection.each(function(model) {
-                    this.insertView("ul", new Views.Project({
+                    this.insertView("ul", new Views.Task({
                         model: model
                     }));
-                }, this);
-            },
-            addProject: function () {
-                var self = this;
-                var project = new this.collection.model();
-                project.save({
-                    name: $('#add-project-name').val()
-                }, {
-                    success: function (project) {
-                        self.collection.push(project);
-                    },
-                    error: function (object, res) {
-                        var error = ($.parseJSON(res.responseText)).error;
-                        $('#add-project-name').tooltip({
-                            trigger: 'manual',
-                            title: t(error.name.message)
-                        }).tooltip('show');
-                        $('#add-project-name').parents('.control-group').addClass('error');
-                        setTimeout(function () {
-                            $('#add-project-name').parents('.control-group').removeClass('error');
-                            $('#add-project-name').tooltip('hide');
-                        }, 2000);
+            }, this);
+            else
+                this.insertView('.span5', new Backbone.View({
+                    render: function () {
+                        console.log(arguments);
+                        return 'No tasks'
                     }
-                });
-                return false;
-            //console.log(this.collection.model);
-            }
-        });
-
-        Views.Project = Backbone.View.extend({
-            template: "search/project",
-            tagName: 'li',
-            serialize: function () {
-                return {
-                    project: this.model
-                };
-            }
-        });
-
-        return Views;
-
+            }));
+        },
+        renderForm: function () {
+            this.setView('.ticket-details', new Views.TaskForm({
+                collection: this.collection
+            })).render();
+        }
     });
+
+    Views.Projects = Backbone.View.extend({
+        template: 'search/projects',
+        events: {
+            'submit #form-project-add': 'addProject'
+        },
+        initialize: function () {
+            this.collection.on("reset", this.render, this);
+            this.collection.on("add", this.render, this);
+        },
+        cleanup: function () {
+            this.collection.off(null, null, this);
+        },
+        beforeRender: function() {
+            this.collection.each(function(model) {
+                this.insertView("ul", new Views.Project({
+                    model: model
+                }));
+            }, this);
+        },
+        addProject: function () {
+            var self = this;
+            var project = new this.collection.model();
+            project.save(Backbone.Syphon.serialize(this), {
+                success: function (project) {
+                    self.collection.push(project);
+                },
+                error: function (object, res) {
+                    var error = ($.parseJSON(res.responseText)).error;
+                    console.log(error.name.message);
+                    $('#form-project-add [name=name]:input').tooltip({
+                        trigger: 'manual',
+                        title: t(error.name.message)
+                    }).tooltip('show');
+                    $('#form-project-add [name=name]:input').parents('.control-group').addClass('error');
+                    setTimeout(function () {
+                        $('#form-project-add [name=name]:input').parents('.control-group').removeClass('error');
+                        $('#form-project-add [name=name]:input').tooltip('destroy');
+                    }, 2000);
+                }
+            });
+            return false;
+        }
+    });
+
+    Views.Project = Backbone.View.extend({
+        template: "search/project",
+        tagName: 'li',
+        serialize: function () {
+            return {
+                project: this.model
+            };
+        }
+    });
+
+    return Views;
+
+});
