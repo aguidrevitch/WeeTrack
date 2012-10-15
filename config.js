@@ -17,7 +17,7 @@ var config = {
         port: 3006,
         serveMerged: true,
         mongodb: {
-            uri: "mongodb://localhost:27017/weetrack"
+            uri: "mongodb://localhost:27017/weetrack_dev"
         },
         redis: {
             db: 0,

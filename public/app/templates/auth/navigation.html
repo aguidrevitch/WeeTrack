@@ -1,4 +1,4 @@
-<div class="navbar">
+<div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <a class="brand" href="<%= user.id ? '/search' : '/' %>">WeeTrack</a>
         <div class="pull-right user-nav">
@@ -17,5 +17,10 @@
             </ul>
             <% } %>
         </div>
+        <% if (user.id) { %>
+            <div class="pull-right">
+                <button id="button-new-task" class="btn"><%= t('New Task') %></button>
+            </div>
+        <% } %>
     </div>
 </div>

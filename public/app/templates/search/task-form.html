@@ -1,0 +1,39 @@
+<form id="form-task-add" class="form form-horizontal">
+  <legend><%= t('New Task') %><button type="button" class="close">×</button></legend>
+  <div class="control-group">
+    <label class="control-label"><%= t('Subject') %></label>
+    <div class="controls">
+      <input type="text" name="subject">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label"><%= t('Project') %></label>
+    <div class="controls">
+      <select name="project">
+      </select>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label"><%= t('Owner') %></label>
+    <div class="controls">
+      <input type="text" name="owner">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label"><%= t('Readers') %></label>
+    <div class="controls">
+      <input type="text" name="readers">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label"><%= t('Content') %></label>
+    <div class="controls">
+      <textarea name="content"></textarea>
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <button class="btn">Create</button>
+    </div>
+  </div>
+</form>

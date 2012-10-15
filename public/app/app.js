@@ -72,7 +72,10 @@ define([
                     return $.ajax({
                         url: app.root + path
                     }).then(function(contents) {
-                        done(JST[path] = _.template(contents));
+                        // templates depend on i18n loaded
+                        ready.done(function () {
+                            done(JST[path] = _.template(contents));
+                        });
                     });
                 }
             }

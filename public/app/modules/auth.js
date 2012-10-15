@@ -11,7 +11,9 @@ define([
 
         var Auth = app.module();
 
-        Auth.Model = Backbone.Model.extend({
+        Auth.Models = {};
+
+        Auth.Models.User = Backbone.Model.extend({
             idAttribute: "_id",
             url: '/api/auth',
             authorize: function (attrs, options) {
@@ -53,7 +55,30 @@ define([
             }
         });
 
-        var user = new Auth.Model();
+        Auth.Models.Task = Backbone.Model.extend({
+            idAttribute: "_id",
+            url: '/api/task'
+        });
+
+        Auth.Models.Tasks = Backbone.Collection.extend({
+            model: Auth.Models.Task,
+            url: '/api/task'
+        });
+
+        Auth.Models.Project = Backbone.Model.extend({
+            idAttribute: "_id",
+            url: '/api/project'
+        });
+
+        Auth.Models.Projects = Backbone.Collection.extend({
+            model: Auth.Models.Project,
+            url: '/api/project'
+        });
+
+        var user = new Auth.Models.User();
+        var projects = new Auth.Models.Projects();
+        var tasks = new Auth.Models.Tasks();
+
         var Router = router.extend({
             routes: {
                 "logout": "logout"
@@ -90,16 +115,24 @@ define([
         };
 
         user.on('authorized', function () {
-            updateNavigation();
-            app.trigger('user:authorized');
+            projects.fetch().done(function () {
+                tasks.fetch().done(function () {
+                    updateNavigation();
+                    app.trigger('user:authorized');
+                });
+            });
         });
 
         user.on('deauthorized', function () {
+            tasks.reset();
+            projects.reset();
             updateNavigation();
             app.trigger('user:deauthorized');
         });
 
         user.on('error', function () {
+            tasks.reset();
+            projects.reset();
             updateNavigation();
             app.trigger('user:deauthorized');
         });
@@ -117,6 +150,14 @@ define([
                     user.trigger('authorized');
                 }
             });
+        };
+
+        Auth.getProjects = function () {
+            return projects;
+        };
+
+        Auth.getTasks = function () {
+            return tasks;
         };
 
         // Return the module for AMD compliance.
