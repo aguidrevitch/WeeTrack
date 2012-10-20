@@ -189,10 +189,8 @@ module.exports = function(grunt) {
     // runtime builder (use if you have a custom server, PhoneGap, Adobe Air,
     // etc.)
     watch: {
-      stylus: {
-        files: ["grunt.js", "assets/css/**/*.styl"],
-        tasks: "stylus:dev"
-      }
+        files: ["grunt.js", "assets/**/*", "app/**/*"],
+        tasks: "styles"
     },
 
     i18next: {

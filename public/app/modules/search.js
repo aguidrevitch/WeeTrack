@@ -7,9 +7,9 @@ define([
     "modules/search/views",
     "modules/auth"
 
-    ],
+],
 
-    function(app, router, Views, Auth) {
+    function (app, router, Views, Auth) {
 
         var Search = app.module();
 
@@ -19,16 +19,7 @@ define([
             },
             search: function () {
                 app.layout.setViews({
-                    "section": new Views.Layout({
-                        views: {
-                            "#left-sidebar" : new Views.Projects({
-                                collection: Auth.getProjects()
-                            }),
-                            "#right-sidebar" : new Views.Tasks({
-                                collection: Auth.getTasks()
-                            })
-                        }
-                    })
+                    "section": new Views.Layout({})
                 }).render();
             }
         });

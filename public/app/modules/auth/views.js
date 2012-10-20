@@ -15,7 +15,7 @@ define([
             initialize: function () {
                 this.model.on('change', this.render, this);
             },
-            serialize: function () {
+            data: function () {
                 return {
                     user: this.model
                 };
@@ -90,7 +90,7 @@ define([
 
         Views.RegisterSuccess = Backbone.View.extend({
             template: "auth/register-success",
-            serialize: function () {
+            data: function () {
                 return {
                     user: this.model
                 };

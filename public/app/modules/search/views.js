@@ -3,23 +3,34 @@ define([
 
     // Libs
     "backbone",
-    "jquery"
-    ],
+    "jquery",
 
-    function(app, Backbone, $) {
+    "modules/auth"
+],
+
+    function (app, Backbone, $, Auth) {
 
         var Views = {};
 
         Views.Layout = Backbone.View.extend({
-            template: "search/layout"
+            template: "search/layout",
+            initialize: function () {
+                console.log('xxx');
+                this.setViews({
+                    "#left-sidebar": new Views.Projects({
+                        collection: Auth.getProjects()
+                    }),
+                        "#right-sidebar": new Views.Tasks({
+                        collection: Auth.getTasks()
+                    })
+                }).render();
+            }
         });
 
         Views.TaskForm = Backbone.View.extend({
             template: "search/task-form",
             events: {
                 'submit #form-task-add': 'addTask'
-            },
-            beforeRender: function () {
             },
             addTask: function () {
                 var self = this;
@@ -41,17 +52,16 @@ define([
             template: "search/tasks",
             initialize: function () {
                 //this.collection.on("reset", this.render, this);
-                //this.collection.on("add", this.render, this);
+                this.collection.on("add", this.render, this);
                 $(document).on('click', '#button-new-task', $.proxy(this.renderForm, this));
-                this.render();
             },
             cleanup: function () {
                 this.collection.off(null, null, this);
             },
-            beforeRender: function() {
+            beforeRender: function () {
                 console.log('start');
                 if (this.collection.length)
-                    this.collection.each(function(model) {
+                    this.collection.each(function (model) {
                         this.insertView("ul", new Views.Task({
                             model: model
                         }));
@@ -75,7 +85,7 @@ define([
         Views.Task = Backbone.View.extend({
             template: "search/task",
             tagName: 'li',
-            serialize: function () {
+            data: function () {
                 return {
                     task: this.model
                 };
@@ -88,14 +98,14 @@ define([
                 'click #form-project-add .btn': 'addProject'
             },
             initialize: function () {
-                this.collection.on("refresh", this.render, this);
+                //this.collection.on("refresh", this.render, this);
                 this.collection.on("add", this.render, this);
             },
             cleanup: function () {
                 this.collection.off(null, null, this);
             },
-            beforeRender: function() {
-                this.collection.each(function(model) {
+            beforeRender: function () {
+                this.collection.each(function (model) {
                     this.insertView("ul", new Views.Project({
                         model: model
                     }));
@@ -129,7 +139,7 @@ define([
         Views.Project = Backbone.View.extend({
             template: "search/project",
             tagName: 'li',
-            serialize: function () {
+            data: function () {
                 return {
                     project: this.model
                 };
