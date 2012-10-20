@@ -115,10 +115,10 @@ define([
         };
 
         user.on('authorized', function () {
+            app.trigger('user:authorized');
             projects.fetch().done(function () {
                 tasks.fetch().done(function () {
                     updateNavigation();
-                    app.trigger('user:authorized');
                 });
             });
         });

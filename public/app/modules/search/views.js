@@ -12,21 +12,6 @@ define([
 
         var Views = {};
 
-        Views.Layout = Backbone.View.extend({
-            template: "search/layout",
-            initialize: function () {
-                console.log('xxx');
-                this.setViews({
-                    "#left-sidebar": new Views.Projects({
-                        collection: Auth.getProjects()
-                    }),
-                        "#right-sidebar": new Views.Tasks({
-                        collection: Auth.getTasks()
-                    })
-                }).render();
-            }
-        });
-
         Views.TaskForm = Backbone.View.extend({
             template: "search/task-form",
             events: {
@@ -51,12 +36,8 @@ define([
         Views.Tasks = Backbone.View.extend({
             template: "search/tasks",
             initialize: function () {
-                //this.collection.on("reset", this.render, this);
+                this.collection.on("reset", this.render, this);
                 this.collection.on("add", this.render, this);
-                $(document).on('click', '#button-new-task', $.proxy(this.renderForm, this));
-            },
-            cleanup: function () {
-                this.collection.off(null, null, this);
             },
             beforeRender: function () {
                 console.log('start');
@@ -74,6 +55,10 @@ define([
                         }
                     }));
                 console.log('end');
+            },
+            afterRender: function () {
+                $('#button-new-task').on('click', $.proxy(this.renderForm, this));
+
             },
             renderForm: function () {
                 this.setView('.ticket-details', new Views.TaskForm({
@@ -98,11 +83,8 @@ define([
                 'click #form-project-add .btn': 'addProject'
             },
             initialize: function () {
-                //this.collection.on("refresh", this.render, this);
+                this.collection.on("reset", this.render, this);
                 this.collection.on("add", this.render, this);
-            },
-            cleanup: function () {
-                this.collection.off(null, null, this);
             },
             beforeRender: function () {
                 this.collection.each(function (model) {
@@ -143,6 +125,18 @@ define([
                 return {
                     project: this.model
                 };
+            }
+        });
+
+        Views.Layout = Backbone.View.extend({
+            template: "search/layout",
+            views: {
+                "#left-sidebar": new Views.Projects({
+                    collection: Auth.getProjects()
+                }),
+                "#right-sidebar": new Views.Tasks({
+                    collection: Auth.getTasks()
+                })
             }
         });
 

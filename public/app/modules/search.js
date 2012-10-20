@@ -5,11 +5,10 @@ define([
 
     // Views
     "modules/search/views",
-    "modules/auth"
 
 ],
 
-    function (app, router, Views, Auth) {
+    function (app, router, Views) {
 
         var Search = app.module();
 
