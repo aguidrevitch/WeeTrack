@@ -40,7 +40,6 @@ define([
                 this.collection.on("add", this.render, this);
             },
             beforeRender: function () {
-                console.log('start');
                 if (this.collection.length)
                     this.collection.each(function (model) {
                         this.insertView("ul", new Views.Task({
@@ -54,11 +53,9 @@ define([
                             return 'No tasks';
                         }
                     }));
-                console.log('end');
             },
             afterRender: function () {
                 $('#button-new-task').on('click', $.proxy(this.renderForm, this));
-
             },
             renderForm: function () {
                 this.setView('.ticket-details', new Views.TaskForm({
@@ -83,15 +80,22 @@ define([
                 'click #form-project-add .btn': 'addProject'
             },
             initialize: function () {
+                this.collection.on("reset", function () {
+                    console.log('- reset')
+                });
                 this.collection.on("reset", this.render, this);
                 this.collection.on("add", this.render, this);
             },
             beforeRender: function () {
+                console.log('before');
                 this.collection.each(function (model) {
                     this.insertView("ul", new Views.Project({
                         model: model
                     }));
                 }, this);
+            },
+            afterRender: function () {
+                console.log("after");
             },
             addProject: function () {
                 var self = this;
@@ -128,14 +132,47 @@ define([
             }
         });
 
+        var Project = Backbone.Model.extend({
+            idAttribute: "_id",
+            url: '/api/project'
+        });
+
+        var Projects = Backbone.Collection.extend({
+            model: Project,
+            url: '/api/project'
+        });
+
+        var Task = Backbone.Model.extend({
+            idAttribute: "_id",
+            url: '/api/task'
+        });
+
+        var Tasks = Backbone.Collection.extend({
+            model: Task,
+            url: '/api/task'
+        });
+
+        var projects = new Projects();
+        var tasks = new Tasks();
+
+        app.on('user:authorized', function () {
+            tasks.fetch();
+            projects.fetch();
+        });
+
+        app.on('user:deauthorized', function () {
+            tasks.reset();
+            projects.reset();
+        });
+
         Views.Layout = Backbone.View.extend({
             template: "search/layout",
             views: {
                 "#left-sidebar": new Views.Projects({
-                    collection: Auth.getProjects()
+                    collection: projects
                 }),
                 "#right-sidebar": new Views.Tasks({
-                    collection: Auth.getTasks()
+                    collection: tasks
                 })
             }
         });
