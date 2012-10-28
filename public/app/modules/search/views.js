@@ -151,7 +151,7 @@ define([
         });
 
         var Task = Backbone.Model.extend({
-            idAttribute: "_id",
+            idAttribute: "id",
             url: '/api/task'
         });
 

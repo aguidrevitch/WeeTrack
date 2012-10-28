@@ -14,9 +14,11 @@ define([
 
         var Router = router.extend({
             authorized: {
-                "search": "search"
+                "search": "search",
+                "search/:task": "search"
             },
             search: function () {
+                console.log(arguments);
                 app.layout.setViews({
                     "section": new Views.Layout()
                 }).render();

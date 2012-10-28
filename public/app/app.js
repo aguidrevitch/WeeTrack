@@ -9,9 +9,9 @@ define([
     // Plugins.
     "plugins/backbone.layoutmanager",
     "plugins/backbone.syphon"
-    ],
+],
 
-    function($, _, Backbone, i18n) {
+    function ($, _, Backbone, i18n) {
 
         // Provide a global location to place configuration settings and module
         // creation.
@@ -33,7 +33,8 @@ define([
             });
         } else {
             i18n.init({
-                lng: "en-US"
+                lng: "en-US",
+                resGetPath: "/locales/__lng__/__ns__.json"
             }, function (t) {
                 // called after translations are loaded
                 window.t = t;
@@ -48,8 +49,8 @@ define([
         Backbone.LayoutManager.configure({
             // Allow LayoutManager to augment Backbone.View.prototype.
             manage: true,
-            prefix : "app/templates/",
-            fetch: function(path) {
+            prefix: "app/templates/",
+            fetch: function (path) {
                 // Initialize done for use in async-mode
                 var done;
 
@@ -66,12 +67,12 @@ define([
                     // Seek out the template asynchronously.
                     return $.ajax({
                         url: app.root + path
-                    }).then(function(contents) {
-                        // templates depend on i18n loaded
-                        ready.done(function () {
-                            done(JST[path] = _.template(contents));
+                    }).then(function (contents) {
+                            // templates depend on i18n loaded
+                            ready.done(function () {
+                                done(JST[path] = _.template(contents));
+                            });
                         });
-                    });
                 }
             }
         });
@@ -79,7 +80,7 @@ define([
         // Mix Backbone.Events, modules, and layout management into the app object.
         return _.extend(app, {
             // Create a custom object with a nested Views object.
-            module: function(additionalProps) {
+            module: function (additionalProps) {
                 return _.extend({
                     Views: {}
                 }, additionalProps);
@@ -97,7 +98,7 @@ define([
             }),
 
             // Helper for using layouts.
-            useLayout: function(name, options) {
+            useLayout: function (name, options) {
                 // If already using this Layout, then don't re-inject into the DOM.
                 if (this.layout && this.layout.options.template === name) {
                     return this.layout;
