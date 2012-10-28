@@ -39,7 +39,6 @@ define([
                         model: model
                     }));
                 }, this);
-                // console.log(this.$el);
                 $('select', this.$el).html('');
                 this.options.projects.each(function (project) {
                     this.insertView('select', new Backbone.View({
@@ -162,6 +161,7 @@ define([
 
         var projects = new Projects();
         var tasks = new Tasks();
+        var task = new Task();
 
         app.on('user:authorized', function () {
             tasks.fetch();
@@ -183,6 +183,9 @@ define([
                 "#middle-sidebar": new Views.Tasks({
                     collection: tasks,
                     projects: projects
+                }),
+                "#right-sidebar": new Views.Comments({
+                    model: task,
                 })
             }
         });
