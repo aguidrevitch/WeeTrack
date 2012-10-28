@@ -9,12 +9,15 @@
 #projects form, #tasks form {
     display: none;
     margin: 0px;
+
 }
 
 #projects .form-fixed, #tasks .form-fixed {
     padding-bottom: 10px;
     position: fixed;
     bottom: 0;
+
+    background-color: white;
 }
 
 #form-project-add input.span1 {

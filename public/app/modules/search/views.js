@@ -12,42 +12,45 @@ define([
 
         var Views = {};
 
-        Views.TaskForm = Backbone.View.extend({
-            template: "search/task-form",
-            events: {
-                'submit #form-task-add': 'addTask'
-            },
-        });
-
         Views.Tasks = Backbone.View.extend({
             template: "search/tasks",
             id: "tasks",
+            projects: [],
             events: {
                 'click .show-form': 'toggleForm',
                 'click .close': 'toggleForm',
                 'click .submit-form': 'addTask'
             },
             initialize: function () {
-                this.collection.on("reset", this.render, this);
-                this.collection.on("add", this.render, this);
+                this.collection.on("reset", this.niceRender, this);
+                this.collection.on("add", this.niceRender, this);
+                this.options.projects.on("reset", this.niceRender, this);
+                this.options.projects.on("add", this.niceRender, this);
+            },
+            cleanup : function () {
+                this.options.projects.off(null, null, this);
+            },
+            niceRender: function () {
+                this.toggleForm( null, _.bind(this.render, this) );
             },
             beforeRender: function () {
-                if (this.collection.length)
-                    this.collection.each(function (model) {
-                        this.insertView("ul", new Views.Task({
-                            model: model
-                        }));
-                    }, this);
-                else
-                    this.insertView('.span5', new Backbone.View({
-                        render: function () {
-                            console.log(arguments);
-                            return 'No tasks';
+                this.collection.each(function (model) {
+                    this.insertView("ul", new Views.Task({
+                        model: model
+                    }));
+                }, this);
+                // console.log(this.$el);
+                $('select', this.$el).html('');
+                this.options.projects.each(function (project) {
+                    this.insertView('select', new Backbone.View({
+                        append: function (root, child) {
+                            $(root).append('<option value="' + project.id + '">'+ project.escape('name') + '</option>');
                         }
                     }));
+                }, this);
             },
-            toggleForm: function () {
-                $('form', this.$el).toggle('slow');
+            toggleForm: function (e, callback) {
+                $('form', this.$el).toggle('fast', callback);
             },
             addTask: function () {
                 var self = this;
@@ -57,8 +60,14 @@ define([
                         self.collection.push(model);
                     },
                     error: function (model, res) {
-                        var error = ($.parseJSON(res.responseText)).error;
-                        console.log(error);
+                        var err = ($.parseJSON(res.responseText)).error;
+                        $(':input + .error', self.el).html('');
+                        $(':input', self.el).parents('.control-group').removeClass('error');
+                        _.each(err, function (value, field) {
+                            var selector = '[name="' + field + '"]:input';
+                            $(selector, self.el).parents('.control-group').addClass('error');
+                            $(selector + ' + .error', self.el).html(t(value.message));
+                        });
                     }
                 });
                 return false;
@@ -87,7 +96,6 @@ define([
                 this.collection.on("add", this.render, this);
             },
             beforeRender: function () {
-                console.log('before');
                 this.collection.each(function (model) {
                     this.insertView("ul", new Views.Project({
                         model: model
@@ -95,7 +103,7 @@ define([
                 }, this);
             },
             showForm: function () {
-                $('form', this.$el).toggle('slow');
+                $('form', this.$el).toggle('fast');
             },
             addProject: function () {
                 var self = this;
@@ -173,7 +181,8 @@ define([
                     collection: projects
                 }),
                 "#middle-sidebar": new Views.Tasks({
-                    collection: tasks
+                    collection: tasks,
+                    projects: projects
                 })
             }
         });
