@@ -1,0 +1,31 @@
+<div id="task-header">
+<h1><%= task.escape('subject') %></h1>
+</div>
+<div class="form-fixed">
+    <form id="form-comment-add" class="form form-horizontal span5">
+        <legend><%= t('New Comment') %>
+            <button type="button" class="close">×</button>
+        </legend>
+        <div class="control-group">
+            <label class="control-label"><%= t('Subject') %></label>
+            <div class="controls">
+                <input type="text" name="subject">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><%= t('Content') %></label>
+
+            <div class="controls">
+                <textarea name="content"></textarea>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button class="btn submit-form">Create</button>
+            </div>
+        </div>
+    </form>
+    <div>
+        <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Comment') %></a>
+    </div>
+</div>

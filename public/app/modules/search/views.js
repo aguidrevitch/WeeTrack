@@ -27,11 +27,11 @@ define([
                 this.options.projects.on("reset", this.niceRender, this);
                 this.options.projects.on("add", this.niceRender, this);
             },
-            cleanup : function () {
+            cleanup: function () {
                 this.options.projects.off(null, null, this);
             },
             niceRender: function () {
-                this.toggleForm( null, _.bind(this.render, this) );
+                this.toggleForm(null, _.bind(this.render, this));
             },
             beforeRender: function () {
                 this.collection.each(function (model) {
@@ -43,7 +43,7 @@ define([
                 this.options.projects.each(function (project) {
                     this.insertView('select', new Backbone.View({
                         append: function (root, child) {
-                            $(root).append('<option value="' + project.id + '">'+ project.escape('name') + '</option>');
+                            $(root).append('<option value="' + project.id + '">' + project.escape('name') + '</option>');
                         }
                     }));
                 }, this);
@@ -87,7 +87,7 @@ define([
             template: 'search/projects',
             id: "projects",
             events: {
-                'click .show-form': 'showForm',
+                'click .show-form': 'toggleForm',
                 'click .submit-form': 'addProject'
             },
             initialize: function () {
@@ -101,7 +101,7 @@ define([
                     }));
                 }, this);
             },
-            showForm: function () {
+            toggleForm: function () {
                 $('form', this.$el).toggle('fast');
             },
             addProject: function () {
@@ -139,6 +139,33 @@ define([
             }
         });
 
+        Views.TaskDetails = Backbone.View.extend({
+            template: "search/task-details",
+            id: 'task-details',
+            events: {
+                'click .show-form': 'toggleForm',
+                'click .close': 'toggleForm',
+                'click .submit-form': 'addComment'
+            },
+            initialize: function () {
+                this.model.on('change', this.render, this);
+            },
+            afterRender: function () {
+
+            },
+            toggleForm: function () {
+                $('form', this.$el).toggle('fast');
+            },
+            addComment: function () {
+
+            },
+            data: function () {
+                return {
+                    task: this.model
+                };
+            }
+        });
+
         var Project = Backbone.Model.extend({
             idAttribute: "_id",
             url: '/api/project'
@@ -151,7 +178,9 @@ define([
 
         var Task = Backbone.Model.extend({
             idAttribute: "id",
-            url: '/api/task'
+            url: function () {
+                return '/api/task/' + this.id
+            }
         });
 
         var Tasks = Backbone.Collection.extend({
@@ -183,10 +212,22 @@ define([
                 "#middle-sidebar": new Views.Tasks({
                     collection: tasks,
                     projects: projects
-                }),
-                "#right-sidebar": new Views.Comments({
-                    model: task,
                 })
+            },
+            initialize: function () {
+                if (this.options.taskId) {
+                    task.id = this.options.taskId;
+                    task.fetch();
+                    this.setViews({
+                        "#right-sidebar": new Views.TaskDetails({
+                            model: task
+                        })
+                    });
+                } else {
+                    this.setViews({
+                        "#right-sidebar": new Backbone.View({})
+                    });
+                }
             }
         });
 

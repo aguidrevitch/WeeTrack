@@ -17,10 +17,11 @@ define([
                 "search": "search",
                 "search/:task": "search"
             },
-            search: function () {
-                console.log(arguments);
+            search: function (id) {
                 app.layout.setViews({
-                    "section": new Views.Layout()
+                    "section": new Views.Layout({
+                        taskId: id
+                    })
                 }).render();
             }
         });

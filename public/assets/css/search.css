@@ -6,13 +6,13 @@
     float: right;
 }
 
-#projects form, #tasks form {
+#projects form, #tasks form, #task-details form {
     display: none;
     margin: 0px;
 
 }
 
-#projects .form-fixed, #tasks .form-fixed {
+#projects .form-fixed, #tasks .form-fixed, #task-details .form-fixed {
     padding-bottom: 10px;
     position: fixed;
     bottom: 0;
