@@ -1,0 +1,54 @@
+#main: {
+    padding-bottom: 40px;
+}
+
+#projects .icon-chevron-right {
+    float: right;
+}
+
+#projects form, #tasks form {
+    display: none;
+    margin: 0px;
+}
+
+#projects .form-fixed, #tasks .form-fixed {
+    padding-bottom: 10px;
+    position: fixed;
+    bottom: 0;
+}
+
+#form-project-add input.span1 {
+    width: 106px;
+}
+
+#form-task-add textarea {
+    height: 80px;
+}
+
+/*
+#form-task-add .control-label {
+    width: 60px;
+}
+
+#form-task-add .controls {
+    margin-left: 80px;
+}
+
+@media (max-width: 767px) {
+    #form-project-add input.span1 {
+        display: inline-block;
+        width: inherit;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+    #form-project-add input.span1 {
+        width: 40px;
+    }
+}
+@media (min-width: 1200px) {
+    #form-project-add input.span1 {
+        width: 106px;
+    }
+}
+*/

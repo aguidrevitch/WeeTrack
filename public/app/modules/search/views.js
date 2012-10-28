@@ -17,24 +17,16 @@ define([
             events: {
                 'submit #form-task-add': 'addTask'
             },
-            addTask: function () {
-                var self = this;
-                var task = new this.collection.model();
-                task.save(Backbone.Syphon.serialize(this), {
-                    success: function (model) {
-                        self.collection.push(model);
-                    },
-                    error: function (model, res) {
-                        var error = ($.parseJSON(res.responseText)).error;
-                        console.log(error);
-                    }
-                });
-                return false;
-            }
         });
 
         Views.Tasks = Backbone.View.extend({
             template: "search/tasks",
+            id: "tasks",
+            events: {
+                'click .show-form': 'toggleForm',
+                'click .close': 'toggleForm',
+                'click .submit-form': 'addTask'
+            },
             initialize: function () {
                 this.collection.on("reset", this.render, this);
                 this.collection.on("add", this.render, this);
@@ -54,13 +46,22 @@ define([
                         }
                     }));
             },
-            afterRender: function () {
-                $('#button-new-task').on('click', $.proxy(this.renderForm, this));
+            toggleForm: function () {
+                $('form', this.$el).toggle('slow');
             },
-            renderForm: function () {
-                this.setView('.ticket-details', new Views.TaskForm({
-                    collection: this.collection
-                })).render();
+            addTask: function () {
+                var self = this;
+                var task = new this.collection.model();
+                task.save(Backbone.Syphon.serialize(this), {
+                    success: function (model) {
+                        self.collection.push(model);
+                    },
+                    error: function (model, res) {
+                        var error = ($.parseJSON(res.responseText)).error;
+                        console.log(error);
+                    }
+                });
+                return false;
             }
         });
 
@@ -76,13 +77,12 @@ define([
 
         Views.Projects = Backbone.View.extend({
             template: 'search/projects',
+            id: "projects",
             events: {
-                'click #form-project-add .btn': 'addProject'
+                'click .show-form': 'showForm',
+                'click .submit-form': 'addProject'
             },
             initialize: function () {
-                this.collection.on("reset", function () {
-                    console.log('- reset')
-                });
                 this.collection.on("reset", this.render, this);
                 this.collection.on("add", this.render, this);
             },
@@ -94,8 +94,8 @@ define([
                     }));
                 }, this);
             },
-            afterRender: function () {
-                console.log("after");
+            showForm: function () {
+                $('form', this.$el).toggle('slow');
             },
             addProject: function () {
                 var self = this;
@@ -167,11 +167,12 @@ define([
 
         Views.Layout = Backbone.View.extend({
             template: "search/layout",
+            className: 'row',
             views: {
                 "#left-sidebar": new Views.Projects({
                     collection: projects
                 }),
-                "#right-sidebar": new Views.Tasks({
+                "#middle-sidebar": new Views.Tasks({
                     collection: tasks
                 })
             }

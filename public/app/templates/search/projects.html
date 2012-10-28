@@ -1,12 +1,16 @@
 <ul class="nav nav-tabs nav-stacked projects"></ul>
-<div class="projects-options">
-  <form id="form-project-add" class="form-inline">
-    <div class="control-group">
-      <label class="control-label"></label>
-      <div class="controls">
-        <input type="text" class="span1" name="name">
-        <a class="btn"><i class="icon-plus"></i></a>
-      </div>
+<div class="form-fixed">
+    <form id="form-project-add" class="form-inline">
+        <div class="control-group">
+            <label class="control-label"></label>
+
+            <div class="controls">
+                <input type="text" class="span1" name="name">
+                <a class="btn submit-form"><i class="icon-plus"></i></a>
+            </div>
+        </div>
+    </form>
+    <div>
+        <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Project') %></a>
     </div>
-  </form>
 </div>

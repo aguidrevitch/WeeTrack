@@ -3,17 +3,28 @@ define([
 
     // Libs
     "backbone",
-    "jquery"
-    ],
+    "jquery",
+    "lodash"
+],
 
-    function(app, Backbone, $) {
+    function (app, Backbone, $, _) {
 
         var Views = {};
 
-        Views.Navigation = Backbone.View.extend({
-            template: "auth/navigation",
+        Views.TopNavigation = Backbone.View.extend({
+            template: "auth/navigation-top",
+            chunks: {},
             initialize: function () {
                 this.model.on('change', this.render, this);
+                app.on('navigation-top:add', function (id, html) {
+                    this.chunks[id] = html;
+                    this.render();
+                }, this);
+            },
+            afterRender: function () {
+                _.each(this.chunks, function (chunk, id) {
+                    $('#navigation-top-extend').append(html);
+                })
             },
             data: function () {
                 return {
@@ -25,7 +36,7 @@ define([
         Views.LoginForm = Backbone.View.extend({
             template: "auth/login-form",
             events: {
-                "submit form" : "login"
+                "submit form": "login"
             },
             initialize: function () {
                 this.model.on('change', this.render, this);
@@ -52,7 +63,7 @@ define([
             template: "auth/register-form",
 
             events: {
-                "submit form" : "register"
+                "submit form": "register"
             },
 
             register: function (e) {
@@ -68,12 +79,12 @@ define([
                             return;
                         }
 
-                        $( ':input + .error', self.el).html('');
-                        $( ':input', self.el).parents('.control-group').removeClass('error');
+                        $(':input + .error', self.el).html('');
+                        $(':input', self.el).parents('.control-group').removeClass('error');
                         _.each(err, function (value, field) {
                             var selector = '[name="' + field + '"]:input';
-                            $( selector, self.el).parents('.control-group').addClass('error');
-                            $( selector + ' + .error', self.el).html(t(value.message));
+                            $(selector, self.el).parents('.control-group').addClass('error');
+                            $(selector + ' + .error', self.el).html(t(value.message));
                         });
                     },
                     success: function (model) {

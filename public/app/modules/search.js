@@ -18,7 +18,7 @@ define([
             },
             search: function () {
                 app.layout.setViews({
-                    "section": new Views.Layout({})
+                    "section": new Views.Layout()
                 }).render();
             }
         });

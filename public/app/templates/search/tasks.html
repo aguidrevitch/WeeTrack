@@ -1,7 +1,52 @@
-<div class="row">
-  <div class="span4">
-    <ul class="nav nav-tabs nav-stacked"></ul>
-  </div>
-  <div class="span5 ticket-details">
-  </div>
+<ul class="nav nav-tabs nav-stacked"></ul>
+<div class="form-fixed">
+    <form id="form-task-add" class="form form-horizontal span5">
+        <legend><%= t('New Task') %>
+            <button type="button" class="close">×</button>
+        </legend>
+        <div class="control-group">
+            <label class="control-label"><%= t('Subject') %></label>
+
+            <div class="controls">
+                <input type="text" name="subject">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><%= t('Project') %></label>
+
+            <div class="controls">
+                <select name="project">
+                </select>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><%= t('Owner') %></label>
+
+            <div class="controls">
+                <input type="text" name="owner">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><%= t('Readers') %></label>
+
+            <div class="controls">
+                <input type="text" name="readers">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"><%= t('Content') %></label>
+
+            <div class="controls">
+                <textarea name="content"></textarea>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button class="btn submit-form">Create</button>
+            </div>
+        </div>
+    </form>
+    <div>
+        <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Task') %></a>
+    </div>
 </div>

@@ -5,9 +5,9 @@ define([
 
     // Views
     "modules/auth/views"
-    ],
+],
 
-    function(app, router, Views) {
+    function (app, router, Views) {
 
         var Auth = app.module();
 
@@ -86,26 +86,15 @@ define([
 
         Auth.Router = new Router();
 
-        var updateNavigation = function () {
-            app.layout.setView("nav", new Views.Navigation({
-                model: user
-            })).render();
-        };
-
         user.on('authorized', function () {
-            updateNavigation();
-            app.trigger('user:authorized');
+            app.trigger('user:authorized', user);
         });
 
         user.on('deauthorized', function () {
-            updateNavigation();
-            app.trigger('user:deauthorized');
+            app.trigger('user:deauthorized', user);
         });
 
         user.on('error', function () {
-            //tasks.reset();
-            //projects.reset();
-            updateNavigation();
             app.trigger('user:deauthorized');
         });
 
@@ -116,9 +105,15 @@ define([
         Auth.init = function () {
             user.fetch({
                 error: function () {
+                    app.layout.setViews({
+                        "nav.top": new Views.TopNavigation({ model: user })
+                    }).render();
                     user.trigger('deauthorized');
                 },
                 success: function () {
+                    app.layout.setViews({
+                        "nav.top": new Views.TopNavigation({ model: user })
+                    }).render();
                     user.trigger('authorized');
                 }
             });
