@@ -15,23 +15,27 @@ define([
         Views.Tasks = Backbone.View.extend({
             template: "search/tasks",
             id: "tasks",
-            projects: [],
             events: {
                 'click .show-form': 'toggleForm',
                 'click .close': 'toggleForm',
                 'click .submit-form': 'addTask'
             },
+            data: function () {
+                return {
+                    projects: this.options.projects
+                }
+            },
             initialize: function () {
                 this.collection.on("reset", this.niceRender, this);
                 this.collection.on("add", this.niceRender, this);
-                this.options.projects.on("reset", this.niceRender, this);
-                this.options.projects.on("add", this.niceRender, this);
+                this.options.projects.on("reset", this.render, this);
+                this.options.projects.on("add", this.render, this);
             },
             cleanup: function () {
                 this.options.projects.off(null, null, this);
             },
             niceRender: function () {
-                this.toggleForm(null, _.bind(this.render, this));
+                $('form', this.$el).hide('fast', _.bind(this.render, this));
             },
             beforeRender: function () {
                 this.collection.each(function (model) {
@@ -158,9 +162,6 @@ define([
             initialize: function () {
                 this.model.on('change', this.render, this);
             },
-            afterRender: function () {
-                console.log(111);
-            },
             toggleForm: function () {
                 $('form', this.$el).toggle('fast');
             },
@@ -225,11 +226,12 @@ define([
                     model: task
                 })
             },
-            initialize: function () {
-                var self = this;
-                if (this.options.taskId) {
-                    task.id = this.options.taskId;
+            setTaskId: function (id) {
+                if (id) {
+                    task.id = id;
                     task.fetch();
+                } else {
+                    task.clear();
                 }
             }
         });

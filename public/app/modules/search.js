@@ -12,16 +12,17 @@ define([
 
         var Search = app.module();
 
+        var Layout = new Views.Layout();
+
         var Router = router.extend({
             authorized: {
                 "search": "search",
                 "search/:task": "search"
             },
             search: function (id) {
+                Layout.setTaskId(id);
                 app.layout.setViews({
-                    "section": new Views.Layout({
-                        taskId: id
-                    })
+                    "section": Layout
                 }).render();
             }
         });

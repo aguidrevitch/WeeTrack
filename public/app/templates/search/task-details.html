@@ -1,6 +1,8 @@
 <div id="task-header">
-<h2><%= task.escape('subject') %></h2>
+    <!-- <button type="button" class="close">×</button> -->
+    <h2><%= task.escape('subject') %></h2>
 </div>
+<% if (task.id) { %>
 <div class="form-fixed">
     <form id="form-comment-add" class="form form-horizontal span5">
         <legend><%= t('New Comment') %>
@@ -8,6 +10,7 @@
         </legend>
         <div class="control-group">
             <label class="control-label"><%= t('Subject') %></label>
+
             <div class="controls">
                 <input type="text" name="subject">
             </div>
@@ -29,3 +32,4 @@
         <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Comment') %></a>
     </div>
 </div>
+<% } %>
