@@ -65,7 +65,14 @@ define([
                         _.each(err, function (value, field) {
                             var selector = '[name="' + field + '"]:input';
                             $(selector, self.el).parents('.control-group').addClass('error');
-                            $(selector + ' + .error', self.el).html(t(value.message));
+                            $(selector, self.el).tooltip({
+                                trigger: 'focus',
+                                title: t(value.message)
+                            }).tooltip();
+                            $(selector, self.el).on('keyup', function () {
+                                $(selector, self.el).parents('.control-group').removeClass('error');
+                                $(selector, self.el).tooltip('destroy');
+                            });
                         });
                     }
                 });
@@ -113,16 +120,17 @@ define([
                     },
                     error: function (object, res) {
                         var error = ($.parseJSON(res.responseText)).error;
-                        console.log(error.name.message);
                         $('#form-project-add [name=name]:input').tooltip({
-                            trigger: 'manual',
+                            trigger: 'focus',
                             title: t(error.name.message)
                         }).tooltip('show');
                         $('#form-project-add [name=name]:input').parents('.control-group').addClass('error');
-                        setTimeout(function () {
+
+                        $('#form-project-add [name=name]:input').on('keyup', function () {
                             $('#form-project-add [name=name]:input').parents('.control-group').removeClass('error');
                             $('#form-project-add [name=name]:input').tooltip('destroy');
-                        }, 2000);
+                        });
+
                     }
                 });
                 return false;
@@ -151,7 +159,7 @@ define([
                 this.model.on('change', this.render, this);
             },
             afterRender: function () {
-
+                console.log(111);
             },
             toggleForm: function () {
                 $('form', this.$el).toggle('fast');
@@ -179,7 +187,7 @@ define([
         var Task = Backbone.Model.extend({
             idAttribute: "id",
             url: function () {
-                return '/api/task/' + this.id
+                return this.id ? '/api/task/' + this.id : '/api/task'
             }
         });
 
@@ -212,21 +220,16 @@ define([
                 "#middle-sidebar": new Views.Tasks({
                     collection: tasks,
                     projects: projects
+                }),
+                "#right-sidebar": new Views.TaskDetails({
+                    model: task
                 })
             },
             initialize: function () {
+                var self = this;
                 if (this.options.taskId) {
                     task.id = this.options.taskId;
                     task.fetch();
-                    this.setViews({
-                        "#right-sidebar": new Views.TaskDetails({
-                            model: task
-                        })
-                    });
-                } else {
-                    this.setViews({
-                        "#right-sidebar": new Backbone.View({})
-                    });
                 }
             }
         });
