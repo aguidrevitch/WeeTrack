@@ -1,5 +1,7 @@
-#main: {
-    padding-bottom: 40px;
+#middle-sidebar {
+    overflow: auto;
+    height: 80%;
+    padding-bottom: 60px;
 }
 
 #projects .icon-chevron-right {

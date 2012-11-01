@@ -12,12 +12,51 @@ define([
 
         var Views = {};
 
+        var Project = Backbone.Model.extend({
+            idAttribute: "_id",
+            url: '/api/project'
+        });
+
+        var Projects = Backbone.Collection.extend({
+            model: Project,
+            url: '/api/project'
+        });
+
+        var Transaction = Backbone.Model.extend({
+        });
+
+        var Transactions = Backbone.Collection.extend({
+            model: Transaction
+        });
+
+        var Task = Backbone.Model.extend({
+            idAttribute: "id",
+            url: function () {
+                return this.id ? '/api/task/' + this.id : '/api/task'
+            },
+            parse: function (response) {
+                this.transactions = new Transactions();
+                this.transactions.reset(response.transactions);
+                delete response.transactions;
+                return response;
+            }
+        });
+
+        var Tasks = Backbone.Collection.extend({
+            model: Task,
+            url: '/api/task'
+        });
+
+        var projects = new Projects();
+        var tasks = new Tasks();
+        var task = new Task();
+
         Views.Tasks = Backbone.View.extend({
             template: "search/tasks",
             id: "tasks",
             events: {
                 'click .show-form': 'toggleForm',
-                'click .close': 'toggleForm',
+                'click form .close': 'toggleForm',
                 'click .submit-form': 'addTask'
             },
             data: function () {
@@ -156,14 +195,26 @@ define([
             id: 'task-details',
             events: {
                 'click .show-form': 'toggleForm',
-                'click .close': 'toggleForm',
+                'click #task-header .close': 'close',
+                'click form .close': 'toggleForm',
                 'click .submit-form': 'addComment'
             },
             initialize: function () {
                 this.model.on('change', this.render, this);
             },
+            beforeRender: function () {
+                //console.log(this.transact)
+                this.model.transactions.each(function (model) {
+                    this.insertView("ul", new Views.Transaction({
+                        model: model
+                    }));
+                }, this);
+            },
             toggleForm: function () {
                 $('form', this.$el).toggle('fast');
+            },
+            close: function () {
+                app.router.navigate('/search', true);
             },
             addComment: function () {
 
@@ -175,31 +226,15 @@ define([
             }
         });
 
-        var Project = Backbone.Model.extend({
-            idAttribute: "_id",
-            url: '/api/project'
-        });
-
-        var Projects = Backbone.Collection.extend({
-            model: Project,
-            url: '/api/project'
-        });
-
-        var Task = Backbone.Model.extend({
-            idAttribute: "id",
-            url: function () {
-                return this.id ? '/api/task/' + this.id : '/api/task'
+        Views.Transaction = Backbone.View.extend({
+            template: "search/transaction",
+            tagName: 'li',
+            data: function () {
+                return {
+                    transaction: this.model
+                };
             }
         });
-
-        var Tasks = Backbone.Collection.extend({
-            model: Task,
-            url: '/api/task'
-        });
-
-        var projects = new Projects();
-        var tasks = new Tasks();
-        var task = new Task();
 
         app.on('user:authorized', function () {
             tasks.fetch();
