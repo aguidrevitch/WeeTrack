@@ -4,7 +4,7 @@ define([
     "router",
 
     // Views
-    "modules/search/views",
+    "modules/search/views"
 
 ],
 

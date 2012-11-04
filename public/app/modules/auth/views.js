@@ -24,7 +24,7 @@ define([
             afterRender: function () {
                 _.each(this.chunks, function (chunk, id) {
                     $('#navigation-top-extend').append(html);
-                })
+                });
             },
             data: function () {
                 return {

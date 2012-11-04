@@ -23,19 +23,27 @@ define([
         });
 
         var Transaction = Backbone.Model.extend({
+            url: '/api/transaction'
         });
 
         var Transactions = Backbone.Collection.extend({
+            url: '/api/transaction',
             model: Transaction
         });
 
         var Task = Backbone.Model.extend({
             idAttribute: "id",
             url: function () {
-                return this.id ? '/api/task/' + this.id : '/api/task'
+                return this.id ? '/api/task/' + this.id : '/api/task';
+            },
+            initialize: function (attributes) {
+                this.transactions = new Transactions();
+                if (attributes && attributes.transactions)
+                    this.transactions.reset(attributes.transactions);
             },
             parse: function (response) {
-                this.transactions = new Transactions();
+                if (!this.transactions)
+                    this.transactions = new Transactions();
                 this.transactions.reset(response.transactions);
                 delete response.transactions;
                 return response;
@@ -62,7 +70,7 @@ define([
             data: function () {
                 return {
                     projects: this.options.projects
-                }
+                };
             },
             initialize: function () {
                 this.collection.on("reset", this.niceRender, this);
@@ -201,14 +209,21 @@ define([
             },
             initialize: function () {
                 this.model.on('change', this.render, this);
+                this.model.transactions.on('reset', this.render, this);
+                this.model.transactions.on('add', this.render, this);
             },
             beforeRender: function () {
-                //console.log(this.transact)
                 this.model.transactions.each(function (model) {
                     this.insertView("ul", new Views.Transaction({
                         model: model
                     }));
                 }, this);
+            },
+            afterRender: function () {
+                $('#form-transaction-add [name=content]:input').on('keyup', function () {
+                    $('#form-transaction-add [name=content]:input').parents('.control-group').removeClass('error');
+                    $('#form-transaction-add [name=content]:input').tooltip('destroy');
+                });
             },
             toggleForm: function () {
                 $('form', this.$el).toggle('fast');
@@ -217,7 +232,28 @@ define([
                 app.router.navigate('/search', true);
             },
             addComment: function () {
+                var self = this;
+                var transaction = new Transaction();
+                transaction.save(Backbone.Syphon.serialize(this), {
+                    success: function (transaction) {
+                        self.model.transactions.push(transaction);
+                    },
+                    error: function (object, res) {
+                        var error = ($.parseJSON(res.responseText)).error;
+                        if (error.content) {
+                            $('#form-transaction-add [name=content]:input').tooltip({
+                                trigger: 'focus',
+                                title: t(error.content.message)
+                            }).tooltip('show');
+                            $('#form-transaction-add [name=content]:input').parents('.control-group').addClass('error');
+                        }
 
+                        if (error._modal) {
+                            app.showModal(error._modal.message);
+                        }
+                    }
+                });
+                return false;
             },
             data: function () {
                 return {
@@ -264,7 +300,10 @@ define([
             setTaskId: function (id) {
                 if (id) {
                     task.id = id;
-                    task.fetch();
+                    task.fetch().error(function (res) {
+                        var error = ($.parseJSON(res.responseText)).error;
+                        app.showModal(error._modal.message);
+                    });
                 } else {
                     task.clear();
                 }

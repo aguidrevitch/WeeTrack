@@ -1,48 +1,48 @@
 <form class="offset2 span8 form-horizontal">
     <legend>Register</legend>
     <div class="control-group">
-        <label class="control-label" for="name">Name</label>
+        <label class="control-label" for="name"><%= t('Name') %> * </label>
         <div class="controls">
-            <input type="text" name="name" placeholder="First and Last Name">
+            <input type="text" name="name" placeholder="<%= t('First and Last Name') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="email">Email</label>
+        <label class="control-label" for="email">Email * </label>
         <div class="controls">
-            <input type="text" name="email" placeholder="Email">
+            <input type="text" name="email" placeholder="<%=t ('Email') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="password">Password</label>
+        <label class="control-label" for="password"><%= t('Password') %> * </label>
         <div class="controls">
-            <input type="password" name="password" placeholder="Password">
+            <input type="password" name="password" placeholder="<%= t('Password') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="password">Verify password</label>
+        <label class="control-label" for="password"><%= t('Verify password') %> * </label>
         <div class="controls">
-            <input type="password" name="verifyPassword" placeholder="Verify Password">
+            <input type="password" name="verifyPassword" placeholder="<%= t('Verify password') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="workspace_name">Workspace</label>
+        <label class="control-label" for="workspace_name"><%= t('Workspace') %> * </label>
         <div class="controls">
-            <input type="text" name="workspace_name" placeholder="Workspace">
+            <input type="text" name="workspace_name" placeholder="<%= t('Workspace') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="workspace_subdomain">Subdomain</label>
+        <label class="control-label" for="workspace_subdomain"><%= t('Subdomain') %> * </label>
         <div class="controls">
-            <input type="text" name="workspace_subdomain" placeholder="Workspace Subdomain">
+            <input type="text" name="workspace_subdomain" placeholder="<%= t('Workspace Subdomain') %>"> .weetrack.com
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Sign up</button>
+        <button type="submit" class="btn btn-primary"><%= t('Sign up') %></button>
     </div>
 </form>

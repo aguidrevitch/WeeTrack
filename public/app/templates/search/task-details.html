@@ -1,23 +1,16 @@
+<% if (task.id) { %>
 <div id="task-header">
     <button type="button" class="close">&times;</button>
     <h2><%= task.escape('subject') %></h2>
     <ul id="task-comments"></ul>
 </div>
-<% if (task.id) { %>
 <div class="form-fixed">
-    <form id="form-comment-add" class="form form-horizontal span5">
+    <form id="form-transaction-add" class="form form-horizontal span5">
         <legend><%= t('New Comment') %>
             <button type="button" class="close">&times;</button>
         </legend>
         <div class="control-group">
-            <label class="control-label"><%= t('Subject') %></label>
-
-            <div class="controls">
-                <input type="text" name="subject">
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label"><%= t('Content') %></label>
+            <label class="control-label"><%= t('Content') %> * </label>
 
             <div class="controls">
                 <textarea name="content"></textarea>
@@ -25,9 +18,10 @@
         </div>
         <div class="control-group">
             <div class="controls">
-                <button class="btn submit-form">Create</button>
+                <button class="btn submit-form"><%= t('Create') %></button>
             </div>
         </div>
+        <input type="hidden" name="task" value="<%= task.escape("id") %>">
     </form>
     <div>
         <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Comment') %></a>

@@ -1,2 +1,2 @@
-<div>by <%= transaction.get('owner').name %></div>
+<div><%= moment(new Date(transaction.get('created'))).fromNow() %> <%= t('by') %> <%= transaction.get('owner').name %></div>
 <div><%= transaction.escape('content') %></div>

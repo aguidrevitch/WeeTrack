@@ -1,7 +1,22 @@
-#middle-sidebar {
+#content > .row {
+    position: absolute;
+    top: 60px;
+    bottom: 0px;
+    overflow: hidden;
+    /* min-height: 460px; */
+}
+
+#left-sidebar, #middle-sidebar, #right-sidebar {
+    position: relative;
+    height: 100%;
+}
+
+#projects, #tasks {
+    position: absolute;
+    bottom: 48px;
+    top: 0px;
+    width: 100%;
     overflow: auto;
-    height: 80%;
-    padding-bottom: 60px;
 }
 
 #projects .icon-chevron-right {

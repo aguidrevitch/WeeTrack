@@ -15,7 +15,8 @@ require.config({
         lodash: "../assets/js/libs/lodash",
         backbone: "../assets/js/libs/backbone",
         bootstrap: "../assets/js/libs/bootstrap",
-        i18next: "../assets/js/libs/i18next"
+        i18next: "../assets/js/libs/i18next",
+        moment: "../assets/js/libs/moment"
     },
 
     shim: {
@@ -28,7 +29,10 @@ require.config({
 
         // Backbone.LayoutManager depends on Backbone.
         "plugins/backbone.layoutmanager": ["backbone"],
-        "plugins/backbone.syphon": ["backbone"]
+        "plugins/backbone.syphon": ["backbone"],
+
+        // russian locale for moment.js
+        "../locales/ru/ru": ["moment"]
     }
 
 });

@@ -4,14 +4,18 @@ define([
     "lodash",
     "backbone",
     "i18next",
+    "moment",
     "bootstrap",
 
     // Plugins.
     "plugins/backbone.layoutmanager",
-    "plugins/backbone.syphon"
+    "plugins/backbone.syphon",
+
+    // Locales
+    "../locales/ru/ru"
 ],
 
-    function ($, _, Backbone, i18n) {
+    function ($, _, Backbone, i18n, moment) {
 
         // Provide a global location to place configuration settings and module
         // creation.
@@ -24,20 +28,24 @@ define([
 
         if (window.I18N) {
             i18n.init({
-                lng: "en-US",
+                load: 'current',
+                fallbackLng: 'en',
                 resStore: window.I18N
             }, function (t) {
                 // will be called instantly, not deferred
                 window.t = t;
+                moment.lang(i18n.lng());
                 ready.resolve();
             });
         } else {
             i18n.init({
-                lng: "en-US",
+                load: 'current',
+                fallbackLng: 'en',
                 resGetPath: "/locales/__lng__/__ns__.json"
             }, function (t) {
                 // called after translations are loaded
                 window.t = t;
+                moment.lang(i18n.lng());
                 ready.resolve();
             });
         }
