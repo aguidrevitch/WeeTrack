@@ -1,4 +1,9 @@
-<a href="/search/<%= task.id %>">
+<td>
     #<%= task.id %>
+</td>
+<td>
     <%= task.escape("subject") %>
-</a>
+</td>
+<td>
+    <span class="label"><%= task.get('project').name %></span>
+</td>

@@ -12,6 +12,16 @@ define([
 
         var Views = {};
 
+        //(function () {
+        var selectedTask;
+        $(Views).on('task:selected', function (e, el) {
+            if ($(selectedTask) != $(el))
+                $(selectedTask).removeClass('success');
+            $(el).addClass('success');
+            selectedTask = el;
+        });
+        //})();
+
         var Project = Backbone.Model.extend({
             idAttribute: "_id",
             url: '/api/project'
@@ -86,7 +96,7 @@ define([
             },
             beforeRender: function () {
                 this.collection.each(function (model) {
-                    this.insertView("ul", new Views.Task({
+                    this.insertView("table", new Views.Task({
                         model: model
                     }));
                 }, this);
@@ -98,6 +108,13 @@ define([
                         }
                     }));
                 }, this);
+            },
+            afterRender: function () {
+                if (selectedTask)
+                    setTimeout(function () {
+                        $('#tasks').scrollTop(0);
+                        $('#tasks').scrollTop($(selectedTask).offset().top - 60);
+                    }, 0);
             },
             toggleForm: function (e, callback) {
                 $('form', this.$el).toggle('fast', callback);
@@ -133,7 +150,17 @@ define([
 
         Views.Task = Backbone.View.extend({
             template: "search/task",
-            tagName: 'li',
+            tagName: 'tr',
+            beforeRender: function () {
+                this.$el.data('id', this.model.id);
+                this.$el.on('click', function () {
+                    app.router.navigate('search/' + $(this).data('id'), true);
+                    $(Views).trigger('task:selected', $(this));
+                });
+                if (this.model.id == task.id) {
+                    $(Views).trigger('task:selected', this.$el);
+                }
+            },
             data: function () {
                 return {
                     task: this.model
@@ -306,6 +333,7 @@ define([
                     });
                 } else {
                     task.clear();
+                    $(Views).trigger('task:selected');
                 }
             }
         });

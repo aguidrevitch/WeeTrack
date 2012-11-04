@@ -1,5 +1,5 @@
 <% if (projects.length) { %>
-<ul class="nav nav-tabs nav-stacked"></ul>
+<table class="table table-striped table-hover table-condenced"></table>
 <div class="form-fixed">
     <form id="form-task-add" class="form form-horizontal span5">
         <legend><%= t('New Task') %>
@@ -43,7 +43,7 @@
         </div>
         <div class="control-group">
             <div class="controls">
-                <button class="btn submit-form"><%= t('Create') %></button>
+                <button class="btn btn-primary submit-form"><%= t('Create') %></button>
             </div>
         </div>
     </form>
