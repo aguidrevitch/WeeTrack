@@ -21,9 +21,12 @@ define([
             },
             search: function (id) {
                 Layout.setTaskId(id);
-                app.layout.setViews({
-                    "section": Layout
-                }).render();
+                if (!this._rendered) {
+                    app.layout.setViews({
+                        "section": Layout
+                    }).render();
+                    this._rendered = true;
+                }
             }
         });
 
