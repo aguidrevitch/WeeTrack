@@ -4,23 +4,14 @@ define([
     // Libs
     "backbone",
     "jquery",
+    "lodash",
 
     "modules/auth"
 ],
 
-    function (app, Backbone, $, Auth) {
+    function (app, Backbone, $, _, Auth) {
 
         var Views = {};
-
-        //(function () {
-        var selectedTask;
-        $(Views).on('task:selected', function (e, el) {
-            if ($(selectedTask) != $(el))
-                $(selectedTask).removeClass('success');
-            $(el).addClass('success');
-            selectedTask = el;
-        });
-        //})();
 
         var Project = Backbone.Model.extend({
             idAttribute: "_id",
@@ -109,12 +100,41 @@ define([
                     }));
                 }, this);
             },
-            afterRender: function () {
-                if (selectedTask)
-                    setTimeout(function () {
-                        $('#tasks').scrollTop(0);
-                        $('#tasks').scrollTop($(selectedTask).offset().top - 60);
-                    }, 0);
+            setSelectedTask: function (model) {
+                if (this.selectedTask != model && this.selectedTask)
+                    this.selectedTask.trigger('deselected');
+
+                if (model)
+                    model.trigger('selected');
+
+                this.selectedTask = model;
+
+                if (this.selectedTask) {
+                    $('#middle-sidebar').removeClass('span10');
+                    $('#middle-sidebar').addClass('span5');
+                } else {
+                    $('#middle-sidebar').addClass('span10');
+                    $('#middle-sidebar').removeClass('span5');
+                }
+            },
+            initDisplay: function () {
+                if (this.selectedTask) {
+                    $('#middle-sidebar').removeClass('span10');
+                    $('#middle-sidebar').addClass('span5');
+                    this.getView(
+                        _.bind(function (view) {
+                            if (view.model == this.selectedTask) {
+                                setTimeout(function () {
+                                    //    console.log(view.model, self.selectedTask);
+                                    $('#tasks').scrollTop(0);
+                                    $('#tasks').scrollTop(view.$el.offset().top - 60);
+                                }, 0);
+                            }
+                        }, this));
+                } else {
+                    $('#middle-sidebar').addClass('span10');
+                    $('#middle-sidebar').removeClass('span5');
+                }
             },
             toggleForm: function (e, callback) {
                 $('form', this.$el).toggle('fast', callback);
@@ -152,14 +172,23 @@ define([
             template: "search/task",
             tagName: 'tr',
             beforeRender: function () {
-                this.$el.data('id', this.model.id);
-                this.$el.on('click', function () {
-                    app.router.navigate('search/' + $(this).data('id'), true);
-                    $(Views).trigger('task:selected', $(this));
-                });
-                if (this.model.id == task.id) {
-                    $(Views).trigger('task:selected', this.$el);
-                }
+
+                this.model.on('selected', function () {
+                    app.router.navigate('search/' + this.model.id, true);
+                    this.$el.addClass('success');
+                }, this);
+
+                this.model.on('deselected', function () {
+                    this.$el.removeClass('success');
+                }, this);
+
+                this.$el.on('click', _.bind(function () {
+                    Views_Tasks.setSelectedTask(this.model);
+                }, this));
+            },
+            afterRender: function () {
+                if (this.model.id == task.id)
+                    Views_Tasks.setSelectedTask(this.model);
             },
             data: function () {
                 return {
@@ -256,6 +285,7 @@ define([
                 $('form', this.$el).toggle('fast');
             },
             close: function () {
+                Views_Tasks.setSelectedTask();
                 app.router.navigate('/search', true);
             },
             addComment: function () {
@@ -299,6 +329,44 @@ define([
             }
         });
 
+        var Views_Project = new Views.Projects({
+            collection: projects
+        });
+
+        var Views_Tasks = new Views.Tasks({
+            collection: tasks,
+            projects: projects
+        });
+
+        var Views_TaskDetails = new Views.TaskDetails({
+            model: task
+        })
+
+        Views.Layout = Backbone.View.extend({
+            template: "search/layout",
+            className: 'row',
+            views: {
+                "#left-sidebar": Views_Project,
+                "#middle-sidebar": Views_Tasks,
+                "#right-sidebar": Views_TaskDetails
+            },
+            afterRender: function () {
+                Views_Tasks.initDisplay();
+            },
+            setTaskId: function (id) {
+                if (id) {
+                    task.id = id;
+                    task.fetch()
+                        .error(function (res) {
+                            var error = ($.parseJSON(res.responseText)).error;
+                            app.showModal(error._modal.message);
+                        })
+                } else {
+                    task.clear();
+                }
+            }
+        });
+
         app.on('user:authorized', function () {
             tasks.fetch();
             projects.fetch();
@@ -309,35 +377,5 @@ define([
             projects.reset();
         });
 
-        Views.Layout = Backbone.View.extend({
-            template: "search/layout",
-            className: 'row',
-            views: {
-                "#left-sidebar": new Views.Projects({
-                    collection: projects
-                }),
-                "#middle-sidebar": new Views.Tasks({
-                    collection: tasks,
-                    projects: projects
-                }),
-                "#right-sidebar": new Views.TaskDetails({
-                    model: task
-                })
-            },
-            setTaskId: function (id) {
-                if (id) {
-                    task.id = id;
-                    task.fetch().error(function (res) {
-                        var error = ($.parseJSON(res.responseText)).error;
-                        app.showModal(error._modal.message);
-                    });
-                } else {
-                    task.clear();
-                    $(Views).trigger('task:selected');
-                }
-            }
-        });
-
         return Views;
-
     });

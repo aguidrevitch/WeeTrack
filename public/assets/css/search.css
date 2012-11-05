@@ -45,6 +45,37 @@
     height: 80px;
 }
 
+#tasks td.id {
+    width: 60px;
+}
+
+#tasks td.subject {
+    position: relative;
+}
+
+#tasks td.subject span {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.span5 #tasks td.subject span {
+    max-width: 300px;
+}
+
+.span10 #tasks td.subject span {
+    max-width: 700px;
+}
+
+#tasks td.subject div {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    line-height: 20px;
+    padding: 8px;
+}
+
 /*
 #form-task-add .control-label {
     width: 60px;

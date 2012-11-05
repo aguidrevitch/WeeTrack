@@ -1,9 +1,11 @@
-<td>
+<td class="id">
     #<%= task.id %>
 </td>
-<td>
-    <%= task.escape("subject") %>
-</td>
-<td>
-    <span class="label"><%= task.get('project').name %></span>
+<td class="subject">
+    <span><%= task.escape("subject") %></span>
+
+    <div>
+        <span class="label pull-right"><%= task.get('project').name %></span>
+    </div>
+
 </td>

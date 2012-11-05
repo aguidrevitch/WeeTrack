@@ -19,8 +19,8 @@ define([
                 "search": "search",
                 "search/:task": "search"
             },
-            search: function (id) {
-                Layout.setTaskId(id);
+            search: function (task_id) {
+                Layout.setTaskId(task_id);
                 if (!this._rendered) {
                     app.layout.setViews({
                         "section": Layout
