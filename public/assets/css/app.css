@@ -1,2 +1,17 @@
+::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+}
+
+
+::-webkit-scrollbar-track-piece  {
+    background-color: lightgray;
+}
+
+::-webkit-scrollbar-thumb:vertical {
+    height: 30px;
+    background-color: gray;
+}
+
 #content {
 }

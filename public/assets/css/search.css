@@ -45,6 +45,10 @@
     height: 80px;
 }
 
+#tasks table {
+    margin-bottom: 0px;
+}
+
 #tasks td.id {
     width: 60px;
 }
