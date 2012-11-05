@@ -11,7 +11,7 @@
     height: 100%;
 }
 
-#projects, #tasks {
+#projects, #tasks, #task-details {
     position: absolute;
     bottom: 48px;
     top: 0px;
