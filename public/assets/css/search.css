@@ -61,11 +61,11 @@
 }
 
 .span5 #tasks td.subject span.subject {
-    max-width: 300px;
+    max-width: 250px;
 }
 
 .span10 #tasks td.subject span.subject {
-    max-width: 700px;
+    max-width: 650px;
 }
 
 #tasks td.subject div.labels {
@@ -75,6 +75,19 @@
     line-height: 20px;
 }
 
+#tasks .label {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.span5 #tasks .label {
+    max-width: 100px;
+}
+
+.span10 #tasks .label {
+    max-width: 200px;
+}
 /*
 #form-task-add .control-label {
     width: 60px;
