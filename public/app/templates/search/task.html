@@ -2,10 +2,11 @@
     #<%= task.id %>
 </td>
 <td class="subject">
-    <span><%= task.escape("subject") %></span>
+    <div style="position: relative;">
+        <span class="subject"><%= task.escape("subject") %></span>
 
-    <div>
-        <span class="label pull-right"><%= task.get('project').name %></span>
+        <div class="labels">
+            <span class="label"><%= task.get('project').name %></span>
+        </div>
     </div>
-
 </td>

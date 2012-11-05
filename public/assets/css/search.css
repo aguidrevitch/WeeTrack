@@ -49,31 +49,26 @@
     width: 60px;
 }
 
-#tasks td.subject {
-    position: relative;
-}
-
-#tasks td.subject span {
+#tasks td.subject span.subject {
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.span5 #tasks td.subject span {
+.span5 #tasks td.subject span.subject {
     max-width: 300px;
 }
 
-.span10 #tasks td.subject span {
+.span10 #tasks td.subject span.subject {
     max-width: 700px;
 }
 
-#tasks td.subject div {
+#tasks td.subject div.labels {
     position: absolute;
     top: 0px;
     right: 0px;
     line-height: 20px;
-    padding: 8px;
 }
 
 /*

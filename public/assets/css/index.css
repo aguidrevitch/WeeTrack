@@ -7,6 +7,7 @@
  * Note: All stylesheets are relative to `assets/css`.
  *
  */ 
+@import "tinyscrollbar.css";
 @import "bootstrap.css";
 @import "bootstrap-responsive.css";
 @import "app.css";
