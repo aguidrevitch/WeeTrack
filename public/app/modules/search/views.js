@@ -124,7 +124,6 @@ define([
                     this.getView(
                         _.bind(function (view) {
                             if (view.model == this.selectedTask) {
-                                console.log(view.$el.offset().top);
                                 setTimeout(function () {
                                     $('#tasks').scrollTop(0);
                                     $('#tasks').scrollTop(view.$el.offset().top - 60);
