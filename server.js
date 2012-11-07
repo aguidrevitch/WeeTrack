@@ -3,6 +3,7 @@
     var config = require("./config"),
         util = require("util"),
         express = require("express"),
+        gzippo = require('gzippo');
         io = require("socket.io"),
         db = require("./lib/database"),
         RedisStore = require('connect-redis')(express);
@@ -30,7 +31,9 @@
             pretty: true
         });
         app.use(express.bodyParser());
-        app.use(express.static(__dirname + "/public"));
+        //app.use(express.static(__dirname + "/public"));
+        app.use(gzippo.staticGzip(__dirname + "/public"));
+        app.use(gzippo.compress());
         app.use('/api/', function (req, res, next) {
                 // registration is sitewide
                 if (req.url.match(/^\/auth$/) && req.method == 'POST') {

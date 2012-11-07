@@ -124,8 +124,8 @@ define([
                     this.getView(
                         _.bind(function (view) {
                             if (view.model == this.selectedTask) {
+                                console.log(view.$el.offset().top);
                                 setTimeout(function () {
-                                    //    console.log(view.model, self.selectedTask);
                                     $('#tasks').scrollTop(0);
                                     $('#tasks').scrollTop(view.$el.offset().top - 60);
                                 }, 0);
@@ -340,7 +340,7 @@ define([
 
         var Views_TaskDetails = new Views.TaskDetails({
             model: task
-        })
+        });
 
         Views.Layout = Backbone.View.extend({
             template: "search/layout",
@@ -360,7 +360,7 @@ define([
                         .error(function (res) {
                             var error = ($.parseJSON(res.responseText)).error;
                             app.showModal(error._modal.message);
-                        })
+                        });
                 } else {
                     task.clear();
                 }
