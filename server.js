@@ -3,7 +3,7 @@
     var config = require("./config"),
         util = require("util"),
         express = require("express"),
-        gzippo = require('gzippo');
+        gzippo = require('gzippo'),
         io = require("socket.io"),
         db = require("./lib/database"),
         RedisStore = require('connect-redis')(express),
@@ -32,7 +32,16 @@
             pretty: true
         });
         // must go before bodyParser
-        app.use('/upload', upload());
+        app.use('/upload', upload({
+            uploadDir: __dirname + '/public/uploads',
+            uploadUrl: '/uploads',
+            imageVersions: {
+                thumbnail: {
+                    width: 80,
+                    height: 80
+                }
+            }
+        }));
         app.use(express.bodyParser());
         app.use(gzippo.staticGzip(__dirname + "/public"));
         app.use(gzippo.compress());

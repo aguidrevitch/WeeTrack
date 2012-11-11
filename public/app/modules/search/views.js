@@ -277,8 +277,21 @@ define([
                 var self = this;
                 this.$el.find('.upload-close').off('click');
                 _.each(data.files, function (file, index) {
-                    if (file.name == self.model.name)
+                    if (file.name == self.model.name) {
+                        if (data.result[index].thumbnail_url) {
+                            var thumbnail = new Image();
+                            thumbnail.onload = function () {
+                                self.$el.tooltip({
+                                    html: true,
+                                    title: '<img src="' + thumbnail.src + '">',
+                                    trigger: 'hover',
+                                    placement: 'left'
+                                });
+                            };
+                            thumbnail.src = data.result[index].thumbnail_url;
+                        }
                         self.$el.find('.upload-close').on('click', function () {
+                            self.$el.tooltip('destroy');
                             $.ajax({
                                 type: 'DELETE',
                                 url: data.result[index].delete_url,
@@ -287,6 +300,7 @@ define([
                                 }
                             });
                         });
+                    }
                 });
             },
             data: function () {
