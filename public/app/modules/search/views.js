@@ -244,13 +244,65 @@ define([
             }
         });
 
+        Views.UploadedFile = Backbone.LayoutView.extend({
+            template: "search/uploaded-file",
+            keep: true,
+            initialize: function () {
+                var self = this;
+                this.options.jqXHR.error(function (jqXHR, textStatus, errorThrown) {
+                    console.log(arguments);
+                    var progress = self.$el.find('.upload-progress span');
+                    if (errorThrown == 'abort')
+                        progress.text(t(errorThrown));
+                    else
+                        progress.text(t('error'));
+                    progress.removeClass('label-info').addClass('label-important');
+                    self.$el.find('.upload-close').off('click');
+                    self.$el.find('.upload-close').on('click', function () {
+                        self.remove();
+                    });
+                });
+            },
+            afterRender: function () {
+                var self = this
+                this.$el.find('.upload-close').on('click', function () {
+                    self.options.jqXHR.abort();
+                });
+            },
+            onUploadProgress: function (data) {
+                this.$el.find('.upload-progress span').html(parseInt(data.loaded / data.total * 100, 10) + "%");
+            },
+            onUploadDone: function (data) {
+                this.$el.find('.upload-progress span').text("done").removeClass('label-info').addClass('label-success');
+                var self = this;
+                this.$el.find('.upload-close').off('click');
+                _.each(data.files, function (file, index) {
+                    if (file.name == self.model.name)
+                        self.$el.find('.upload-close').on('click', function () {
+                            $.ajax({
+                                type: 'DELETE',
+                                url: data.result[index].delete_url,
+                                success: function () {
+                                    self.remove();
+                                }
+                            });
+                        });
+                });
+            },
+            data: function () {
+                return {
+                    file: this.model
+                }
+            }
+        });
+
         Views.TaskDetails = Backbone.LayoutView.extend({
             template: "search/task-details",
             id: 'task-details',
             events: {
                 'click .show-form': 'toggleForm',
                 'click #task-header .close': 'close',
-                'click form .close': 'toggleForm',
+                'click form .close-form': 'toggleForm',
                 'click .submit-form': 'addComment'
             },
             initialize: function () {
@@ -274,44 +326,43 @@ define([
                     $('#form-transaction-add [name=content]:input').tooltip('destroy');
                 });
 
-                var counter = 0;
-                var ids = {};
+                var self = this;
+                var uploads = {};
 
-                $('#fileupload').fileupload({
-                    dataType: 'json'
-                });
-
-                $('#fileupload').bind('fileuploadadd', function (e, data) {
-                    _.each(data.files, function (file) {
-                        var id = ids[file.name] = 'file-' + ++counter;
-                        $('#upload-progress').append(
-                            $('<div class="upload-item">')
-                                .attr('id', id)
-                                .append(file.name)
-                                .append('<div class="upload-state"></div>')
-                        );
-                    });
-                });
-                $('#fileupload').bind('fileuploadprogress', function (e, data) {
-                    var progress = parseInt(data.loaded / data.total * 100, 10);
-                    _.each(data.files, function (file) {
-                        $('#' + ids[file.name]).find('.upload-state').html(progress + "%");
-                    });
-                });
-                $('#fileupload').bind('fileuploaddone', function (e, data) {
-                    _.each(data.files, function (file, index) {
-                        $('#' + ids[file.name]).find('.upload-state').html('&times');
-                        $('#' + ids[file.name]).find('.upload-state').on('click', function () {
-                            $.ajax({
-                                type: 'DELETE',
-                                url: data.result[index].delete_url,
-                                success: function () {
-                                    $('#' + ids[file.name]).remove();
-                                }
+                $('#fileupload').fileupload({ dataType: 'json',
+                    add: function (e, data) {
+                        _.each(data.files, function (file) {
+                            var view = uploads[file.name] = new Views.UploadedFile({
+                                model: file,
+                                jqXHR: data.submit()
                             });
-                        });
+                            self.insertView("#upload-progress", view).render();
+                        }, this);
+                        /*
+                         var jqXHR = data.submit()
+                         .success(function (result, textStatus, jqXHR) {
+
+                         })
+                         .error(function (jqXHR, textStatus, errorThrown) {
+                         })
+                         .complete(function (result, textStatus, jqXHR) {
+                         });
+                         */
+                    }
+                });
+
+                $('#fileupload').bind('fileuploadprogress', function (e, data) {
+                    _.each(data.files, function (file) {
+                        uploads[file.name].onUploadProgress(data);
                     });
                 });
+
+                $('#fileupload').bind('fileuploaddone', function (e, data) {
+                    _.each(data.files, function (file) {
+                        uploads[file.name].onUploadDone(data);
+                    });
+                });
+
             },
             toggleForm: function () {
                 $('form', this.$el).toggle('fast');
