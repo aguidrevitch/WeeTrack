@@ -12,21 +12,15 @@ define([
 
         var Search = app.module();
 
-        var Layout = new Views.Layout();
-
         var Router = router.extend({
             authorized: {
                 "search": "search",
                 "search/:task": "search"
             },
             search: function (task_id) {
-                Layout.setTaskId(task_id);
-                if (!this._rendered) {
-                    app.layout.setViews({
-                        "section": Layout
-                    }).render();
-                    this._rendered = true;
-                }
+                app.layout.setViews({
+                    "section": new Views.Layout({ task_id: task_id })
+                }).render();
             }
         });
 

@@ -9,9 +9,13 @@ require([
     "modules/auth",
     "modules/home",
     "modules/search"
-    ],
+],
 
-    function(app, Router, Auth) {
+    function (app, Router, Auth) {
+
+        // Set stacktrace limit for Chrome
+        if (Error.stackTraceLimit)
+            Error.stackTraceLimit = 1000;
 
         // Set default layout
         app.useLayout("main");
@@ -23,7 +27,7 @@ require([
         // All navigation that is relative should be passed through the navigate
         // method, to be processed by the router. If the link has a `data-bypass`
         // attribute, bypass the delegation completely.
-        $(document).on("click", "a[href]:not([data-bypass])", function(evt) {
+        $(document).on("click", "a[href]:not([data-bypass])", function (evt) {
             // Get the absolute anchor href.
             var href = {
                 prop: $(this).prop("href"),

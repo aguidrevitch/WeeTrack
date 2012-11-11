@@ -6,6 +6,25 @@
     /* min-height: 460px; */
 }
 
+#upload-progress {
+    clear: both;
+}
+
+#upload-progress .upload-item {
+    position: relative;
+    line-height: 20px;
+    padding: 8px 0px;
+    border-bottom: 1px solid gray;
+}
+
+#upload-progress .upload-item .upload-state {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    line-height: 20px;
+    padding: 8px 0px;
+}
+
 #left-sidebar, #middle-sidebar, #right-sidebar {
     position: relative;
     height: 100%;

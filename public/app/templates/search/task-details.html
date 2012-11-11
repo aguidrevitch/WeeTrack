@@ -17,6 +17,18 @@
             </div>
         </div>
         <div class="control-group">
+            <label class="control-label"><%= t('Files') %></label>
+
+            <div class="controls">
+                <span class="btn btn-success fileinput-button">
+                    <i class="icon-plus icon-white"></i>
+                    <span>Add files...</span>
+                    <input id="fileupload" type="file" name="files[]" data-url="/upload" multiple>
+                </span>
+                <div id="upload-progress"></div>
+            </div>
+        </div>
+        <div class="control-group">
             <div class="controls">
                 <button class="btn btn-primary submit-form"><%= t('Create') %></button>
             </div>

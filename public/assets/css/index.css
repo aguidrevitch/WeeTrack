@@ -9,6 +9,7 @@
  */ 
 @import "bootstrap.css";
 @import "bootstrap-responsive.css";
+@import "jquery.fileupload-ui.css";
 @import "app.css";
 @import "search.css";
 

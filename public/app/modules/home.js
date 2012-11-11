@@ -20,9 +20,9 @@ define([
                 "": "index"
             },
             index: function () {
-                app.layout.setView(
-                    "section", new Home.Views.Home({})
-                ).render();
+                app.layout.setViews({
+                    "section": new Home.Views.Home()
+                }).render();
             }
         });
 

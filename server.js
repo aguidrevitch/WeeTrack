@@ -6,7 +6,8 @@
         gzippo = require('gzippo');
         io = require("socket.io"),
         db = require("./lib/database"),
-        RedisStore = require('connect-redis')(express);
+        RedisStore = require('connect-redis')(express),
+        upload = require('jquery-file-upload-middleware');
 
     var app = express();
 
@@ -30,11 +31,12 @@
             layout: false,
             pretty: true
         });
+        // must go before bodyParser
+        app.use('/upload', upload());
         app.use(express.bodyParser());
-        //app.use(express.static(__dirname + "/public"));
         app.use(gzippo.staticGzip(__dirname + "/public"));
         app.use(gzippo.compress());
-        app.use('/api/', function (req, res, next) {
+        app.use('/api', function (req, res, next) {
                 // registration is sitewide
                 if (req.url.match(/^\/auth$/) && req.method == 'POST') {
                     next();

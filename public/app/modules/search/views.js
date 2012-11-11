@@ -60,7 +60,7 @@ define([
         var tasks = new Tasks();
         var task = new Task();
 
-        Views.Tasks = Backbone.View.extend({
+        Views.Tasks = Backbone.LayoutView.extend({
             template: "search/tasks",
             id: "tasks",
             events: {
@@ -76,64 +76,55 @@ define([
             initialize: function () {
                 this.collection.on("reset", this.niceRender, this);
                 this.collection.on("add", this.niceRender, this);
-                this.options.projects.on("reset", this.render, this);
-                this.options.projects.on("add", this.render, this);
+                this.options.projects.on("reset", this.niceRender, this);
+                this.options.projects.on("add", this.niceRender, this);
+                var selectedView;
+                app.on("task:selected", function (view, scroll) {
+                    if (scroll)
+                        this.selectedTask = view;
+                    if (selectedView)
+                        selectedView.trigger('deselected');
+                    if (view)
+                        view.trigger('selected');
+                    selectedView = view;
+                }, this);
             },
             cleanup: function () {
+                app.off("task:selected", null, this);
                 this.options.projects.off(null, null, this);
             },
             niceRender: function () {
-                $('form', this.$el).hide('fast', _.bind(this.render, this));
+                if ($('form', this.$el).is(':visible')) {
+                    $('form', this.$el).hide('fast', _.bind(this.render, this));
+                } else {
+                    this.render();
+                }
             },
             beforeRender: function () {
+                var count = this.collection.length;
                 this.collection.each(function (model) {
-                    this.insertView("table", new Views.Task({
+                    var view = new Views.Task({
                         model: model
-                    }));
+                    });
+                    view.on("afterRender", function () {
+                        count--;
+                        if (count == 0 && this.selectedTask) {
+                            $('#tasks').scrollTop(0);
+                            $('#tasks').scrollTop(this.selectedTask.$el.offset().top - 120);
+                        }
+                    }, this);
+                    this.insertView("table", view);
                 }, this);
+            },
+            afterRender: function () {
                 $('select', this.$el).html('');
                 this.options.projects.each(function (project) {
-                    this.insertView('select', new Backbone.View({
+                    this.insertView('select', new Backbone.LayoutView({
                         append: function (root, child) {
                             $(root).append('<option value="' + project.id + '">' + project.escape('name') + '</option>');
                         }
                     }));
                 }, this);
-            },
-            setSelectedTask: function (model) {
-                if (this.selectedTask != model && this.selectedTask)
-                    this.selectedTask.trigger('deselected');
-
-                if (model)
-                    model.trigger('selected');
-
-                this.selectedTask = model;
-
-                if (this.selectedTask) {
-                    $('#middle-sidebar').removeClass('span10');
-                    $('#middle-sidebar').addClass('span5');
-                } else {
-                    $('#middle-sidebar').addClass('span10');
-                    $('#middle-sidebar').removeClass('span5');
-                }
-            },
-            initDisplay: function () {
-                if (this.selectedTask) {
-                    $('#middle-sidebar').removeClass('span10');
-                    $('#middle-sidebar').addClass('span5');
-                    this.getView(
-                        _.bind(function (view) {
-                            if (view.model == this.selectedTask) {
-                                setTimeout(function () {
-                                    $('#tasks').scrollTop(0);
-                                    $('#tasks').scrollTop(view.$el.offset().top - 60);
-                                }, 0);
-                            }
-                        }, this));
-                } else {
-                    $('#middle-sidebar').addClass('span10');
-                    $('#middle-sidebar').removeClass('span5');
-                }
             },
             toggleForm: function (e, callback) {
                 $('form', this.$el).toggle('fast', callback);
@@ -167,27 +158,27 @@ define([
             }
         });
 
-        Views.Task = Backbone.View.extend({
+        Views.Task = Backbone.LayoutView.extend({
             template: "search/task",
             tagName: 'tr',
-            beforeRender: function () {
-
-                this.model.on('selected', function () {
-                    app.router.navigate('search/' + this.model.id, true);
-                    this.$el.addClass('success');
-                }, this);
-
-                this.model.on('deselected', function () {
-                    this.$el.removeClass('success');
-                }, this);
-
-                this.$el.on('click', _.bind(function () {
-                    Views_Tasks.setSelectedTask(this.model);
-                }, this));
+            cleanup: function () {
+                this.destroyed = true;
             },
             afterRender: function () {
-                if (this.model.id == task.id)
-                    Views_Tasks.setSelectedTask(this.model);
+                if (!this.destroyed) {
+                    this.on('selected', function () {
+                        this.$el.addClass('success');
+                    }, this);
+                    this.on('deselected', function () {
+                        this.$el.removeClass('success');
+                    }, this);
+                    this.$el.on('click', _.bind(function () {
+                        app.router.navigate('search/' + this.model.id);
+                        app.trigger('task:selected', this);
+                    }, this));
+                    if (this.model.id == task.id)
+                        app.trigger('task:selected', this, true);
+                }
             },
             data: function () {
                 return {
@@ -196,7 +187,7 @@ define([
             }
         });
 
-        Views.Projects = Backbone.View.extend({
+        Views.Projects = Backbone.LayoutView.extend({
             template: 'search/projects',
             id: "projects",
             events: {
@@ -243,7 +234,7 @@ define([
             }
         });
 
-        Views.Project = Backbone.View.extend({
+        Views.Project = Backbone.LayoutView.extend({
             template: "search/project",
             tagName: 'li',
             data: function () {
@@ -253,7 +244,7 @@ define([
             }
         });
 
-        Views.TaskDetails = Backbone.View.extend({
+        Views.TaskDetails = Backbone.LayoutView.extend({
             template: "search/task-details",
             id: 'task-details',
             events: {
@@ -263,9 +254,12 @@ define([
                 'click .submit-form': 'addComment'
             },
             initialize: function () {
-                this.model.on('change', this.render, this);
-                this.model.transactions.on('reset', this.render, this);
-                this.model.transactions.on('add', this.render, this);
+                //this.model.on('change', this.render, this);
+                //this.model.transactions.on('reset', this.render, this);
+                //this.model.transactions.on('add', this.render, this);
+            },
+            cleanup: function () {
+                this.model.transactions.off('reset', null, null);
             },
             beforeRender: function () {
                 this.model.transactions.each(function (model) {
@@ -279,13 +273,52 @@ define([
                     $('#form-transaction-add [name=content]:input').parents('.control-group').removeClass('error');
                     $('#form-transaction-add [name=content]:input').tooltip('destroy');
                 });
+
+                var counter = 0;
+                var ids = {};
+
+                $('#fileupload').fileupload({
+                    dataType: 'json'
+                });
+
+                $('#fileupload').bind('fileuploadadd', function (e, data) {
+                    _.each(data.files, function (file) {
+                        var id = ids[file.name] = 'file-' + ++counter;
+                        $('#upload-progress').append(
+                            $('<div class="upload-item">')
+                                .attr('id', id)
+                                .append(file.name)
+                                .append('<div class="upload-state"></div>')
+                        );
+                    });
+                });
+                $('#fileupload').bind('fileuploadprogress', function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    _.each(data.files, function (file) {
+                        $('#' + ids[file.name]).find('.upload-state').html(progress + "%");
+                    });
+                });
+                $('#fileupload').bind('fileuploaddone', function (e, data) {
+                    _.each(data.files, function (file, index) {
+                        $('#' + ids[file.name]).find('.upload-state').html('&times');
+                        $('#' + ids[file.name]).find('.upload-state').on('click', function () {
+                            $.ajax({
+                                type: 'DELETE',
+                                url: data.result[index].delete_url,
+                                success: function () {
+                                    $('#' + ids[file.name]).remove();
+                                }
+                            });
+                        });
+                    });
+                });
             },
             toggleForm: function () {
                 $('form', this.$el).toggle('fast');
             },
             close: function () {
-                Views_Tasks.setSelectedTask();
-                app.router.navigate('/search', true);
+                app.trigger('task:selected');
+                app.router.navigate('/search');
             },
             addComment: function () {
                 var self = this;
@@ -318,7 +351,7 @@ define([
             }
         });
 
-        Views.Transaction = Backbone.View.extend({
+        Views.Transaction = Backbone.LayoutView.extend({
             template: "search/transaction",
             tagName: 'li',
             data: function () {
@@ -328,41 +361,45 @@ define([
             }
         });
 
-        var Views_Project = new Views.Projects({
-            collection: projects
-        });
-
-        var Views_Tasks = new Views.Tasks({
-            collection: tasks,
-            projects: projects
-        });
-
-        var Views_TaskDetails = new Views.TaskDetails({
-            model: task
-        });
-
-        Views.Layout = Backbone.View.extend({
+        Views.Layout = Backbone.LayoutView.extend({
             template: "search/layout",
             className: 'row',
-            views: {
-                "#left-sidebar": Views_Project,
-                "#middle-sidebar": Views_Tasks,
-                "#right-sidebar": Views_TaskDetails
+            initialize: function () {
+                this.setViews({
+                    "#left-sidebar": new Views.Projects({
+                        collection: projects
+                    }),
+                    "#middle-sidebar": new Views.Tasks({
+                        collection: tasks,
+                        projects: projects
+                    })
+                });
+                app.on("task:selected", function (view) {
+                    if (view) {
+                        this.setViews({
+                            "#right-sidebar": new Views.TaskDetails({
+                                model: view.model
+                            })
+                        });
+                        this.getView('#right-sidebar').render();
+                        $('#middle-sidebar').removeClass('span10');
+                        $('#middle-sidebar').addClass('span5');
+                    } else {
+                        $('#middle-sidebar').addClass('span10');
+                        $('#middle-sidebar').removeClass('span5');
+                    }
+                }, this);
+
+                if (this.options.task_id)
+                    task.id = this.options.task_id;
+            },
+            cleanup: function () {
+                app.off("task:selected", null, this);
             },
             afterRender: function () {
-                Views_Tasks.initDisplay();
-            },
-            setTaskId: function (id) {
-                if (id) {
-                    task.id = id;
-                    task.fetch()
-                        .error(function (res) {
-                            var error = ($.parseJSON(res.responseText)).error;
-                            app.showModal(error._modal.message);
-                        });
-                } else {
-                    task.clear();
-                }
+                // task:selected can fire before view is actually rendered
+                // so we must re-render #middle-sidebar and re-fire task:selected
+                this.getView('#middle-sidebar').render();
             }
         });
 

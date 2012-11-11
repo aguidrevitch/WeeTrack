@@ -6,10 +6,14 @@ define([
     "i18next",
     "moment",
     "bootstrap",
+    "stacktrace",
 
     // Plugins.
     "plugins/backbone.layoutmanager",
     "plugins/backbone.syphon",
+    "jquery.ui.widget",
+    "plugins/jquery.iframe-transport",
+    "plugins/jquery.fileupload",
 
     // Locales
     "../locales/ru/ru"
@@ -128,7 +132,7 @@ define([
                 $("#main").empty().append(layout.el);
 
                 // Render the layout.
-                layout.render();
+                // layout.render();
 
                 // Cache the refererence.
                 this.layout = layout;

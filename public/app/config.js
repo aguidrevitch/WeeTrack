@@ -16,7 +16,9 @@ require.config({
         backbone: "../assets/js/libs/backbone",
         bootstrap: "../assets/js/libs/bootstrap",
         i18next: "../assets/js/libs/i18next",
-        moment: "../assets/js/libs/moment"
+        moment: "../assets/js/libs/moment",
+        stacktrace: "../assets/js/libs/stacktrace",
+        "jquery.ui.widget": "../assets/js/libs/jquery.ui.widget",
     },
 
     shim: {
@@ -27,12 +29,18 @@ require.config({
         },
         bootstrap: [ "jquery" ],
 
+        "jquery.ui.widget": ["jquery"],
+
+        "plugins/jquery.iframe-transport": ["jquery"],
+        "plugins/jquery.fileupload": ["jquery"],
+
         // Backbone.LayoutManager depends on Backbone.
         "plugins/backbone.layoutmanager": ["backbone"],
         "plugins/backbone.syphon": ["backbone"],
 
+
         // russian locale for moment.js
-        "../locales/ru/ru": ["moment"]
+        "../locales/ru/ru": [ "moment" ]
     }
 
 });

@@ -66,10 +66,11 @@ define([
                 "register": "register"
             },
             login: function () {
-                app.layout.setView(
-                    "section", new Views.LoginForm({
+                app.layout.setViews({
+                    "section": new Views.LoginForm({
                         model: user
-                    })).render();
+                    })
+                }).render();
             },
             logout: function () {
                 user.deauthorize();
@@ -77,10 +78,11 @@ define([
             },
             register: function () {
                 var user = new Auth.Models.User();
-                app.layout.setView(
-                    "section", new Views.RegisterForm({
+                app.layout.setViews({
+                    "section": new Views.RegisterForm({
                         model: user
-                    })).render();
+                    })
+                }).render();
             }
         });
 
@@ -107,13 +109,15 @@ define([
                 error: function () {
                     app.layout.setViews({
                         "nav.top": new Views.TopNavigation({ model: user })
-                    }).render();
+                    });
+                    app.layout.getView('nav.top').render();
                     user.trigger('deauthorized');
                 },
                 success: function () {
                     app.layout.setViews({
                         "nav.top": new Views.TopNavigation({ model: user })
-                    }).render();
+                    });
+                    app.layout.getView('nav.top').render();
                     user.trigger('authorized');
                 }
             });
