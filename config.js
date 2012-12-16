@@ -11,7 +11,9 @@ var config = {
         session: {
             secret: "secret",
             maxAge: 60000 * 60 * 24 * 365
-        }
+        },
+        uploadDir: __dirname + '/public/uploads',
+        uploadUrl: '/uploads'
     },
     production: {
         port: 3006,
@@ -26,7 +28,9 @@ var config = {
         session: {
             secret: "secret",
             maxAge: 60000 * 60 * 24 * 365
-        }
+        },
+        uploadDir: __dirname + '/public/uploads',
+        uploadUrl: '/uploads'
     }
 };
 

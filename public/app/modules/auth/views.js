@@ -42,7 +42,7 @@ define([
                 this.model.on('change', this.render, this);
             },
             login: function () {
-                var data = Backbone.Syphon.serialize(this);
+                var data = this.$el.find('form').serializeObject();
                 this.model.authorize(data, {
                     error: function (err) {
                         if (err._modal)
@@ -68,7 +68,7 @@ define([
 
             register: function (e) {
                 var self = this;
-                var data = Backbone.Syphon.serialize(this);
+                var data = this.$el.find('form').serializeObject();
                 self.model.set(data);
                 self.model.save({}, {
                     error: function (model, res) {

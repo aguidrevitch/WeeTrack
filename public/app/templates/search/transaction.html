@@ -1,2 +1,13 @@
-<div><%= moment(new Date(transaction.get('created'))).fromNow() %> <%= t('by') %> <%= transaction.get('owner').name %></div>
+<% if (transaction.get('subtype') == 'text') { %>
+<div>
+    <%= moment(new Date(transaction.get('created'))).fromNow() %>
+    <%= t('by') %> <%= transaction.get('owner').name %>
+</div>
 <div><%= transaction.escape('content') %></div>
+<% } else if (transaction.get('subtype') == 'file') { %>
+<div>
+    <%= moment(new Date(transaction.get('created'))).fromNow() %>
+    <%= t('by') %> <%= transaction.get('owner').name %>
+</div>
+<div><a href="<%= transaction.escape('url') %>"><%= transaction.escape('filename') %></a></div>
+<% } %>

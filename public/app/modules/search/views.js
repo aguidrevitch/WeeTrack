@@ -12,6 +12,7 @@ define([
     function (app, Backbone, $, _, Auth) {
 
         var Views = {};
+        var TASK_ID;
 
         var Project = Backbone.Model.extend({
             idAttribute: "_id",
@@ -58,7 +59,6 @@ define([
 
         var projects = new Projects();
         var tasks = new Tasks();
-        var task = new Task();
 
         Views.Tasks = Backbone.LayoutView.extend({
             template: "search/tasks",
@@ -115,13 +115,13 @@ define([
                     }, this);
                     this.insertView("table", view);
                 }, this);
-            },
-            afterRender: function () {
-                $('select', this.$el).html('');
+
                 this.options.projects.each(function (project) {
                     this.insertView('select', new Backbone.LayoutView({
-                        append: function (root, child) {
-                            $(root).append('<option value="' + project.id + '">' + project.escape('name') + '</option>');
+                        tagName: 'option',
+                        beforeRender: function () {
+                            this.$el.append(project.escape('name'));
+                            this.$el.attr('value', project.id);
                         }
                     }));
                 }, this);
@@ -132,7 +132,7 @@ define([
             addTask: function () {
                 var self = this;
                 var task = new this.collection.model();
-                task.save(Backbone.Syphon.serialize(this), {
+                task.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
                         self.collection.push(model);
                     },
@@ -176,7 +176,7 @@ define([
                         app.router.navigate('search/' + this.model.id);
                         app.trigger('task:selected', this);
                     }, this));
-                    if (this.model.id == task.id)
+                    if (this.model.id == TASK_ID)
                         app.trigger('task:selected', this, true);
                 }
             },
@@ -211,7 +211,7 @@ define([
             addProject: function () {
                 var self = this;
                 var project = new this.collection.model();
-                project.save(Backbone.Syphon.serialize(this), {
+                project.save(this.$el.find('form').serializeObject(), {
                     success: function (project) {
                         self.collection.push(project);
                     },
@@ -250,7 +250,6 @@ define([
             initialize: function () {
                 var self = this;
                 this.options.jqXHR.error(function (jqXHR, textStatus, errorThrown) {
-                    console.log(arguments);
                     var progress = self.$el.find('.upload-progress span');
                     if (errorThrown == 'abort')
                         progress.text(t(errorThrown));
@@ -278,6 +277,8 @@ define([
                 this.$el.find('.upload-close').off('click');
                 _.each(data.files, function (file, index) {
                     if (file.name == self.model.name) {
+                        //console.log(data.result[index]);
+                        self.$el.append('<input type="hidden" name="upload" value="' + data.result[index].name + '">');
                         if (data.result[index].thumbnail_url) {
                             var thumbnail = new Image();
                             thumbnail.onload = function () {
@@ -317,12 +318,12 @@ define([
                 'click .show-form': 'toggleForm',
                 'click #task-header .close': 'close',
                 'click form .close-form': 'toggleForm',
-                'click .submit-form': 'addComment'
+                'click .submit-form': 'addTransaction'
             },
             initialize: function () {
-                //this.model.on('change', this.render, this);
+                this.model.on('change', this.render, this);
                 //this.model.transactions.on('reset', this.render, this);
-                //this.model.transactions.on('add', this.render, this);
+                this.model.transactions.on('add', this.render, this);
             },
             cleanup: function () {
                 this.model.transactions.off('reset', null, null);
@@ -352,16 +353,6 @@ define([
                             });
                             self.insertView("#upload-progress", view).render();
                         }, this);
-                        /*
-                         var jqXHR = data.submit()
-                         .success(function (result, textStatus, jqXHR) {
-
-                         })
-                         .error(function (jqXHR, textStatus, errorThrown) {
-                         })
-                         .complete(function (result, textStatus, jqXHR) {
-                         });
-                         */
                     }
                 });
 
@@ -384,29 +375,86 @@ define([
             close: function () {
                 app.trigger('task:selected');
                 app.router.navigate('/search');
+                this.remove();
             },
-            addComment: function () {
+            addTransaction: function () {
                 var self = this;
-                var transaction = new Transaction();
-                transaction.save(Backbone.Syphon.serialize(this), {
-                    success: function (transaction) {
-                        self.model.transactions.push(transaction);
-                    },
-                    error: function (object, res) {
-                        var error = ($.parseJSON(res.responseText)).error;
-                        if (error.content) {
-                            $('#form-transaction-add [name=content]:input').tooltip({
-                                trigger: 'focus',
-                                title: t(error.content.message)
-                            }).tooltip('show');
-                            $('#form-transaction-add [name=content]:input').parents('.control-group').addClass('error');
-                        }
 
-                        if (error._modal) {
-                            app.showModal(error._modal.message);
+                var form = this.$el.find('form');
+                var save = function (options) {
+                    options.task = self.model.id;
+                    var transaction = new Transaction();
+                    var deferred = new $.Deferred();
+                    transaction.save(options, {
+                        success: function (transaction) {
+                            self.model.transactions.push(transaction);
+                            deferred.resolve();
+                        },
+                        error: function (object, res) {
+                            var error = ($.parseJSON(res.responseText)).error;
+                            if (error._modal) {
+                                app.showModal(error._modal.message);
+                            } else {
+                                _.each(error, function (value, key) {
+                                    form.find('[name=' + key + ']:input').tooltip({
+                                        trigger: 'focus',
+                                        title: t(value.message)
+                                    }).tooltip('show');
+                                    form.find('[name=' + key + ']:input').parents('.control-group').addClass('error');
+                                });
+                            }
+                            deferred.fail();
                         }
+                    });
+                    return deferred.promise();
+                };
+
+                var serialized = form.serializeObject();
+                var type = 'reply';
+
+                var counter = 0;
+                var saved = function () {
+                    if (0 == --counter) {
+                        console.log(counter);
+                        self.render();
                     }
-                });
+                }
+
+                counter++;
+                save({
+                    type: type,
+                    subtype: 'text',
+                    content: serialized.content
+                }).done(saved);
+
+                if (serialized.upload)
+                    form.find('[name=upload]').each(function (index, element) {
+                        counter++;
+                        save({
+                            type: type,
+                            subtype: 'file',
+                            filename: $(element).val()
+                        }).done(saved);
+                    });
+
+                if (serialized.owner) {
+                    counter++;
+                    save({
+                        type: 'reply', // owner changes should always be visible
+                        subtype: 'owner',
+                        owner: serialized.owner
+                    }).done(saved);
+                }
+
+                if (serialized.status) {
+                    counter++;
+                    save({
+                        type: 'reply', // status changes should always be visible
+                        subtype: 'status',
+                        status: serialized.status
+                    }).done(saved);
+                }
+
                 return false;
             },
             data: function () {
@@ -441,12 +489,15 @@ define([
                 });
                 app.on("task:selected", function (view) {
                     if (view) {
-                        this.setViews({
-                            "#right-sidebar": new Views.TaskDetails({
-                                model: view.model
-                            })
-                        });
-                        this.getView('#right-sidebar').render();
+                        var task = new Task({ id: view.model.id });
+                        task.fetch().done(_.bind(function () {
+                            this.setViews({
+                                "#right-sidebar": new Views.TaskDetails({
+                                    model: task
+                                })
+                            });
+                            this.getView('#right-sidebar').render();
+                        }, this));
                         $('#middle-sidebar').removeClass('span10');
                         $('#middle-sidebar').addClass('span5');
                     } else {
@@ -456,7 +507,7 @@ define([
                 }, this);
 
                 if (this.options.task_id)
-                    task.id = this.options.task_id;
+                    TASK_ID = this.options.task_id;
             },
             cleanup: function () {
                 app.off("task:selected", null, this);

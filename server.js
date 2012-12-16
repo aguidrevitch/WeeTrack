@@ -7,7 +7,9 @@
         io = require("socket.io"),
         db = require("./lib/database"),
         RedisStore = require('connect-redis')(express),
-        upload = require('jquery-file-upload-middleware');
+        upload = require('jquery-file-upload-middleware'),
+        http = require('http'),
+        _ = require('lodash');
 
     var app = express();
 
@@ -31,46 +33,66 @@
             layout: false,
             pretty: true
         });
+
         // must go before bodyParser
-        app.use('/upload', upload({
-            uploadDir: __dirname + '/public/uploads',
-            uploadUrl: '/uploads',
+        upload.configure({
+            uploadDir: app.locals.config.uploadDir,
+            uploadUrl: app.locals.config.uploadUrl,
             imageVersions: {
                 thumbnail: {
                     width: 80,
                     height: 80
                 }
             }
-        }));
+        });
+
+        app.use('/upload', function (req, res, next) {
+            upload.fileHandler()(req, res, next);
+        });
+
+        /*
+        upload.on('begin', function () {
+            console.log('begin', arguments)
+        });
+        upload.on('end', function () {
+            console.log('end', arguments)
+        });
+        upload.on('abort', function () {
+            console.log('abort', arguments)
+        });
+        */
+
         app.use(express.bodyParser());
         app.use(gzippo.staticGzip(__dirname + "/public"));
         app.use(gzippo.compress());
+
         app.use('/api', function (req, res, next) {
-                // registration is sitewide
-                if (req.url.match(/^\/auth$/) && req.method == 'POST') {
-                    next();
-                    return;
-                }
-                var domain = req.get('Host') || '';
-                var subdomain = domain.match(/^([^\.]+)/)[1];
-                require('./lib/models/workspace').findOne({
-                    subdomain: subdomain
-                }, null, function (err, workspace) {
-                    if (workspace) {
-                        req.workspace = workspace;
-                        next();
-                    } else {
-                        res.json(500, {
-                            error: {
-                                _modal: {
-                                    message: 'Unknown workspace'
-                                }
-                            }
-                        });
-                    }
-                });
+            // registration is sitewide
+            if (req.url.match(/^\/auth$/) && req.method == 'POST') {
+                next();
+                return;
             }
-        );
+            var domain = req.headers.host || '';
+            var subdomain = domain.match(/^([^\.]+)/)[1];
+            require('./lib/models/workspace').findOne({
+                subdomain: subdomain
+            }, null, function (err, workspace) {
+                if (workspace) {
+                    req.workspace = workspace;
+                    req.filemanager = upload.fileManager();
+                    next();
+                } else {
+                    res.json(500, {
+                        error: {
+                            _modal: {
+                                message: 'Unknown workspace'
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
         app.use(app.router);
         app.use(express.errorHandler({
             dumpExceptions: true,

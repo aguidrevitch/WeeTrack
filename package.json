@@ -19,7 +19,9 @@
         "nodemailer": ">= 0.3.28",
         "async": ">= 0.1.22",
         "validator": ">= 0.4.12",
-        "chain": "git://github.com/aguidrevitch/node-chain.git"
+        "jquery-file-upload-middleware": ">= 0.0.2",
+        "chain": "git://github.com/aguidrevitch/node-chain.git",
+        "mkdirp": "*"
     },
     "engines": {
         "node": ">= 0.8.8"

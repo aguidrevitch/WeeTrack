@@ -33,11 +33,10 @@ require.config({
 
         "plugins/jquery.iframe-transport": ["jquery"],
         "plugins/jquery.fileupload": ["jquery"],
+        "plugins/jquery.serializeObject": ["jquery"],
 
         // Backbone.LayoutManager depends on Backbone.
         "plugins/backbone.layoutmanager": ["backbone"],
-        "plugins/backbone.syphon": ["backbone"],
-
 
         // russian locale for moment.js
         "../locales/ru/ru": [ "moment" ]
