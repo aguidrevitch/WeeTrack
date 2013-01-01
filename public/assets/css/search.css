@@ -48,7 +48,10 @@
 
 }
 
-#projects .form-fixed, #tasks .form-fixed, #task-details .form-fixed {
+#workspaces .form-fixed,
+#projects .form-fixed,
+#tasks .form-fixed,
+#task-details .form-fixed {
     padding-bottom: 10px;
     position: fixed;
     bottom: 0;

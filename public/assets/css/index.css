@@ -7,11 +7,11 @@
  * Note: All stylesheets are relative to `assets/css`.
  *
  */ 
-@import "bootstrap.css";
-@import "bootstrap-responsive.css";
-@import "jquery.fileupload-ui.css";
+@import "../vendor/bootstrap/css/bootstrap.css";
+@import "../vendor/bootstrap/css/bootstrap-responsive.css";
+@import "../vendor/select2/css/select2.css";
+@import "../vendor/jquery-fileupload/css/jquery.fileupload-ui.css";
 @import "app.css";
 @import "search.css";
-
 
 /* Put development-only CSS below this line. */
