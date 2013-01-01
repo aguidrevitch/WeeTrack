@@ -6,11 +6,11 @@ define([
     "i18next",
     "moment",
     "bootstrap",
-    "stacktrace",
+    "select2",
 
     // Plugins.
     "plugins/backbone.layoutmanager",
-    "jquery.ui.widget",
+    "plugins/jquery.ui.widget",
     "plugins/jquery.iframe-transport",
     "plugins/jquery.fileupload",
     "plugins/jquery.serializeObject",
@@ -34,7 +34,8 @@ define([
             i18n.init({
                 load: 'current',
                 fallbackLng: 'en',
-                resStore: window.I18N
+                resStore: window.I18N,
+                postProcess: 'sprintf'
             }, function (t) {
                 // will be called instantly, not deferred
                 window.t = t;
@@ -45,7 +46,8 @@ define([
             i18n.init({
                 load: 'current',
                 fallbackLng: 'en',
-                resGetPath: "/locales/__lng__/__ns__.json"
+                resGetPath: "/locales/__lng__/__ns__.json",
+                postProcess: 'sprintf'
             }, function (t) {
                 // called after translations are loaded
                 window.t = t;

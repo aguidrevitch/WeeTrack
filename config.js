@@ -1,6 +1,7 @@
 var config = {
     development: {
         port: 3006,
+        hostname: 'localhost',
         mongodb: {
             uri: "mongodb://localhost:27017/weetrack_dev"
         },
@@ -16,6 +17,7 @@ var config = {
         uploadUrl: '/uploads'
     },
     production: {
+        hostname: 'weetrack.com',
         port: 3006,
         serveMerged: true,
         mongodb: {

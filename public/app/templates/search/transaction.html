@@ -9,5 +9,7 @@
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
     <%= t('by') %> <%= transaction.get('owner').name %>
 </div>
-<div><a href="<%= transaction.escape('url') %>"><%= transaction.escape('filename') %></a></div>
+<div>
+    <a data-bypass="true" href="<%= transaction.escape('url') %>" thumbnail_url="<%= transaction.escape('thumbnail_url') %>"><%= transaction.escape('filename') %></a>
+</div>
 <% } %>

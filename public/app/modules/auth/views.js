@@ -60,7 +60,7 @@ define([
         });
 
         Views.RegisterForm = Backbone.View.extend({
-            template: "auth/register-form",
+            template: "auth/register",
 
             events: {
                 "submit form": "register"
@@ -88,23 +88,10 @@ define([
                         });
                     },
                     success: function (model) {
-                        app.layout.setViews({
-                            "section": new Views.RegisterSuccess({
-                                model: model
-                            })
-                        }).render();
+                        app.router.navigate('workspace/add');
                     }
                 });
                 return false;
-            }
-        });
-
-        Views.RegisterSuccess = Backbone.View.extend({
-            template: "auth/register-success",
-            data: function () {
-                return {
-                    user: this.model
-                };
             }
         });
 

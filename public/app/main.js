@@ -7,6 +7,7 @@ require([
 
     // Modules
     "modules/auth",
+    "modules/workspace",
     "modules/home",
     "modules/search"
 ],

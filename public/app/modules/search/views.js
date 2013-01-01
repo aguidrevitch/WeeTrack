@@ -310,30 +310,11 @@ define([
                 }
             }
         });
-
-        Views.TaskDetails = Backbone.LayoutView.extend({
-            template: "search/task-details",
-            id: 'task-details',
+        Views.TransactionForm = Backbone.LayoutView.extend({
+            template: "search/transaction-form",
             events: {
-                'click .show-form': 'toggleForm',
-                'click #task-header .close': 'close',
                 'click form .close-form': 'toggleForm',
                 'click .submit-form': 'addTransaction'
-            },
-            initialize: function () {
-                this.model.on('change', this.render, this);
-                //this.model.transactions.on('reset', this.render, this);
-                this.model.transactions.on('add', this.render, this);
-            },
-            cleanup: function () {
-                this.model.transactions.off('reset', null, null);
-            },
-            beforeRender: function () {
-                this.model.transactions.each(function (model) {
-                    this.insertView("ul", new Views.Transaction({
-                        model: model
-                    }));
-                }, this);
             },
             afterRender: function () {
                 $('#form-transaction-add [name=content]:input').on('keyup', function () {
@@ -367,15 +348,6 @@ define([
                         uploads[file.name].onUploadDone(data);
                     });
                 });
-
-            },
-            toggleForm: function () {
-                $('form', this.$el).toggle('fast');
-            },
-            close: function () {
-                app.trigger('task:selected');
-                app.router.navigate('/search');
-                this.remove();
             },
             addTransaction: function () {
                 var self = this;
@@ -400,6 +372,9 @@ define([
                                         trigger: 'focus',
                                         title: t(value.message)
                                     }).tooltip('show');
+                                    setTimeout(function () {
+                                        form.find('[name=' + key + ']:input').tooltip('hide');
+                                    }, 2000)
                                     form.find('[name=' + key + ']:input').parents('.control-group').addClass('error');
                                 });
                             }
@@ -412,22 +387,24 @@ define([
                 var serialized = form.serializeObject();
                 var type = 'reply';
 
-                var counter = 0;
+                var counter = 1;
                 var saved = function () {
-                    if (0 == --counter) {
-                        console.log(counter);
-                        self.render();
-                    }
+                    if (!--counter)
+                        self.toggleForm();
                 }
 
-                counter++;
-                save({
-                    type: type,
-                    subtype: 'text',
-                    content: serialized.content
-                }).done(saved);
+                /* saving content */
+                if (serialized.content) {
+                    counter++;
+                    save({
+                        type: type,
+                        subtype: 'text',
+                        content: serialized.content
+                    }).done(saved);
+                }
 
-                if (serialized.upload)
+                /* saving uploaded files */
+                if (serialized.upload) {
                     form.find('[name=upload]').each(function (index, element) {
                         counter++;
                         save({
@@ -436,26 +413,70 @@ define([
                             filename: $(element).val()
                         }).done(saved);
                     });
-
-                if (serialized.owner) {
-                    counter++;
-                    save({
-                        type: 'reply', // owner changes should always be visible
-                        subtype: 'owner',
-                        owner: serialized.owner
-                    }).done(saved);
                 }
-
-                if (serialized.status) {
-                    counter++;
-                    save({
-                        type: 'reply', // status changes should always be visible
-                        subtype: 'status',
-                        status: serialized.status
-                    }).done(saved);
-                }
-
+                saved();
                 return false;
+            },
+            toggleForm: function () {
+                $('form', this.$el).toggle('fast');
+            },
+            data: function () {
+                return {
+                    task: this.model
+                };
+            }
+        });
+
+        Views.TaskDetails = Backbone.LayoutView.extend({
+            template: "search/task-details",
+            id: 'task-details',
+            events: {
+                'click .show-form': 'toggleForm',
+                'click #task-header .close-details': 'close',
+            },
+            initialize: function () {
+                // this.model.on('change', this.render, this);
+                this.model.transactions.on('add', this.render, this);
+            },
+            cleanup: function () {
+                this.model.transactions.off('add', null, null);
+                //this.model.off('change', null, null);
+            },
+            beforeRender: function () {
+                this.model.transactions.each(function (model) {
+                    this.insertView("ul", new Views.Transaction({
+                        model: model
+                    }));
+                }, this);
+                this.form = this.insertView('.form-fixed', new Views.TransactionForm({
+                    model: this.model,
+                    append: function(root, child) {
+                        $(root).prepend(child);
+                    }
+                }));
+            },
+            afterRender: function () {
+                $('a[thumbnail_url]', this.$el).each(function () {
+                    var self = $(this);
+                    var thumbnail = new Image();
+                    thumbnail.onload = function () {
+                        self.tooltip({
+                            html: true,
+                            title: '<img src="' + thumbnail.src + '">',
+                            trigger: 'hover',
+                            placement: 'left'
+                        });
+                    };
+                    thumbnail.src = $(this).attr('thumbnail_url');
+                });
+            },
+            close: function () {
+                app.trigger('task:selected');
+                app.router.navigate('/search');
+                this.remove();
+            },
+            toggleForm: function () {
+                this.form.toggleForm();
             },
             data: function () {
                 return {

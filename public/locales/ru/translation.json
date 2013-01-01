@@ -13,31 +13,42 @@
 
     "Login": "Войти",
     "Logout": "Выйти",
+    "Sign in": "Войти",
+    "Sign up": "Зарегистрироваться",
     "Register": "Регистрация",
+
     "Email": "Адрес электронной почты",
     "Password": "Пароль",
     "Remember me": "Запомнить меня",
-    "Sign in": "Войти",
     "Name": "Имя",
     "First and Last Name": "Имя и фамилия",
     "Verify password": "Повторите пароль",
     "Workspace": "Рабочее пространство",
+    "Workspace Name": "Название пространства",
+    "Search for a user": "Искать пользователя",
+
+    "Workspaces": "Рабочие пространства",
     "Subdomain": "Домен",
     "Workspace Subdomain": "Домен рабочего пространства",
-
-    "Sign up": "Зарегистрироваться",
+    "Details": "Детали",
+    "Users": "Пользователи",
+    "Administrators": "Администраторы",
+    "Clients": "Клиенты",
 
     "Welcome to WeeTrack !": "Добро пожаловать в WeeTrack !",
+    "Add Workspace": "Добавить",
     "Add Project": "Добавить проект",
     "Add Task": "Добавить задачу",
     "New Task": "Новая задача",
-    "Subject": "Заголовок",
+    "Subject": "Название",
     "Project": "Проект",
     "Owner": "Владелец",
     "Readers": "Наблюдатели",
     "Add Comment": "Добавить комментарий",
     "New Comment": "Новый комментарий",
     "Content": "Сообщение",
-    "Create": "Добавить",
-    "by": "от"
+    "Create": "Создать",
+    "by": "от",
+    "Files": "Файлы",
+    "Attach": "Присоединить"
 }
