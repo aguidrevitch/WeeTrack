@@ -69,14 +69,20 @@
 
         /* modal */
         app.use(function (req, res, next) {
-            res.modal = function (code, message) {
+            res.modal = function (code, err) {
                 if (arguments.length == 1) {
-                    message = code;
+                    err = code;
                     code = 500;
                 }
+
+                if (err instanceof Error)
+                    err = err.message;
+
                 res.json(code, {
                     error: {
-                        _modal: message
+                        _modal: {
+                            message: err
+                        }
                     }
                 });
             };
