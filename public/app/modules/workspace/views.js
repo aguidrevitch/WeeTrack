@@ -44,6 +44,7 @@ define([
                                     model: workspace
                                 })
                             });
+                            this.getView('#middle-sidebar').render();
                         }, this));
                     } else {
                         // new workspace
@@ -52,8 +53,8 @@ define([
                                 model: new Workspace()
                             })
                         });
+                        this.getView('#middle-sidebar').render();
                     }
-                    this.getView('#middle-sidebar').render();
                 }, this);
 
                 if (this.options.workspace_id)
