@@ -1625,6 +1625,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // single
         initSelection: function () {
             var selected;
+            console.log(1, this.opts.initSelection);
             if (this.opts.element.val() === "" && this.opts.element.text() === "") {
                 this.close();
                 this.setPlaceholder();
@@ -1826,6 +1827,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // TODO validate placeholder is a string if specified
 
             if (opts.element.get(0).tagName.toLowerCase() === "select") {
+                console.log(1111)
                 // install sthe selection initializer
                 opts.initSelection = function (element,callback) {
 

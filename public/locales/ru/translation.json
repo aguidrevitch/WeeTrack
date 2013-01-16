@@ -30,7 +30,7 @@
     "Workspaces": "Рабочие пространства",
     "Subdomain": "Домен",
     "Workspace Subdomain": "Домен рабочего пространства",
-    "Details": "Детали",
+    "Settings": "Настройки  ",
     "Users": "Пользователи",
     "Administrators": "Администраторы",
     "Clients": "Клиенты",
@@ -48,6 +48,7 @@
     "New Comment": "Новый комментарий",
     "Content": "Сообщение",
     "Create": "Создать",
+    "Save Changes": "Сохранить Изменения",
     "by": "от",
     "Files": "Файлы",
     "Attach": "Присоединить"

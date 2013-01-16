@@ -1,16 +1,19 @@
 <form class="form-horizontal">
-    <legend><%= t('Details') %></legend>
+    <legend>
+        <%= t('Settings') %>
+        <button type="button" class="close close-form">&times;</button>
+    </legend>
     <div class="control-group">
         <label class="control-label"><%= t('Name') %> * </label>
         <div class="controls">
-            <input type="text" name="name" placeholder="<%= t('Workspace Name') %>" value="<%= workspace.escape('name') %>">
+            <input type="text" name="name" placeholder="<%= t('Workspace Name') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label"><%= t('Subdomain') %> * </label>
         <div class="controls">
-            <input type="text" name="subdomain" placeholder="<%= t('Workspace Subdomain') %>" value="<%= workspace.escape('subdomain') %>"> .weetrack.com
+            <input type="text" name="subdomain" placeholder="<%= t('Workspace Subdomain') %>"> .weetrack.com
             <span class="help-inline error"></span>
         </div>
     </div>
@@ -37,6 +40,6 @@
         </div>
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary submit-form"><%= workspace._id ? t('Save') : t('Create') %></button>
+        <button type="submit" class="btn btn-primary submit-form"><%= workspace.id ? t('Save Changes') : t('Create') %></button>
     </div>
 </form>

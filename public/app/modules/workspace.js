@@ -15,6 +15,7 @@ define([
         var Router = router.extend({
             authorized: {
                 "workspace": "workspace",
+                "workspace/": "workspace",
                 "workspace/:workspace": "workspace",
             },
             workspace: function (workspace_id) {
