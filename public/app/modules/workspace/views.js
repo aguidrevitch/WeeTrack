@@ -237,13 +237,14 @@ define([
             saveWorkspace: function () {
                 var view = this;
                 var isNew = this.model.isNew()
-                var workspace = new Workspace();
+                var workspace = new Workspace({ _id: this.model.id });
                 workspace.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
                         view.model = model;
                         view.render();
                         if (isNew)
                             workspaces.push(model);
+                        app.router.navigate('workspace/' + model.id);
                     },
                     error: function (model, res) {
                         var err;
