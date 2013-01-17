@@ -10,6 +10,7 @@
     "Validator \"taken\" failed for path name": "Занято",
     "Validator \"required\" failed for path subject": "Обязательный",
     "Validator \"required\" failed for path content": "Обязательный",
+    "Validator \"syntax\" failed for path subdomain": "Недопустимые символы",
 
     "Login": "Войти",
     "Logout": "Выйти",
@@ -28,12 +29,13 @@
     "Search for a user": "Искать пользователя",
 
     "Workspaces": "Рабочие пространства",
-    "Subdomain": "Домен",
-    "Workspace Subdomain": "Домен рабочего пространства",
+    "Subdomain": "Поддомен",
+    "Workspace Subdomain": "Поддомен рабочего пространства",
     "Settings": "Настройки  ",
     "Users": "Пользователи",
     "Administrators": "Администраторы",
     "Clients": "Клиенты",
+    "Workspace saved": "Рабочее пространство сохранено",
 
     "Welcome to WeeTrack !": "Добро пожаловать в WeeTrack !",
     "Add Workspace": "Добавить",

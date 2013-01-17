@@ -133,10 +133,7 @@ define([
 
             },
             initialize: function () {
-                this.model.on('change', function () {
-                    console.log(this.model);
-                    this.render();
-                }, this);
+                this.model.on('change', this.render, this);
             },
             data: function () {
                 return {
@@ -144,7 +141,6 @@ define([
                 };
             },
             afterRender: function () {
-                //console.log(this.model);
 
                 $("[name=name]").val(this.model.escape('name'));
                 $("[name=subdomain]").val(this.model.escape('subdomain'));
@@ -233,6 +229,15 @@ define([
                 });
                 $("[name=administrators], [name=users], [name=clients]", this.$el).select2('val', []);
                 $("[name=administrators], [name=users], [name=clients]", this.$el).css({'opacity': 1});
+
+                if (this.justSaved) {
+                    $('.alert', this.$el).alert();
+                    $('.alert', this.$el).show();
+                    setTimeout(function () {
+                        $('.alert', this.$el).fadeOut('slow');
+                    }, 2000);
+                }
+                this.justSaved = false;
             },
             saveWorkspace: function () {
                 var view = this;
@@ -241,6 +246,7 @@ define([
                 workspace.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
                         view.model = model;
+                        view.justSaved = true;
                         view.render();
                         if (isNew)
                             workspaces.push(model);
