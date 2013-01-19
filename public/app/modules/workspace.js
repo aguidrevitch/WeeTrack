@@ -16,7 +16,7 @@ define([
             authorized: {
                 "workspace": "workspace",
                 "workspace/": "workspace",
-                "workspace/:workspace": "workspace",
+                "workspace/:workspace": "workspace"
             },
             workspace: function (workspace_id) {
                 app.layout.setViews({

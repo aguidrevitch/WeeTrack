@@ -35,8 +35,7 @@ define([
                 load: 'current',
                 fallbackLng: 'en',
                 resStore: window.I18N,
-                postProcess: 'sprintf',
-                keyseparator: '',
+                postProcess: 'sprintf'
             }, function (t) {
                 // will be called instantly, not deferred
                 window.t = t;

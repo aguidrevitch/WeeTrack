@@ -78,11 +78,11 @@ define([
                 }, this);
 
                 if (this.options.workspace_id)
-                    app.trigger('workspace:selected', this.options.workspace_id)
+                    app.trigger('workspace:selected', this.options.workspace_id);
             },
             cleanup: function () {
                 app.off("workspace:selected", null, this);
-            },
+            }
         });
 
         Views.Info = Backbone.LayoutView.extend({
@@ -154,7 +154,7 @@ define([
                 $(window).on('unload', this.closeForm, this);
             },
             cleanup: function () {
-                $(window).off('unload', this.closeForm, this)
+                $(window).off('unload', this.closeForm, this);
             },
             data: function () {
                 var domain = window.location.hostname.replace(/.*(?:\.\w+\.\w+)/);
@@ -184,7 +184,7 @@ define([
                         return '';
                     },
                     query: function (query) {
-                        var email = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                        var email = /^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                         var self = this;
                         var prev = $(self.element).data('prev') || '';
                         prev = prev.replace(/[(\[\]\.\*\?\^\$\\]/g, function (m) {
@@ -208,7 +208,7 @@ define([
                                     if (data.length) {
                                         _.each(data, function (v) {
                                             v.id = v._id;
-                                            v.text = v.name ? v.name : v.email
+                                            v.text = v.name ? v.name : v.email;
                                         });
                                         query.callback({results: data});
                                     } else {
@@ -262,12 +262,14 @@ define([
                 }
 
                 this.isDirty = false;
-                $(':input:not([class=select2-input])', this.$el).on('keyup', _.bind(function () {
+                $(':input', this.$el).filter(function () {
+                    return !$(this).hasClass('select2-input')
+                }).on('keyup', _.bind(function () {
                     console.log('keyp');
                     this.isDirty = true;
                 }, this));
 
-                $('[class=select2-input]:input', this.$el).on('keyup', _.bind(function () {
+                $("[name=administrators], [name=users], [name=clients]", this.$el).on('change', _.bind(function () {
                     console.log('change');
                     this.isDirty = true;
                 }, this));
@@ -276,7 +278,7 @@ define([
             },
             saveWorkspace: function () {
                 var view = this;
-                var isNew = this.model.isNew()
+                var isNew = this.model.isNew();
                 var workspace = new Workspace({ _id: this.model.id });
                 workspace.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
@@ -305,7 +307,7 @@ define([
                             $(selector, self.el).parents('.control-group').addClass('error');
                             $(selector + ' + .error', self.el).html(t(value.message));
                         });
-                    },
+                    }
                 });
                 return false;
             },

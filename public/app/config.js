@@ -17,7 +17,7 @@ require.config({
         bootstrap: "../assets/vendor/bootstrap/js/bootstrap",
         i18next: "../assets/vendor/i18next/js/i18next",
         moment: "../assets/vendor/moment/js/moment",
-        select2: "../assets/vendor/select2/js/select2",
+        select2: "../assets/vendor/select2/js/select2"
         //"jquery.ui.widget": "../assets/js/libs/jquery.ui.widget",
     },
 

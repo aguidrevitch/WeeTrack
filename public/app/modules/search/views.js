@@ -108,7 +108,7 @@ define([
                     });
                     view.on("afterRender", function () {
                         count--;
-                        if (count == 0 && this.selectedTask) {
+                        if (count === 0 && this.selectedTask) {
                             $('#tasks').scrollTop(0);
                             $('#tasks').scrollTop(this.selectedTask.$el.offset().top - 120);
                         }
@@ -263,7 +263,7 @@ define([
                 });
             },
             afterRender: function () {
-                var self = this
+                var self = this;
                 this.$el.find('.upload-close').on('click', function () {
                     self.options.jqXHR.abort();
                 });
@@ -307,7 +307,7 @@ define([
             data: function () {
                 return {
                     file: this.model
-                }
+                };
             }
         });
         Views.TransactionForm = Backbone.LayoutView.extend({
@@ -374,7 +374,7 @@ define([
                                     }).tooltip('show');
                                     setTimeout(function () {
                                         form.find('[name=' + key + ']:input').tooltip('hide');
-                                    }, 2000)
+                                    }, 2000);
                                     form.find('[name=' + key + ']:input').parents('.control-group').addClass('error');
                                 });
                             }
@@ -391,7 +391,7 @@ define([
                 var saved = function () {
                     if (!--counter)
                         self.toggleForm();
-                }
+                };
 
                 /* saving content */
                 if (serialized.content) {
@@ -432,7 +432,7 @@ define([
             id: 'task-details',
             events: {
                 'click .show-form': 'toggleForm',
-                'click #task-header .close-details': 'close',
+                'click #task-header .close-details': 'close'
             },
             initialize: function () {
                 // this.model.on('change', this.render, this);
