@@ -35,7 +35,8 @@ define([
                 load: 'current',
                 fallbackLng: 'en',
                 resStore: window.I18N,
-                postProcess: 'sprintf'
+                postProcess: 'sprintf',
+                keyseparator: '',
             }, function (t) {
                 // will be called instantly, not deferred
                 window.t = t;
@@ -143,8 +144,26 @@ define([
                 return layout;
             },
             showModal: function (message) {
+                // translation
+                $('#modal .modal-header h3').html(t('Error'));
+                $('#modal .modal-footer a').html(t('Close'));
+
                 $('#modal .modal-body').html(message);
                 $('#modal').modal();
+            },
+            showConfirm: function (message, callback) {
+                // translation
+                $('#confirm .modal-header h3').html(t('Warning'));
+                $('#confirm .modal-footer .yes').html(t('Yes'));
+                $('#confirm .modal-footer .no').html(t('No'));
+
+                $('#confirm .modal-body').html(message);
+                $('#confirm .yes, #confirm .no').on('click', function () {
+                    $('#confirm').modal('hide');
+                    $('#confirm .yes, #confirm .no').off('click', null, null);
+                    callback($(this).hasClass('yes'));
+                });
+                $('#confirm').modal();
             }
         }, Backbone.Events);
 

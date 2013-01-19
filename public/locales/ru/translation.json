@@ -12,6 +12,14 @@
     "Validator \"required\" failed for path content": "Обязательный",
     "Validator \"syntax\" failed for path subdomain": "Недопустимые символы",
 
+    "Unsaved changes": "Данные были изменены, но не сохранены. Сбросить изменения ?",
+
+    "Error": "Ошибка",
+    "Warning": "Предупреждение",
+    "Close": "Закрыть",
+    "Yes": "Да",
+    "No": "Нет",
+
     "Login": "Войти",
     "Logout": "Выйти",
     "Sign in": "Войти",
@@ -54,4 +62,6 @@
     "by": "от",
     "Files": "Файлы",
     "Attach": "Присоединить"
+
+
 }

@@ -39,27 +39,35 @@ define([
                     })
                 });
                 app.on("workspace:selected", function (id) {
-                    if (id && id != 'add') {
-                        app.router.navigate('workspace/' + id);
-                        // existing workspace
-                        var workspace = new Workspace({ _id: id });
-                        this.setViews({
-                            "#middle-sidebar": new Views.Form({
-                                model: workspace
-                            })
-                        });
-                        //this.getView("#middle-sidebar").render();
-                        workspace.fetch();
-                    } else {
-                        app.router.navigate('workspace/add');
-                        // new workspace
-                        this.setViews({
-                            "#middle-sidebar": new Views.Form({
-                                model: new Workspace()
-                            })
-                        });
-                        this.getView('#middle-sidebar').render();
-                    }
+                    var openedForm = this.getView('#middle-sidebar');
+
+                    if (openedForm.model && id == openedForm.model.id)
+                        return;
+
+                    openedForm.close(_.bind(function (yes) {
+                        if (yes) {
+                            if (id && id != 'add') {
+                                app.router.navigate('workspace/' + id);
+                                // existing workspace
+                                var workspace = new Workspace({ _id: id });
+                                this.setViews({
+                                    "#middle-sidebar": new Views.Form({
+                                        model: workspace
+                                    })
+                                });
+                                workspace.fetch();
+                            } else {
+                                app.router.navigate('workspace/add');
+                                // new workspace
+                                this.setViews({
+                                    "#middle-sidebar": new Views.Form({
+                                        model: new Workspace()
+                                    })
+                                });
+                                this.getView('#middle-sidebar').render();
+                            }
+                        }
+                    }, this));
                 }, this);
 
                 app.on("workspace:deselected", function () {
@@ -78,8 +86,17 @@ define([
         });
 
         Views.Info = Backbone.LayoutView.extend({
-            template: 'workspace/info'
-        })
+            template: 'workspace/info',
+            events: {
+                'click .show-form': 'toggleForm'
+            },
+            toggleForm: function () {
+                app.trigger('workspace:selected');
+            },
+            close: function (callback) {
+                callback(true);
+            }
+        });
 
         Views.List = Backbone.LayoutView.extend({
             template: 'workspace/list',
@@ -134,10 +151,16 @@ define([
             },
             initialize: function () {
                 this.model.on('change', this.render, this);
+                $(window).on('unload', this.closeForm, this);
+            },
+            cleanup: function () {
+                $(window).off('unload', this.closeForm, this)
             },
             data: function () {
+                var domain = window.location.hostname.replace(/.*(?:\.\w+\.\w+)/);
                 return {
-                    workspace: this.model
+                    workspace: this.model,
+                    domain: domain
                 };
             },
             afterRender: function () {
@@ -237,6 +260,18 @@ define([
                         $('.alert', this.$el).fadeOut('slow');
                     }, 2000);
                 }
+
+                this.isDirty = false;
+                $(':input:not([class=select2-input])', this.$el).on('keyup', _.bind(function () {
+                    console.log('keyp');
+                    this.isDirty = true;
+                }, this));
+
+                $('[class=select2-input]:input', this.$el).on('keyup', _.bind(function () {
+                    console.log('change');
+                    this.isDirty = true;
+                }, this));
+
                 this.justSaved = false;
             },
             saveWorkspace: function () {
@@ -274,12 +309,24 @@ define([
                 });
                 return false;
             },
+            close: function (callback) {
+                if (this.isDirty) {
+                    app.showConfirm(t('Unsaved changes'), function (yes) {
+                        callback(yes);
+                    });
+                } else {
+                    callback(true);
+                }
+            },
             closeForm: function () {
-                this.remove();
-                app.trigger('workspace:deselected');
+                this.close(function (yes) {
+                    if (yes) {
+                        this.remove();
+                        app.trigger('workspace:deselected');
+                    }
+                });
             }
-        })
-        ;
+        });
 
         app.on('user:authorized', function () {
             workspaces.fetch();

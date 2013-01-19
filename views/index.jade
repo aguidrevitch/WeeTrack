@@ -21,4 +21,11 @@ html(lang='en')
         h3 Error
       .modal-body
       .modal-footer
-        a.btn(href="#",data-bypass="true",data-dismiss="modal") Close
+        a.btn.close(href="#",data-bypass="true",data-dismiss="modal") Close
+    #confirm.modal.hide.fade
+      .modal-header
+        h3 Confirm
+      .modal-body
+      .modal-footer
+        a.btn.yes(href="#",data-bypass="true") Yes
+        a.btn.no(href="#",data-bypass="true") No
