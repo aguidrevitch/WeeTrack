@@ -16,6 +16,17 @@ define([
         Auth.Models.User = Backbone.Model.extend({
             idAttribute: "_id",
             url: '/api/auth',
+            authorizeSession: function () {
+                var self = this;
+                this.fetch({
+                    error: function () {
+                        self.trigger('deauthorized');
+                    },
+                    success: function () {
+                        self.trigger('authorized');
+                    }
+                });
+            },
             authorize: function (attrs, options) {
                 var self = this;
                 this.fetch({
@@ -89,38 +100,27 @@ define([
         Auth.Router = new Router();
 
         user.on('authorized', function () {
+            app.layout.setViews({
+                "nav.top": new Views.TopNavigation({ model: user })
+            });
+            app.layout.getView('nav.top').render();
             app.trigger('user:authorized', user);
         });
 
         user.on('deauthorized', function () {
+            app.layout.setViews({
+                "nav.top": new Views.TopNavigation({ model: user })
+            });
+            app.layout.getView('nav.top').render();
             app.trigger('user:deauthorized', user);
         });
 
-        user.on('error', function () {
-            app.trigger('user:deauthorized');
-        });
-
         app.on('router:unauthorized', function () {
-            Backbone.history.loadUrl('/login');
+            Backbone.history.loadUrl('login');
         });
 
         Auth.init = function () {
-            user.fetch({
-                error: function () {
-                    app.layout.setViews({
-                        "nav.top": new Views.TopNavigation({ model: user })
-                    });
-                    app.layout.getView('nav.top').render();
-                    user.trigger('deauthorized');
-                },
-                success: function () {
-                    app.layout.setViews({
-                        "nav.top": new Views.TopNavigation({ model: user })
-                    });
-                    app.layout.getView('nav.top').render();
-                    user.trigger('authorized');
-                }
-            });
+            user.authorizeSession();
         };
 
         // Return the module for AMD compliance.

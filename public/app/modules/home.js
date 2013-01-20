@@ -11,7 +11,7 @@ define([
         // Create a new module.
         var Home = app.module();
 
-        Home.Views.Home = Backbone.View.extend({
+        Home.Views.Home = Backbone.Layout.extend({
             template: "home"
         });
 

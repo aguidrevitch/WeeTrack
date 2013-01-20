@@ -16,7 +16,6 @@ define([
         var Workspace = Backbone.Model.extend({
             idAttribute: "_id",
             url: function () {
-                //console.log(this, this.id);
                 return this.id ? '/api/workspace/' + this.id : '/api/workspace';
             }
         });
@@ -28,7 +27,7 @@ define([
 
         var workspaces = new Workspaces();
 
-        Views.Layout = Backbone.LayoutView.extend({
+        Views.Layout = Backbone.Layout.extend({
             template: "workspace/layout",
             className: 'row',
             initialize: function () {
@@ -75,6 +74,7 @@ define([
                         "#middle-sidebar": new Views.Info()
                     });
                     this.getView('#middle-sidebar').render();
+                    app.router.navigate('workspace');
                 }, this);
 
                 if (this.options.workspace_id)
@@ -85,7 +85,7 @@ define([
             }
         });
 
-        Views.Info = Backbone.LayoutView.extend({
+        Views.Info = Backbone.Layout.extend({
             template: 'workspace/info',
             events: {
                 'click .show-form': 'toggleForm'
@@ -98,7 +98,7 @@ define([
             }
         });
 
-        Views.List = Backbone.LayoutView.extend({
+        Views.List = Backbone.Layout.extend({
             template: 'workspace/list',
             id: "workspaces",
             events: {
@@ -125,13 +125,13 @@ define([
             }
         });
 
-        Views.Item = Backbone.LayoutView.extend({
+        Views.Item = Backbone.Layout.extend({
             template: "workspace/item",
             tagName: 'li',
             events: {
                 'click a': 'selected'
             },
-            data: function () {
+            serialize: function () {
                 return {
                     workspace: this.model
                 };
@@ -142,7 +142,7 @@ define([
             }
         });
 
-        Views.Form = Backbone.LayoutView.extend({
+        Views.Form = Backbone.Layout.extend({
             template: "workspace/form",
             events: {
                 'click .submit-form': 'saveWorkspace',
@@ -156,7 +156,7 @@ define([
             cleanup: function () {
                 $(window).off('unload', this.closeForm, this);
             },
-            data: function () {
+            serialize: function () {
                 var domain = window.location.hostname.replace(/.*(?:\.\w+\.\w+)/);
                 return {
                     workspace: this.model,
@@ -164,7 +164,6 @@ define([
                 };
             },
             afterRender: function () {
-
                 $("[name=name]").val(this.model.escape('name'));
                 $("[name=subdomain]").val(this.model.escape('subdomain'));
 
@@ -261,19 +260,17 @@ define([
                     }, 2000);
                 }
 
-                this.isDirty = false;
                 $(':input', this.$el).filter(function () {
                     return !$(this).hasClass('select2-input')
                 }).on('keyup', _.bind(function () {
-                    console.log('keyp');
                     this.isDirty = true;
                 }, this));
 
                 $("[name=administrators], [name=users], [name=clients]", this.$el).on('change', _.bind(function () {
-                    console.log('change');
                     this.isDirty = true;
                 }, this));
 
+                this.isDirty = false;
                 this.justSaved = false;
             },
             saveWorkspace: function () {
@@ -322,10 +319,8 @@ define([
             },
             closeForm: function () {
                 this.close(function (yes) {
-                    if (yes) {
-                        this.remove();
+                    if (yes)
                         app.trigger('workspace:deselected');
-                    }
                 });
             }
         });

@@ -11,7 +11,7 @@ define([
 
         var Views = {};
 
-        Views.TopNavigation = Backbone.View.extend({
+        Views.TopNavigation = Backbone.Layout.extend({
             template: "auth/navigation-top",
             chunks: {},
             initialize: function () {
@@ -26,14 +26,14 @@ define([
                     $('#navigation-top-extend').append(html);
                 });
             },
-            data: function () {
+            serialize: function () {
                 return {
                     user: this.model
                 };
             }
         });
 
-        Views.LoginForm = Backbone.View.extend({
+        Views.LoginForm = Backbone.Layout.extend({
             template: "auth/login-form",
             events: {
                 "submit form": "login"
@@ -59,7 +59,7 @@ define([
             }
         });
 
-        Views.RegisterForm = Backbone.View.extend({
+        Views.RegisterForm = Backbone.Layout.extend({
             template: "auth/register",
 
             events: {

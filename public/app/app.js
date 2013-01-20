@@ -60,7 +60,7 @@ define([
         var JST = window.JST = window.JST || {};
 
         // Configure LayoutManager with Backbone Boilerplate defaults.
-        Backbone.LayoutManager.configure({
+        Backbone.Layout.configure({
             // Allow LayoutManager to augment Backbone.View.prototype.
             manage: true,
             prefix: "app/templates/",
@@ -159,7 +159,7 @@ define([
                 $('#confirm .modal-body').html(message);
                 $('#confirm .yes, #confirm .no').on('click', function () {
                     $('#confirm').modal('hide');
-                    $('#confirm .yes, #confirm .no').off('click', null, null);
+                    $('#confirm .yes, #confirm .no').off('click');
                     callback($(this).hasClass('yes'));
                 });
                 $('#confirm').modal();

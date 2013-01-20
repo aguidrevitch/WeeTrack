@@ -60,7 +60,7 @@ define([
         var projects = new Projects();
         var tasks = new Tasks();
 
-        Views.Tasks = Backbone.LayoutView.extend({
+        Views.Tasks = Backbone.Layout.extend({
             template: "search/tasks",
             id: "tasks",
             events: {
@@ -68,7 +68,7 @@ define([
                 'click form .close': 'toggleForm',
                 'click .submit-form': 'addTask'
             },
-            data: function () {
+            serialize: function () {
                 return {
                     projects: this.options.projects
                 };
@@ -158,7 +158,7 @@ define([
             }
         });
 
-        Views.Task = Backbone.LayoutView.extend({
+        Views.Task = Backbone.Layout.extend({
             template: "search/task",
             tagName: 'tr',
             cleanup: function () {
@@ -180,14 +180,14 @@ define([
                         app.trigger('task:selected', this, true);
                 }
             },
-            data: function () {
+            serialize: function () {
                 return {
                     task: this.model
                 };
             }
         });
 
-        Views.Projects = Backbone.LayoutView.extend({
+        Views.Projects = Backbone.Layout.extend({
             template: 'search/projects',
             id: "projects",
             events: {
@@ -234,17 +234,17 @@ define([
             }
         });
 
-        Views.Project = Backbone.LayoutView.extend({
+        Views.Project = Backbone.Layout.extend({
             template: "search/project",
             tagName: 'li',
-            data: function () {
+            serialize: function () {
                 return {
                     project: this.model
                 };
             }
         });
 
-        Views.UploadedFile = Backbone.LayoutView.extend({
+        Views.UploadedFile = Backbone.Layout.extend({
             template: "search/uploaded-file",
             keep: true,
             initialize: function () {
@@ -304,13 +304,13 @@ define([
                     }
                 });
             },
-            data: function () {
+            serialize: function () {
                 return {
                     file: this.model
                 };
             }
         });
-        Views.TransactionForm = Backbone.LayoutView.extend({
+        Views.TransactionForm = Backbone.Layout.extend({
             template: "search/transaction-form",
             events: {
                 'click form .close-form': 'toggleForm',
@@ -420,14 +420,14 @@ define([
             toggleForm: function () {
                 $('form', this.$el).toggle('fast');
             },
-            data: function () {
+            serialize: function () {
                 return {
                     task: this.model
                 };
             }
         });
 
-        Views.TaskDetails = Backbone.LayoutView.extend({
+        Views.TaskDetails = Backbone.Layout.extend({
             template: "search/task-details",
             id: 'task-details',
             events: {
@@ -478,24 +478,24 @@ define([
             toggleForm: function () {
                 this.form.toggleForm();
             },
-            data: function () {
+            serialize: function () {
                 return {
                     task: this.model
                 };
             }
         });
 
-        Views.Transaction = Backbone.LayoutView.extend({
+        Views.Transaction = Backbone.Layout.extend({
             template: "search/transaction",
             tagName: 'li',
-            data: function () {
+            serialize: function () {
                 return {
                     transaction: this.model
                 };
             }
         });
 
-        Views.Layout = Backbone.LayoutView.extend({
+        Views.Layout = Backbone.Layout.extend({
             template: "search/layout",
             className: 'row',
             initialize: function () {
