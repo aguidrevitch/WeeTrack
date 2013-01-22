@@ -1,4 +1,20 @@
-<ul class="nav nav-tabs nav-stacked projects"></ul>
+<% if (workspaces.length) { %>
+<select name="workspace" class="input-medium">
+    <% workspaces.each(function (workspace) { %>
+    <option value="<%= workspace.id %>"><%= workspace.escape('name') %></option>
+    <% }) %>
+</select>
+<ul class="nav nav-tabs nav-stacked projects">
+    <% projects.each(function (project) { %>
+    <li>
+        <a data-id="<%= workspace.id %>" href="/project/<%= project.id %>">
+            <i class="icon-chevron-right"></i>
+            <%= project.escape("name") %>
+        </a>
+    </li>
+    <% }) %>
+</ul>
 <div class="form-fixed">
     <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Project') %></a>
 </div>
+<% } %>

@@ -45,9 +45,12 @@
     "Clients": "Клиенты",
     "Workspace saved": "Рабочее пространство сохранено",
 
+    "Projects": "Проекты",
+    "Project Name": "Название проекта",
+
     "Welcome to WeeTrack !": "Добро пожаловать в WeeTrack !",
     "Add Workspace": "Добавить",
-    "Add Project": "Добавить проект",
+    "Add Project": "Добавить",
     "Add Task": "Добавить задачу",
     "New Task": "Новая задача",
     "Subject": "Название",

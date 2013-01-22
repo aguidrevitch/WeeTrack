@@ -16,3 +16,11 @@
 #content {
     padding-top: 60px;
 }
+
+#workspaces .icon-chevron-right,
+#projects .icon-chevron-right {
+    float: right;
+    margin-top: 2px;
+    margin-right: -6px;
+    opacity: .25;
+}

@@ -1,4 +1,13 @@
-<ul class="nav nav-tabs nav-stacked workspaces"></ul>
+<ul class="nav nav-tabs nav-stacked workspaces">
+    <% workspaces.each(function (workspace) { %>
+    <li>
+        <a data-id="<%= workspace.id %>" href="/workspace/<%= workspace.id %>">
+            <i class="icon-chevron-right"></i>
+            <%= workspace.escape("name") %>
+        </a>
+    </li>
+    <% }) %>
+</ul>
 <div class="form-fixed">
     <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Workspace') %></a>
 </div>

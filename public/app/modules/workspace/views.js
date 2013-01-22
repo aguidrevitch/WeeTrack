@@ -95,6 +95,9 @@ define([
             },
             cleanup: function () {
                 app.off("workspace:selected", null, this);
+                app.off("workspace:deselected", null, this);
+                app.off("user:authorized", null, this);
+                app.off("user:deauthorized", null, this);
             }
         });
 
@@ -115,7 +118,8 @@ define([
             template: 'workspace/list',
             id: "workspaces",
             events: {
-                'click .show-form': 'toggleForm'
+                'click .show-form': 'toggleForm',
+                'click a': 'selected'
             },
             initialize: function () {
                 this.collection.on("reset", this.render, this);
@@ -125,32 +129,17 @@ define([
                 this.collection.off('add', null, this);
                 this.collection.off('reset', null, this);
             },
-            beforeRender: function () {
-                this.collection.each(function (model) {
-                    this.insertView("ul", new Views.Item({
-                        model: model
-                    }));
-                }, this);
+            serialize: function () {
+                return {
+                    workspaces: this.collection
+                };
+            },
+            selected: function (e) {
+                app.trigger('workspace:selected', $(e.target).data('id'));
+                return false;
             },
             toggleForm: function () {
                 app.trigger('workspace:selected');
-                return false;
-            }
-        });
-
-        Views.Item = Backbone.Layout.extend({
-            template: "workspace/item",
-            tagName: 'li',
-            events: {
-                'click a': 'selected'
-            },
-            serialize: function () {
-                return {
-                    workspace: this.model
-                };
-            },
-            selected: function () {
-                app.trigger('workspace:selected', this.model.id);
                 return false;
             }
         });
@@ -274,7 +263,7 @@ define([
                 }
 
                 $(':input', this.$el).filter(function () {
-                    return !$(this).hasClass('select2-input')
+                    return !$(this).hasClass('select2-input');
                 }).on('keyup', _.bind(function () {
                     this.isDirty = true;
                 }, this));
