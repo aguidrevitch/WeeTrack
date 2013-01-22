@@ -37,6 +37,7 @@
     "Search for a user": "Искать пользователя",
 
     "Workspaces": "Рабочие пространства",
+    "Select a workspace on the left, or": "Выберите рабочее пространство слева, или",
     "Subdomain": "Поддомен",
     "Workspace Subdomain": "Поддомен рабочего пространства",
     "Settings": "Настройки  ",
@@ -47,6 +48,8 @@
 
     "Projects": "Проекты",
     "Project Name": "Название проекта",
+    "Select a project on the left, or": "Выберите проект слева, или",
+    "Please add at least one Workspace first": "Сначала создайте хотя бы одно рабочее пространство",
 
     "Welcome to WeeTrack !": "Добро пожаловать в WeeTrack !",
     "Add Workspace": "Добавить",

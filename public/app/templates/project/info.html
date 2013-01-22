@@ -1,8 +1,8 @@
 <% if (workspaces.length) { %>
-Select a project on the left, or
+<%= t('Select a project on the left, or') %>
 <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Project') %></a>
 <% } else { %>
-Please add at least one Workspace first
+<%= t('Please add at least one Workspace first') %>
 <a href="/workspace/add" class="btn show-form"><i class="icon-plus"></i> <%= t('Add Workspace') %></a>
 <% } %>
 
