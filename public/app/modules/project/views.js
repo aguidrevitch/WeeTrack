@@ -46,7 +46,7 @@ define([
             initialize: function () {
 
                 this.workspaces = new Workspaces();
-                //this.workspaces.fetch();
+                this.workspaces.fetch();
 
                 this.collection = new Projects();
                 this.collection.fetch();
