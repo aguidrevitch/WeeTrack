@@ -13,24 +13,38 @@ define([
 
         var Views = {};
 
-        var Workspace = Backbone.Model.extend({
+        var Project = Backbone.Model.extend({
             idAttribute: "_id",
             url: function () {
-                return this.id ? '/api/workspace/' + this.id : '/api/workspace';
+                return this.id ? '/api/project/' + this.id : '/api/project';
+            }
+        });
+
+        var Projects = Backbone.Collection.extend({
+            model: Project,
+            url: function () {
+                if (this.id)
+                    return '/api/project/' + this.id
+                else if (this.workspace_id)
+                    return '/api/project/?workspace=' + this.workspace_id
+                else
+                    return '/api/project/'
             }
         });
 
         var Workspaces = Backbone.Collection.extend({
-            model: Workspace,
             url: '/api/workspace'
         });
 
         Views.Layout = Backbone.Layout.extend({
-            template: "workspace/layout",
+            template: "project/layout",
             className: 'row',
             initialize: function () {
 
-                this.collection = new Workspaces();
+                this.workspaces = new Workspaces();
+                this.workspaces.fetch();
+
+                this.collection = new Projects();
                 this.collection.fetch();
 
                 this.setViews({
@@ -48,7 +62,7 @@ define([
                     this.collection.reset();
                 }, this);
 
-                app.on("workspace:selected", function (id) {
+                app.on("project:selected", function (id) {
                     var openedForm = this.getView('#middle-sidebar');
 
                     if (openedForm.model && id == openedForm.model.id)
@@ -57,23 +71,23 @@ define([
                     openedForm.close(_.bind(function (yes) {
                         if (yes) {
                             if (id && id != 'add') {
-                                app.router.navigate('workspace/' + id);
-                                // existing workspace
-                                var workspace = new Workspace({ _id: id });
+                                app.router.navigate('project/' + id);
+                                // existing project
+                                var project = new Project({ _id: id });
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
                                         collection: this.collection,
-                                        model: workspace
+                                        model: project
                                     })
                                 });
-                                workspace.fetch();
+                                project.fetch();
                             } else {
-                                app.router.navigate('workspace/add');
-                                // new workspace
+                                app.router.navigate('project/add');
+                                // new project
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
                                         collection: this.collection,
-                                        model: new Workspace()
+                                        model: new Project()
                                     })
                                 });
                                 this.getView('#middle-sidebar').render();
@@ -82,29 +96,29 @@ define([
                     }, this));
                 }, this);
 
-                app.on("workspace:deselected", function () {
+                app.on("project:deselected", function () {
                     this.setViews({
                         "#middle-sidebar": new Views.Info()
                     });
                     this.getView('#middle-sidebar').render();
-                    app.router.navigate('workspace');
+                    app.router.navigate('project');
                 }, this);
 
-                if (this.options.workspace_id)
-                    app.trigger('workspace:selected', this.options.workspace_id);
+                if (this.options.project_id)
+                    app.trigger('project:selected', this.options.project_id);
             },
             cleanup: function () {
-                app.off("workspace:selected", null, this);
+                app.off("project:selected", null, this);
             }
         });
 
         Views.Info = Backbone.Layout.extend({
-            template: 'workspace/info',
+            template: 'project/info',
             events: {
                 'click .show-form': 'toggleForm'
             },
             toggleForm: function () {
-                app.trigger('workspace:selected');
+                app.trigger('project:selected');
             },
             close: function (callback) {
                 callback(true);
@@ -112,8 +126,8 @@ define([
         });
 
         Views.List = Backbone.Layout.extend({
-            template: 'workspace/list',
-            id: "workspaces",
+            template: 'project/list',
+            id: "projects",
             events: {
                 'click .show-form': 'toggleForm'
             },
@@ -133,32 +147,32 @@ define([
                 }, this);
             },
             toggleForm: function () {
-                app.trigger('workspace:selected');
+                app.trigger('project:selected');
                 return false;
             }
         });
 
         Views.Item = Backbone.Layout.extend({
-            template: "workspace/item",
+            template: "project/item",
             tagName: 'li',
             events: {
                 'click a': 'selected'
             },
             serialize: function () {
                 return {
-                    workspace: this.model
+                    project: this.model
                 };
             },
             selected: function () {
-                app.trigger('workspace:selected', this.model.id);
+                app.trigger('project:selected', this.model.id);
                 return false;
             }
         });
 
         Views.Form = Backbone.Layout.extend({
-            template: "workspace/form",
+            template: "project/form",
             events: {
-                'click .submit-form': 'saveWorkspace',
+                'click .submit-form': 'saveProject',
                 'click .close-form': 'closeForm'
 
             },
@@ -172,7 +186,7 @@ define([
             serialize: function () {
                 var domain = window.location.hostname.replace(/.*(?:\.\w+\.\w+)/);
                 return {
-                    workspace: this.model,
+                    project: this.model,
                     domain: domain
                 };
             },
@@ -286,18 +300,18 @@ define([
                 this.isDirty = false;
                 this.justSaved = false;
             },
-            saveWorkspace: function () {
+            saveProject: function () {
                 var view = this;
                 var isNew = this.model.isNew();
-                var workspace = new Workspace({ _id: this.model.id });
-                workspace.save(this.$el.find('form').serializeObject(), {
+                var project = new Project({ _id: this.model.id });
+                project.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
                         view.model = model;
                         view.justSaved = true;
                         view.render();
                         if (isNew)
                             view.collection.push(model);
-                        app.router.navigate('workspace/' + model.id);
+                        app.router.navigate('project/' + model.id);
                     },
                     error: function (model, res) {
                         var err;
@@ -333,7 +347,7 @@ define([
             closeForm: function () {
                 this.close(function (yes) {
                     if (yes)
-                        app.trigger('workspace:deselected');
+                        app.trigger('project:deselected');
                 });
             }
         });

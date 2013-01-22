@@ -8,6 +8,7 @@ require([
     // Modules
     "modules/auth",
     "modules/workspace",
+    "modules/project",
     "modules/home",
     "modules/search"
 ],

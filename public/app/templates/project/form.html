@@ -1,0 +1,55 @@
+<form class="form-horizontal">
+    <legend>
+        <%= t('Settings') %>
+        <button type="button" class="close close-form">&times;</button>
+    </legend>
+    <div class="control-group">
+        <label class="control-label"><%= t('Workspace') %> * </label>
+
+        <div class="controls">
+            <select name="workspace" placeholder="<%= t('Select Workspace') %>">
+            </select>
+            <span class="help-inline error"></span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Name') %> * </label>
+
+        <div class="controls">
+            <input type="text" name="name" placeholder="<%= t('Project Name') %>">
+            <span class="help-inline error"></span>
+        </div>
+    </div>
+    <legend><%= t('Users') %></legend>
+    <div class="control-group">
+        <label class="control-label"><%= t('Administrators') %></label>
+
+        <div class="controls">
+            <input type="text" class="input-xxlarge" name="administrators">
+            <span class="help-inline error"></span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Users') %></label>
+
+        <div class="controls">
+            <input type="text" class="input-xxlarge" name="users">
+            <span class="help-inline error"></span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Clients') %></label>
+
+        <div class="controls">
+            <input type="text" class="input-xxlarge" name="clients">
+            <span class="help-inline error"></span>
+        </div>
+    </div>
+    <div class="alert alert-success" style="display:none">
+        <%= t('Workspace saved') %>
+        <!-- <a class="close" data-dismiss="alert" href="#">&times;</a> -->
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary submit-form"><%= project.id ? t('Save Changes') : t('Create') %></button>
+    </div>
+</form>
