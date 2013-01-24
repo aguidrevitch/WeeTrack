@@ -207,26 +207,24 @@ define([
                 $(window).off('unload', this.closeForm, this);
             },
             serialize: function () {
-                var domain = window.location.hostname.replace(/.*(?:\.\w+\.\w+)/);
                 return {
                     project: this.model,
-                    domain: domain
+                    workspaces: this.workspaces
                 };
             },
-            beforeRender: function () {
-                this.workspaces.each(function (workspace) {
-                    this.insertView("select", new Backbone.Layout({
-                        tagName: 'option',
-                        beforeRender: function () {
-                            this.$el.append(workspace.escape('name'));
-                            this.$el.attr('value', workspace.id);
-                        }
-                    }));
-                }, this);
-            },
             afterRender: function () {
-                $("[name=name]").val(this.model.escape('name'));
-                $("[name=subdomain]").val(this.model.escape('subdomain'));
+                var self = this;
+
+                var domain = window.location.hostname.replace(/.*(?:\.\w+\.\w+)/);
+                $('select[name=workspace]', this.$el).on('change', function () {
+                    var select = $(this);
+                    var workspace = self.workspaces.find(function (model) {
+                        return model.id == select.val();
+                    })
+                    if (workspace)
+                        $('.domain', this.$el).html(workspace.escape('subdomain') + '.' + domain);
+                });
+                $('select[name=workspace]', this.$el).val(this.model.get('workspace')).change();
 
                 var select2options = {
                     placeholder: t("Search for a user"),

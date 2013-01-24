@@ -7,7 +7,7 @@
 <ul class="nav nav-tabs nav-stacked projects">
     <% projects.each(function (project) { %>
     <li>
-        <a data-id="<%= workspace.id %>" href="/project/<%= project.id %>">
+        <a data-id="<%= project.id %>" href="/project/<%= project.id %>">
             <i class="icon-chevron-right"></i>
             <%= project.escape("name") %>
         </a>

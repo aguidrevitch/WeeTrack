@@ -51,18 +51,6 @@
 
         app.use('/upload', upload.fileHandler());
 
-        /*
-         upload.on('begin', function () {
-         console.log('begin', arguments)
-         });
-         upload.on('end', function () {
-         console.log('end', arguments)
-         });
-         upload.on('abort', function () {
-         console.log('abort', arguments)
-         });
-         */
-
         app.use(express.bodyParser());
         app.use(gzippo.staticGzip(__dirname + "/public"));
         app.use(gzippo.compress());
@@ -104,46 +92,10 @@
             }
         });
 
-        /* domain */
-        app.use('/api', function (req, res, next) {
-            var domain = req.get('Host') || '';
-            if (domain) {
-                var re = new RegExp("^(.*)\." + config.hostname, "i");
-                var subdomain = (domain.match(re) || [])[1];
-                if (subdomain) {
-                    Workspace.findOne({
-                        subdomain: subdomain
-                    }, function (err, workspace) {
-                        if (workspace)
-                            req.workspace = workspace;
-                        next();
-                    });
-                } else {
-                    next();
-                }
-            } else {
-                next();
-            }
-        });
-
         /* upload file manager */
         app.use('/api', function (req, res, next) {
             req.filemanager = upload.fileManager();
             next();
-        });
-
-        /* main handler */
-        app.use('/api', function (req, res, next) {
-            // registration is sitewide
-            if (req.url.match(/^\/auth/) || req.url.match(/^\/user/) || req.url.match(/^\/workspace/)) {
-                next();
-                return;
-            }
-
-            if (!req.workspace)
-                res.modal('Unknown workspace');
-            else
-                next();
         });
 
         app.use(app.router);

@@ -166,8 +166,6 @@ define([
                 };
             },
             afterRender: function () {
-                $("[name=name]").val(this.model.escape('name'));
-                $("[name=subdomain]").val(this.model.escape('subdomain'));
 
                 var select2options = {
                     placeholder: t("Search for a user"),

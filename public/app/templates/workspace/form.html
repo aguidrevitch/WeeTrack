@@ -7,7 +7,7 @@
         <label class="control-label"><%= t('Name') %> * </label>
 
         <div class="controls">
-            <input type="text" name="name" placeholder="<%= t('Workspace Name') %>">
+            <input type="text" name="name" placeholder="<%= t('Workspace Name') %>"  value="<%= workspace.escape('name') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
@@ -15,7 +15,7 @@
         <label class="control-label"><%= t('Subdomain') %> * </label>
 
         <div class="controls">
-            <input type="text" name="subdomain" placeholder="<%= t('Workspace Subdomain') %>"> .<%= domain %>
+            <input type="text" name="subdomain" placeholder="<%= t('Workspace Subdomain') %>" value="<%= workspace.escape('subdomain') %>"> .<%= domain %>
             <span class="help-inline error"></span>
         </div>
     </div>

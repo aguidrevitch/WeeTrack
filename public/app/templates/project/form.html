@@ -8,6 +8,9 @@
 
         <div class="controls">
             <select name="workspace" placeholder="<%= t('Select Workspace') %>">
+                <% workspaces.each(function (workspace) { %>
+                <option value="<%= workspace.id %>"><%= workspace.escape('name') %></option>
+                <% }) %>
             </select>
             <span class="help-inline error"></span>
         </div>
@@ -16,7 +19,7 @@
         <label class="control-label"><%= t('Name') %> * </label>
 
         <div class="controls">
-            <input type="text" name="name" placeholder="<%= t('Project Name') %>">
+            <input type="text" name="name" placeholder="<%= t('Project Name') %>" value="<%= project.escape('name') %>">
             <span class="help-inline error"></span>
         </div>
     </div>
@@ -24,7 +27,7 @@
         <label class="control-label"><%= t('Email') %> * </label>
 
         <div class="controls">
-            <input type="text" name="email" placeholder="<%= t('Email') %>"> @<%= domain %>
+            <input type="text" name="email" placeholder="<%= t('Email') %>" value="<%= project.escape('email') %>"> @<span class="domain"></span>
             <span class="help-inline error"></span>
         </div>
     </div>
@@ -58,6 +61,7 @@
         <!-- <a class="close" data-dismiss="alert" href="#">&times;</a> -->
     </div>
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary submit-form"><%= project.id ? t('Save Changes') : t('Create') %></button>
+        <button type="submit" class="btn btn-primary submit-form"><%= project.id ? t('Save Changes') : t('Create') %>
+        </button>
     </div>
 </form>
