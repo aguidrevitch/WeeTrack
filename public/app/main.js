@@ -5,7 +5,12 @@ require([
     // Main Router.
     "router",
 
+    // Models
+    "modules/models",
+    "modules/collections",
+
     // Modules
+    "modules/global",
     "modules/auth",
     "modules/workspace",
     "modules/project",
@@ -13,7 +18,7 @@ require([
     "modules/search"
 ],
 
-    function (app, Router, Auth) {
+    function (app, Router, Models, Collections, Global, Auth) {
 
         // Set stacktrace limit for Chrome
         if (Error.stackTraceLimit)
@@ -25,6 +30,10 @@ require([
         // Define your master router on the application namespace and trigger all
         // navigation from this instance.
         app.router = new Router();
+
+        app.models = Models;
+        app.collections = Collections;
+        app.global = Global;
 
         // All navigation that is relative should be passed through the navigate
         // method, to be processed by the router. If the link has a `data-bypass`

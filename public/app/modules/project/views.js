@@ -13,43 +13,12 @@ define([
 
         var Views = {};
 
-        var Project = Backbone.Model.extend({
-            idAttribute: "_id",
-            url: function () {
-                return this.id ? '/api/project/' + this.id : '/api/project';
-            }
-        });
-
-        var Projects = Backbone.Collection.extend({
-            model: Project,
-            url: function () {
-                if (this.id)
-                    return '/api/project/' + this.id;
-                else if (this.workspace_id)
-                    return '/api/project/?workspace=' + this.workspace_id;
-                else
-                    return '/api/project/';
-            }
-        });
-
-        var Workspace = Backbone.Model.extend({
-            idAttribute: "_id"
-        });
-        var Workspaces = Backbone.Collection.extend({
-            model: Workspace,
-            url: '/api/workspace'
-        });
-
         Views.Layout = Backbone.Layout.extend({
             template: "project/layout",
             className: 'row',
             initialize: function () {
 
-                this.workspaces = new Workspaces();
-                this.workspaces.fetch();
-
-                this.collection = new Projects();
-                this.collection.fetch();
+                this.workspaces = this.options.workspaces;
 
                 this.setViews({
                     "#middle-sidebar": new Views.Info({
@@ -86,7 +55,7 @@ define([
                             if (id && id != 'add') {
                                 app.router.navigate('project/' + id);
                                 // existing project
-                                var project = new Project({ _id: id });
+                                var project = new app.models.Project({ _id: id });
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
                                         collection: this.collection,
@@ -102,7 +71,7 @@ define([
                                     "#middle-sidebar": new Views.Form({
                                         collection: this.collection,
                                         workspaces: this.workspaces,
-                                        model: new Project()
+                                        model: new app.models.Project()
                                     })
                                 });
                                 this.getView('#middle-sidebar').render();
@@ -134,17 +103,20 @@ define([
 
         Views.Info = Backbone.Layout.extend({
             template: 'project/info',
+            events: {
+                'click .show-form': 'toggleForm'
+            },
             initialize: function () {
                 this.workspaces = this.options.workspaces;
-                this.workspaces.on('change', this.render, this);
+                this.workspaces.on('sync', this.render, this);
             },
             serialize: function () {
                 return {
                     workspaces: this.workspaces
                 };
             },
-            events: {
-                'click .show-form': 'toggleForm'
+            beforeRender: function () {
+                console.log(this.workspaces.length);
             },
             toggleForm: function () {
                 app.trigger('project:selected');
@@ -164,8 +136,8 @@ define([
             },
             initialize: function () {
                 this.workspaces = this.options.workspaces;
-                this.workspaces.on("change", this.render, this);
-                this.collection.on("reset", this.render, this);
+                this.workspaces.on("sync", this.render, this);
+                this.collection.on("sync", this.render, this);
                 this.collection.on("add", this.render, this);
             },
             serialize: function () {
@@ -200,7 +172,7 @@ define([
             },
             initialize: function () {
                 this.workspaces = this.options.workspaces;
-                this.model.on('change', this.render, this);
+                this.model.on('sync', this.render, this);
                 $(window).on('unload', this.closeForm, this);
             },
             cleanup: function () {
@@ -338,7 +310,7 @@ define([
                 var project = new Project({ _id: this.model.id });
                 project.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
-                        view.model = model;
+                        view.model.set(model.model.attributes);
                         view.justSaved = true;
                         view.render();
                         if (isNew)
@@ -385,5 +357,4 @@ define([
         });
 
         return Views;
-    })
-;
+    });

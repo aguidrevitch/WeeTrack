@@ -13,25 +13,10 @@ define([
 
         var Views = {};
 
-        var Workspace = Backbone.Model.extend({
-            idAttribute: "_id",
-            url: function () {
-                return this.id ? '/api/workspace/' + this.id : '/api/workspace';
-            }
-        });
-
-        var Workspaces = Backbone.Collection.extend({
-            model: Workspace,
-            url: '/api/workspace'
-        });
-
         Views.Layout = Backbone.Layout.extend({
             template: "workspace/layout",
             className: 'row',
             initialize: function () {
-
-                this.collection = new Workspaces();
-                this.collection.fetch();
 
                 this.setViews({
                     "#middle-sidebar": new Views.Info(),
@@ -39,14 +24,6 @@ define([
                         collection: this.collection
                     })
                 });
-
-                app.on('user:authorized', function () {
-                    this.collection.fetch();
-                }, this);
-
-                app.on('user:deauthorized', function () {
-                    this.collection.reset();
-                }, this);
 
                 app.on("workspace:selected", function (id) {
                     var openedForm = this.getView('#middle-sidebar');
@@ -59,7 +36,7 @@ define([
                             if (id && id != 'add') {
                                 app.router.navigate('workspace/' + id);
                                 // existing workspace
-                                var workspace = new Workspace({ _id: id });
+                                var workspace = new app.models.Workspace({ _id: id });
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
                                         collection: this.collection,
@@ -73,7 +50,7 @@ define([
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
                                         collection: this.collection,
-                                        model: new Workspace()
+                                        model: new app.models.Workspace()
                                     })
                                 });
                                 this.getView('#middle-sidebar').render();
@@ -122,12 +99,12 @@ define([
                 'click a': 'selected'
             },
             initialize: function () {
-                this.collection.on("reset", this.render, this);
+                this.collection.on("sync", this.render, this);
                 this.collection.on("add", this.render, this);
             },
             cleanup: function () {
+                this.collection.off('sync', null, this);
                 this.collection.off('add', null, this);
-                this.collection.off('reset', null, this);
             },
             serialize: function () {
                 return {
@@ -152,7 +129,7 @@ define([
 
             },
             initialize: function () {
-                this.model.on('change', this.render, this);
+                this.model.on('sync', this.render, this);
                 $(window).on('unload', this.closeForm, this);
             },
             cleanup: function () {
@@ -276,15 +253,16 @@ define([
             saveWorkspace: function () {
                 var view = this;
                 var isNew = this.model.isNew();
-                var workspace = new Workspace({ _id: this.model.id });
+                var workspace = new app.models.Workspace({ _id: this.model.id });
                 workspace.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
-                        view.model = model;
+                        view.model.set(model.attributes);
                         view.justSaved = true;
                         view.render();
                         if (isNew)
                             view.collection.push(model);
                         app.router.navigate('workspace/' + model.id);
+                        app.trigger('workspace:updated', view.model);
                     },
                     error: function (model, res) {
                         var err;
