@@ -5,10 +5,13 @@ define(['backbone', 'modules/models'], function (Backbone, Models) {
     Collections.Projects = Backbone.Collection.extend({
         model: Models.Project,
         url: function () {
-            if (this.workspace_id)
-                return '/api/project/?workspace=' + this.workspace_id;
+            if (this.workspace)
+                return '/api/project/?workspace=' + this.workspace;
             else
                 return '/api/project/';
+        },
+        setWorkspace: function (id) {
+            this.workspace = id;
         }
     });
 

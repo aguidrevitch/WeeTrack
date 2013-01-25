@@ -19,7 +19,8 @@ define([
             initialize: function () {
 
                 this.workspaces = this.options.workspaces;
-                //this.collection = new app.collections.Projects();
+                this.collection = new app.collections.Projects();
+                this.collection.fetch();
 
                 this.setViews({
                     "#middle-sidebar": new Views.Info({
@@ -33,7 +34,9 @@ define([
 
                 app.on('workspace:selected', function (id) {
                     console.log(id);
-                });
+                    this.collection.setWorkspace(id);
+                    this.collection.fetch();
+                }, this);
 
                 app.on("project:selected", function (id) {
                     var openedForm = this.getView('#middle-sidebar');
