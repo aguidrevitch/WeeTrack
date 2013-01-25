@@ -19,26 +19,17 @@ define([
             initialize: function () {
 
                 this.workspaces = this.options.workspaces;
+                //this.collection = new app.collections.Projects();
 
                 this.setViews({
                     "#middle-sidebar": new Views.Info({
-                        workspaces: this.workspaces
+                        collection: this.workspaces
                     }),
                     "#left-sidebar": new Views.List({
                         collection: this.collection,
                         workspaces: this.workspaces
                     })
                 });
-
-                app.on('user:authorized', function () {
-                    this.workspaces.fetch();
-                    this.collection.fetch();
-                }, this);
-
-                app.on('user:deauthorized', function () {
-                    this.workspaces.reset();
-                    this.collection.reset();
-                }, this);
 
                 app.on('workspace:selected', function (id) {
                     console.log(id);
@@ -83,7 +74,7 @@ define([
                 app.on("project:deselected", function () {
                     this.setViews({
                         "#middle-sidebar": new Views.Info({
-                            workspaces: this.workspaces
+                            collection: this.workspaces
                         })
                     });
                     this.getView('#middle-sidebar').render();
@@ -107,16 +98,15 @@ define([
                 'click .show-form': 'toggleForm'
             },
             initialize: function () {
-                this.workspaces = this.options.workspaces;
-                this.workspaces.on('sync', this.render, this);
+                this.collection.on('sync', this.render, this);
+            },
+            cleanup: function () {
+                this.collection.off('sync', null, this);
             },
             serialize: function () {
                 return {
-                    workspaces: this.workspaces
+                    workspaces: this.collection
                 };
-            },
-            beforeRender: function () {
-                console.log(this.workspaces.length);
             },
             toggleForm: function () {
                 app.trigger('project:selected');
@@ -307,15 +297,16 @@ define([
             saveProject: function () {
                 var view = this;
                 var isNew = this.model.isNew();
-                var project = new Project({ _id: this.model.id });
+                var project = new app.models.Project({ _id: this.model.id });
                 project.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
-                        view.model.set(model.model.attributes);
+                        view.model.set(model.attributes);
                         view.justSaved = true;
                         view.render();
                         if (isNew)
                             view.collection.push(model);
                         app.router.navigate('project/' + model.id);
+                        app.trigger('project:updated', view.model);
                     },
                     error: function (model, res) {
                         var err;
@@ -333,7 +324,7 @@ define([
                         _.each(err, function (value, field) {
                             var selector = '[name="' + field + '"]:input';
                             $(selector, self.el).parents('.control-group').addClass('error');
-                            $(selector + ' + .error', self.el).html(t(value.message));
+                            $(selector, self.el).siblings('.error').html(t(value.message));
                         });
                     }
                 });

@@ -280,7 +280,7 @@ define([
                         _.each(err, function (value, field) {
                             var selector = '[name="' + field + '"]:input';
                             $(selector, self.el).parents('.control-group').addClass('error');
-                            $(selector + ' + .error', self.el).html(t(value.message));
+                            $(selector, self.el).siblings('.error').html(t(value.message));
                         });
                     }
                 });

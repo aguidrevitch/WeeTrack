@@ -11,7 +11,9 @@
     "Validator \"required\" failed for path subject": "Required",
     "Validator \"required\" failed for path content": "Required",
     "Validator \"syntax\" failed for path subdomain": "Disallowed sybmols",
+    "Validator \"workspace update\" failed for path workspace": "Not allowed yet",
+    "Validator \"taken\" failed for path email": "Already taken",
 
-    "Unsaved changes": "The data was updated but not saved. Discard changes ?"
+   "Unsaved changes": "The data was updated but not saved. Discard changes ?"
 
 }

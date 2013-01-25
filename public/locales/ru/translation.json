@@ -11,6 +11,8 @@
     "Validator \"required\" failed for path subject": "Обязательный",
     "Validator \"required\" failed for path content": "Обязательный",
     "Validator \"syntax\" failed for path subdomain": "Недопустимые символы",
+    "Validator \"workspace update\" failed for path workspace": "Пока нельзя изменить",
+    "Validator \"taken\" failed for path email": "Занят",
 
     "Unsaved changes": "Данные были изменены, но не сохранены. Сбросить изменения ?",
 
