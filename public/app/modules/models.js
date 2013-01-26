@@ -55,7 +55,7 @@ define(["backbone"], function (Backbone) {
             options.success = function (model, xhr, options) {
                 model.trigger('authorized');
                 if (success)
-                    success(model, xhr, options)
+                    success(model, xhr, options);
             };
             Backbone.Model.prototype.save.call(this, attrs, options);
         }

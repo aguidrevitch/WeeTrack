@@ -78,7 +78,7 @@ define([
 
                 if (this.options.project_id)
                     app.trigger('project:selected', this.options.project_id);
-            },
+            }
         });
 
         Views.Info = Backbone.Layout.extend({
@@ -162,7 +162,7 @@ define([
                     var select = $(this);
                     var workspace = self.workspaces.find(function (model) {
                         return model.id == select.val();
-                    })
+                    });
                     if (workspace)
                         $('.domain', this.$el).html(workspace.escape('subdomain') + '.' + domain);
                 });

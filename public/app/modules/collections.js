@@ -5,7 +5,7 @@ define(['backbone', 'modules/models'], function (Backbone, Models) {
     Collections.Projects = Backbone.Collection.extend({
         model: Models.Project,
         url: function () {
-            var query = {}
+            var query = {};
 
             if (this.workspace)
                 query.workspace = this.workspace;
@@ -40,7 +40,7 @@ define(['backbone', 'modules/models'], function (Backbone, Models) {
     Collections.Workspaces = Backbone.Collection.extend({
         model: Models.Workspace,
         url: function () {
-            var query = {}
+            var query = {};
 
             if (this.perm)
                 query.perm = this.perm;
