@@ -1,7 +1,8 @@
 <% if (workspaces.length) { %>
 <select name="workspace" class="input-medium">
+    <option value="" <%= !projects.getWorkspace() ? 'selected="selected"': '' %>><%= t('All') %></option>
     <% workspaces.each(function (workspace) { %>
-    <option value="<%= workspace.id %>"><%= workspace.escape('name') %></option>
+    <option value="<%= workspace.id %>" <%= (projects.getWorkspace() == workspace.id) ? 'selected="selected"': '' %>><%= workspace.escape('name') %></option>
     <% }) %>
 </select>
 <ul class="nav nav-tabs nav-stacked projects">

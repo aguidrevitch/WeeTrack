@@ -32,12 +32,6 @@ define([
                     })
                 });
 
-                app.on('workspace:selected', function (id) {
-                    console.log(id);
-                    this.collection.setWorkspace(id);
-                    this.collection.fetch();
-                }, this);
-
                 app.on("project:selected", function (id) {
                     var openedForm = this.getView('#middle-sidebar');
 
@@ -144,7 +138,8 @@ define([
                 this.collection.off('reset', null, this);
             },
             workspaceChanged: function (e) {
-                app.trigger('workspace:selected', $(e.target).val());
+                this.collection.setWorkspace($(e.target).val());
+                this.collection.fetch();
             },
             selected: function (e) {
                 app.trigger('project:selected', $(e.target).data('id'));

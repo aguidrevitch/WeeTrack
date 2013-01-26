@@ -8,9 +8,18 @@
 
         <div class="controls">
             <select name="workspace" placeholder="<%= t('Select Workspace') %>">
+                <% if (project.isNew() ) { %>
                 <% workspaces.each(function (workspace) { %>
                 <option value="<%= workspace.id %>"><%= workspace.escape('name') %></option>
                 <% }) %>
+                <% } else { %>
+                <% workspaces.each(function (workspace) { %>
+                <% if (workspace.id == project.get('workspace')) { %>
+                <option value="<%= workspace.id %>"><%= workspace.escape('name') %></option>
+                <% } %>
+                <% }) %>
+                <%= project.escape('workspace') %>
+                <% } %>
             </select>
             <span class="help-inline error"></span>
         </div>
@@ -27,7 +36,8 @@
         <label class="control-label"><%= t('Email') %> * </label>
 
         <div class="controls">
-            <input type="text" name="email" placeholder="<%= t('Email') %>" value="<%= project.escape('email') %>"> @<span class="domain"></span>
+            <input type="text" name="email" placeholder="<%= t('Email') %>" value="<%= project.escape('email') %>">
+            @<span class="domain"></span>
             <span class="help-inline error"></span>
         </div>
     </div>
