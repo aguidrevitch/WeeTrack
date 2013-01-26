@@ -39,7 +39,22 @@ define(['backbone', 'modules/models'], function (Backbone, Models) {
 
     Collections.Workspaces = Backbone.Collection.extend({
         model: Models.Workspace,
-        url: '/api/workspace'
+        url: function () {
+            var query = {}
+
+            if (this.perm)
+                query.perm = this.perm;
+
+            if (_.keys(query).length) {
+                var qs = [];
+                _.each(query, function (value, key) {
+                    qs.push(key + '=' + value);
+                });
+                return '/api/workspace/?' + qs.join('&');
+            } else {
+                return '/api/workspace/';
+            }
+        }
     });
 
     return Collections;
