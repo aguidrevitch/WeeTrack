@@ -11,63 +11,6 @@ define([
 
         var Auth = app.module();
 
-        Auth.Models = {};
-
-        Auth.Models.User = Backbone.Model.extend({
-            idAttribute: "_id",
-            url: '/api/auth',
-            authorizeSession: function () {
-                var self = this;
-                this.fetch({
-                    error: function () {
-                        self.trigger('deauthorized');
-                    },
-                    success: function () {
-                        self.trigger('authorized');
-                    }
-                });
-            },
-            authorize: function (attrs, options) {
-                var self = this;
-                this.fetch({
-                    data: {
-                        email: attrs.email,
-                        password: attrs.password,
-                        remember_me: attrs.remember_me
-                    },
-                    error: function (model, res) {
-                        var error = ($.parseJSON(res.responseText)).error;
-
-                        user.set({
-                            _id: null
-                        });
-
-                        self.trigger('deauthorized');
-                        if (options.error)
-                            options.error(error);
-                    },
-                    success: function (model, res) {
-                        self.trigger('authorized');
-                        if (options.success)
-                            options.success(model, res);
-                    }
-                });
-            },
-            deauthorize: function () {
-                var self = this;
-                self.destroy({
-                    success: function () {
-                        user.set({
-                            _id: null
-                        });
-                        self.trigger('deauthorized');
-                    }
-                });
-            }
-        });
-
-        var user = new Auth.Models.User();
-
         var Router = router.extend({
             routes: {
                 "logout": "logout"
@@ -79,19 +22,18 @@ define([
             login: function () {
                 app.layout.setViews({
                     "section": new Views.LoginForm({
-                        model: user
+                        model: app.global.user
                     })
                 }).render();
             },
             logout: function () {
-                user.deauthorize();
+                app.global.user.deauthorize();
                 app.router.navigate('/', true);
             },
             register: function () {
-                var user = new Auth.Models.User();
                 app.layout.setViews({
                     "section": new Views.RegisterForm({
-                        model: user
+                        model: app.global.user
                     })
                 }).render();
             }
@@ -99,20 +41,24 @@ define([
 
         Auth.Router = new Router();
 
-        user.on('authorized', function () {
+        app.on('user:authorized', function (user) {
+            //console.log('user:authorized', user.id);
             app.layout.setViews({
-                "nav.top": new Views.TopNavigation({ model: user })
+                ".user-nav": new Views.TopNavigation({
+                    model: user
+                })
             });
-            app.layout.getView('nav.top').render();
-            app.trigger('user:authorized', user);
+            app.layout.getView('.user-nav').render();
         });
 
-        user.on('deauthorized', function () {
+        app.on('user:deauthorized', function (user) {
+            console.log('user:deauthorized', user.id);
             app.layout.setViews({
-                "nav.top": new Views.TopNavigation({ model: user })
+                ".user-nav": new Views.TopNavigation({
+                    model: user
+                })
             });
-            app.layout.getView('nav.top').render();
-            app.trigger('user:deauthorized', user);
+            app.layout.getView('.user-nav').render();
         });
 
         app.on('router:unauthorized', function () {
@@ -120,7 +66,7 @@ define([
         });
 
         Auth.init = function () {
-            user.authorizeSession();
+            app.global.user.authorizeSession();
         };
 
         // Return the module for AMD compliance.

@@ -12,11 +12,13 @@ define([
         var Views = {};
 
         Views.TopNavigation = Backbone.Layout.extend({
+            tagName: 'ul',
+            className: 'nav pull-right',
             template: "auth/navigation-top",
             chunks: {},
             initialize: function () {
-                this.model.on('change', this.render, this);
-                app.on('navigation-top:add', function (id, html) {
+                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(app, 'navigation-top:add', function (id, html) {
                     this.chunks[id] = html;
                     this.render();
                 }, this);
@@ -39,7 +41,7 @@ define([
                 "submit form": "login"
             },
             initialize: function () {
-                this.model.on('change', this.render, this);
+                this.listenTo(this.model, 'change', this.render);
             },
             login: function () {
                 var data = this.$el.find('form').serializeObject();
@@ -50,7 +52,8 @@ define([
                     },
                     success: function () {
                         if (location.pathname.indexOf('/login') !== 0)
-                            Backbone.history.loadUrl(location.pathname);
+                            app.router.navigate(location.pathname, true);
+                            //Backbone.history.loadUrl(location.pathname);
                         else
                             app.router.navigate('/search', true);
                     }
@@ -61,11 +64,9 @@ define([
 
         Views.RegisterForm = Backbone.Layout.extend({
             template: "auth/register",
-
             events: {
                 "submit form": "register"
             },
-
             register: function (e) {
                 var self = this;
                 var data = this.$el.find('form').serializeObject();
@@ -88,7 +89,7 @@ define([
                         });
                     },
                     success: function (model) {
-                        app.router.navigate('workspace/add');
+                        app.router.navigate('workspace/add', { trigger: true });
                     }
                 });
                 return false;

@@ -125,6 +125,7 @@ define([
 
                 // Create a new Layout with options.
                 var layout = new Backbone.Layout(_.extend({
+
                     template: name,
                     className: "layout " + name,
                     id: "layout"

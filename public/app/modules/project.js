@@ -19,13 +19,15 @@ define([
                 "project/:project_id": "project"
             },
             project: function (project_id) {
+                var projects = new app.collections.Projects();
                 app.layout.setViews({
                     "section": new Views.Layout({
                         project_id: project_id,
-                        collection: app.global.projects,
+                        collection: projects,
                         workspaces: app.global.workspaces
                     })
                 }).render();
+                projects.fetch();
             }
         });
 

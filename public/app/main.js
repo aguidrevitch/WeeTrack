@@ -75,6 +75,6 @@ require([
         });
 
         // trying to authorize by session
-        Auth.init();
+        app.global.user.authorizeSession();
 
     });

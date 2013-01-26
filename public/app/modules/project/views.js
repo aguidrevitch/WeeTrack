@@ -19,8 +19,6 @@ define([
             initialize: function () {
 
                 this.workspaces = this.options.workspaces;
-                this.collection = new app.collections.Projects();
-                this.collection.fetch();
 
                 this.setViews({
                     "#middle-sidebar": new Views.Info({
@@ -32,7 +30,7 @@ define([
                     })
                 });
 
-                app.on("project:selected", function (id) {
+                this.listenTo(app, 'project:selected', function (id) {
                     var openedForm = this.getView('#middle-sidebar');
 
                     if (openedForm.model && id == openedForm.model.id)
@@ -68,7 +66,7 @@ define([
                     }, this));
                 }, this);
 
-                app.on("project:deselected", function () {
+                this.listenTo(app, 'project:deselected', function () {
                     this.setViews({
                         "#middle-sidebar": new Views.Info({
                             collection: this.workspaces
@@ -81,12 +79,6 @@ define([
                 if (this.options.project_id)
                     app.trigger('project:selected', this.options.project_id);
             },
-            cleanup: function () {
-                app.off("workspace:selected", null, this);
-                app.off("workspace:deselected", null, this);
-                app.off("project:selected", null, this);
-                app.off("project:deselected", null, this);
-            }
         });
 
         Views.Info = Backbone.Layout.extend({
@@ -95,10 +87,7 @@ define([
                 'click .show-form': 'toggleForm'
             },
             initialize: function () {
-                this.collection.on('sync', this.render, this);
-            },
-            cleanup: function () {
-                this.collection.off('sync', null, this);
+                this.listenTo(this.collection, 'sync', this.render);
             },
             serialize: function () {
                 return {
@@ -123,19 +112,15 @@ define([
             },
             initialize: function () {
                 this.workspaces = this.options.workspaces;
-                this.workspaces.on("sync", this.render, this);
-                this.collection.on("sync", this.render, this);
-                this.collection.on("add", this.render, this);
+                this.listenTo(this.workspaces, 'sync', this.render);
+                this.listenTo(this.collection, 'sync', this.render);
+                this.listenTo(this.collection, 'add', this.render);
             },
             serialize: function () {
                 return {
                     projects: this.collection,
                     workspaces: this.workspaces
                 };
-            },
-            cleanup: function () {
-                this.collection.off('add', null, this);
-                this.collection.off('reset', null, this);
             },
             workspaceChanged: function (e) {
                 this.collection.setWorkspace($(e.target).val());
@@ -160,11 +145,8 @@ define([
             },
             initialize: function () {
                 this.workspaces = this.options.workspaces;
-                this.model.on('sync', this.render, this);
-                $(window).on('unload', this.closeForm, this);
-            },
-            cleanup: function () {
-                $(window).off('unload', this.closeForm, this);
+                this.listenTo(this.model, 'sync', this.render);
+                this.listenTo($(window), 'unload', this.closeForm);
             },
             serialize: function () {
                 return {
