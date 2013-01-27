@@ -12,145 +12,158 @@ define([
     function (app, Backbone, $, _, Auth) {
 
         var Views = {};
-        var TASK_ID;
 
-        var Project = Backbone.Model.extend({
-            idAttribute: "_id",
-            url: '/api/project'
-        });
+        Views.Layout = Backbone.Layout.extend({
+            template: "home/layout",
+            className: 'row',
+            initialize: function () {
+                this.workspaces = this.options.workspaces;
+                this.projects = this.options.projects;
 
-        var Projects = Backbone.Collection.extend({
-            model: Project,
-            url: '/api/project'
-        });
+                this.setViews({
+                    "#top-sidebar": new Views.Filter({
+                        workspaces: this.workspaces,
+                        projects: this.projects
+                    }),
+                    "#left-sidebar": new Views.List({
+                        collection: this.collection
+                    }),
+                    "#right-sidebar": new Views.Info({
+                        model: new app.models.Task()
+                    })
+                });
 
-        var Transaction = Backbone.Model.extend({
-            url: '/api/transaction'
-        });
+                this.listenTo(app, 'task:selected', function (id) {
+                    var openedForm = this.getView('#right-sidebar');
 
-        var Transactions = Backbone.Collection.extend({
-            url: '/api/transaction',
-            model: Transaction
-        });
+                    if (openedForm.model && id == openedForm.model.id)
+                        return;
 
-        var Task = Backbone.Model.extend({
-            idAttribute: "id",
-            url: function () {
-                return this.id ? '/api/task/' + this.id : '/api/task';
-            },
-            initialize: function (attributes) {
-                this.transactions = new Transactions();
-                if (attributes && attributes.transactions)
-                    this.transactions.reset(attributes.transactions);
-            },
-            parse: function (response) {
-                if (!this.transactions)
-                    this.transactions = new Transactions();
-                this.transactions.reset(response.transactions);
-                delete response.transactions;
-                return response;
+                    openedForm.close(_.bind(function (yes) {
+                        if (yes) {
+                            if (id && id != 'add') {
+                                app.router.navigate(id);
+                                // existing project
+                                var task = new app.models.Task({ _id: id });
+                                this.setViews({
+                                    "#right-sidebar": new Views.Form({
+                                        projects: this.projects,
+                                        model: task
+                                    })
+                                });
+                                task.fetch();
+                            } else {
+                                app.router.navigate('add');
+                                // new project
+                                this.setViews({
+                                    "#right-sidebar": new Views.Form({
+                                        projects: this.projects,
+                                        model: new app.models.Task()
+                                    })
+                                });
+                                this.getView('#right-sidebar').render();
+                            }
+                        }
+                    }, this));
+                }, this);
+
+                this.listenTo(app, 'task:deselected', function () {
+                    this.setViews({
+                        "#right-sidebar": new Views.Info({
+                            model: new app.models.Task()
+                        })
+                    });
+                    this.getView('#rigth-sidebar').render();
+                    app.router.navigate('');
+                }, this);
+
+                if (this.options.task_id)
+                    app.trigger('task:selected', this.options.task_id);
             }
         });
 
-        var Tasks = Backbone.Collection.extend({
-            model: Task,
-            url: '/api/task'
+        Views.Info = Backbone.Layout.extend({
+            template: 'home/info',
+            close: function (callback) {
+                callback(true);
+            }
         });
 
-        var projects = new Projects();
-        var tasks = new Tasks();
+        Views.Filter = Backbone.Layout.extend({
+            template: 'home/filter'
+        });
 
-        Views.Tasks = Backbone.Layout.extend({
-            template: "search/tasks",
+        Views.List = Backbone.Layout.extend({
+            template: "home/list",
             id: "tasks",
             events: {
                 'click .show-form': 'toggleForm',
-                'click form .close': 'toggleForm',
-                'click .submit-form': 'addTask'
+            },
+            initialize: function () {
+                this.listenTo(this.collection, 'sync', this.render)
+                this.listenTo(this.collection, 'add', this.render)
             },
             serialize: function () {
                 return {
-                    projects: this.options.projects
+                    tasks: this.collection
                 };
             },
-            initialize: function () {
-                this.collection.on("reset", this.niceRender, this);
-                this.collection.on("add", this.niceRender, this);
-                this.options.projects.on("reset", this.niceRender, this);
-                this.options.projects.on("add", this.niceRender, this);
-                var selectedView;
-                app.on("task:selected", function (view, scroll) {
-                    if (scroll)
-                        this.selectedTask = view;
-                    if (selectedView)
-                        selectedView.trigger('deselected');
-                    if (view)
-                        view.trigger('selected');
-                    selectedView = view;
-                }, this);
-            },
-            cleanup: function () {
-                app.off("task:selected", null, this);
-                this.options.projects.off(null, null, this);
-            },
-            niceRender: function () {
-                if ($('form', this.$el).is(':visible')) {
-                    $('form', this.$el).hide('fast', _.bind(this.render, this));
-                } else {
-                    this.render();
-                }
-            },
             beforeRender: function () {
-                var count = this.collection.length;
                 this.collection.each(function (model) {
                     var view = new Views.Task({
                         model: model
                     });
-                    view.on("afterRender", function () {
-                        count--;
-                        if (count === 0 && this.selectedTask) {
-                            $('#tasks').scrollTop(0);
-                            $('#tasks').scrollTop(this.selectedTask.$el.offset().top - 120);
-                        }
-                    }, this);
-                    this.insertView("table", view);
-                }, this);
-
-                this.options.projects.each(function (project) {
-                    this.insertView('select', new Backbone.LayoutView({
-                        tagName: 'option',
-                        beforeRender: function () {
-                            this.$el.append(project.escape('name'));
-                            this.$el.attr('value', project.id);
-                        }
-                    }));
                 }, this);
             },
             toggleForm: function (e, callback) {
-                $('form', this.$el).toggle('fast', callback);
+                app.router.navigate('add');
+                return false;
             },
-            addTask: function () {
-                var self = this;
-                var task = new this.collection.model();
+        });
+
+        Views.Form = Backbone.Layout.extend({
+            template: "home/form",
+            events: {
+                'click .submit-form': 'saveTask'
+            },
+            initialize: function () {
+                this.projects = this.options.projects
+            },
+            serialize: function () {
+                return {
+                    projects: this.projects
+                }
+            },
+            saveTask: function () {
+                var view = this;
+                var isNew = this.model.isNew();
+                var task = new app.models.Task({ _id: this.model.id });
                 task.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
-                        self.collection.push(model);
+                        view.model.set(model.attributes);
+                        view.justSaved = true;
+                        view.render();
+                        if (isNew)
+                            view.collection.push(model);
+                        app.router.navigate('/' + model.id);
                     },
                     error: function (model, res) {
-                        var err = ($.parseJSON(res.responseText)).error;
+                        var err;
+                        try {
+                            err = ($.parseJSON(res.responseText)).error;
+                        } catch (e) {
+                            return;
+                        }
+
+                        if (err._modal)
+                            app.showModal(err._modal.message);
+
                         $(':input + .error', self.el).html('');
                         $(':input', self.el).parents('.control-group').removeClass('error');
                         _.each(err, function (value, field) {
                             var selector = '[name="' + field + '"]:input';
                             $(selector, self.el).parents('.control-group').addClass('error');
-                            $(selector, self.el).tooltip({
-                                trigger: 'focus',
-                                title: t(value.message)
-                            }).tooltip();
-                            $(selector, self.el).on('keyup', function () {
-                                $(selector, self.el).parents('.control-group').removeClass('error');
-                                $(selector, self.el).tooltip('destroy');
-                            });
+                            $(selector, self.el).siblings('.error').html(t(value.message));
                         });
                     }
                 });
@@ -495,51 +508,7 @@ define([
             }
         });
 
-        Views.Layout = Backbone.Layout.extend({
-            template: "search/layout",
-            className: 'row',
-            initialize: function () {
-                this.setViews({
-                    "#left-sidebar": new Views.Projects({
-                        collection: projects
-                    }),
-                    "#middle-sidebar": new Views.Tasks({
-                        collection: tasks,
-                        projects: projects
-                    })
-                });
-                app.on("task:selected", function (view) {
-                    if (view) {
-                        var task = new Task({ id: view.model.id });
-                        task.fetch().done(_.bind(function () {
-                            this.setViews({
-                                "#right-sidebar": new Views.TaskDetails({
-                                    model: task
-                                })
-                            });
-                            this.getView('#right-sidebar').render();
-                        }, this));
-                        $('#middle-sidebar').removeClass('span10');
-                        $('#middle-sidebar').addClass('span5');
-                    } else {
-                        $('#middle-sidebar').addClass('span10');
-                        $('#middle-sidebar').removeClass('span5');
-                    }
-                }, this);
-
-                if (this.options.task_id)
-                    TASK_ID = this.options.task_id;
-            },
-            cleanup: function () {
-                app.off("task:selected", null, this);
-            },
-            afterRender: function () {
-                // task:selected can fire before view is actually rendered
-                // so we must re-render #middle-sidebar and re-fire task:selected
-                this.getView('#middle-sidebar').render();
-            }
-        });
-
+        /*
         app.on('user:authorized', function () {
             tasks.fetch();
             projects.fetch();
@@ -549,6 +518,7 @@ define([
             tasks.reset();
             projects.reset();
         });
+        */
 
         return Views;
     });

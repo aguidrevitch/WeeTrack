@@ -1,6 +1,26 @@
-define(['backbone', 'modules/models'], function (Backbone, Models) {
+define(['backbone', 'modules/models', 'modules/transaction'], function (Backbone, Models, Transaction) {
 
     var Collections = {};
+
+    Collections.Workspaces = Backbone.Collection.extend({
+        model: Models.Workspace,
+        url: function () {
+            var query = {};
+
+            if (this.perm)
+                query.perm = this.perm;
+
+            if (_.keys(query).length) {
+                var qs = [];
+                _.each(query, function (value, key) {
+                    qs.push(key + '=' + value);
+                });
+                return '/api/workspace/?' + qs.join('&');
+            } else {
+                return '/api/workspace/';
+            }
+        }
+    });
 
     Collections.Projects = Backbone.Collection.extend({
         model: Models.Project,
@@ -37,26 +57,12 @@ define(['backbone', 'modules/models'], function (Backbone, Models) {
         }
     });
 
-    Collections.Workspaces = Backbone.Collection.extend({
-        model: Models.Workspace,
-        url: function () {
-            var query = {};
-
-            if (this.perm)
-                query.perm = this.perm;
-
-            if (_.keys(query).length) {
-                var qs = [];
-                _.each(query, function (value, key) {
-                    qs.push(key + '=' + value);
-                });
-                return '/api/workspace/?' + qs.join('&');
-            } else {
-                return '/api/workspace/';
-            }
-        }
+    Collections.Tasks = Backbone.Collection.extend({
+        model: Models.Task,
+        url: '/api/task'
     });
 
-    return Collections;
+    Collections.Transactions = Transaction.Collection;
 
+    return Collections;
 });

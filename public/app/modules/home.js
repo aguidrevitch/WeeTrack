@@ -1,27 +1,33 @@
 define([
     // Application.
     "app",
-    // Router
-    "router"
+    "router",
+
+    // Views
+    "modules/home/views"
+
 ],
 
-    // Map dependencies from above array.
-    function (app, router) {
+    function (app, router, Views) {
 
-        // Create a new module.
         var Home = app.module();
 
-        Home.Views.Home = Backbone.Layout.extend({
-            template: "home"
-        });
-
         var Router = router.extend({
-            routes: {
-                "": "index"
+            authorized: {
+                "": "home"
             },
-            index: function () {
+            initialize: function (options) {
+                this.route(/^(add)$/, "task", this.home);
+                this.route(/^(\d+)/, "task", this.home);
+            },
+            home: function (task_id) {
                 app.layout.setViews({
-                    "section": new Home.Views.Home()
+                    "section": new Views.Layout({
+                        workspaces: app.global.workspaces,
+                        projects: app.global.projects,
+                        collection: app.global.tasks,
+                        task_id: task_id
+                    })
                 }).render();
             }
         });

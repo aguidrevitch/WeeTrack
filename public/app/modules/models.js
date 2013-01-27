@@ -1,4 +1,4 @@
-define(["backbone"], function (Backbone) {
+define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
 
     var Models = {};
 
@@ -61,6 +61,13 @@ define(["backbone"], function (Backbone) {
         }
     });
 
+    Models.Workspace = Backbone.Model.extend({
+        idAttribute: "_id",
+        url: function () {
+            return this.id ? '/api/workspace/' + this.id : '/api/workspace';
+        }
+    });
+
     Models.Project = Backbone.Model.extend({
         idAttribute: "_id",
         url: function () {
@@ -68,12 +75,26 @@ define(["backbone"], function (Backbone) {
         }
     });
 
-    Models.Workspace = Backbone.Model.extend({
-        idAttribute: "_id",
+    Models.Task = Backbone.Model.extend({
+        idAttribute: "id",
         url: function () {
-            return this.id ? '/api/workspace/' + this.id : '/api/workspace';
+            return this.id ? '/api/task/' + this.id : '/api/task';
+        },
+        initialize: function (attributes) {
+            this.transactions = new Transaction.Collection();
+            if (attributes && attributes.transactions)
+                this.transactions.reset(attributes.transactions);
+        },
+        parse: function (response) {
+            if (!this.transactions)
+                this.transactions = new Transaction.Collection();
+            this.transactions.reset(response.transactions);
+            delete response.transactions;
+            return response;
         }
     });
+
+    Models.Transaction = Transaction.Model;
 
     return Models;
 });

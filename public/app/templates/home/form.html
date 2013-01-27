@@ -1,0 +1,69 @@
+<form id="form-task-add" class="form form-horizontal">
+    <legend><%= t('New Task') %>
+        <button type="button" class="close">&times;</button>
+    </legend>
+    <div class="control-group">
+        <label class="control-label"><%= t('Project') %></label>
+
+        <div class="controls">
+            <select name="project">
+                <% projects.each(function (project) { %>
+                <option value="<%= project.id %>"><%= project.escape('name') %></option>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Status') %> *</label>
+
+        <div class="controls">
+            <input type="text" name="status" value="new">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Subject') %> *</label>
+
+        <div class="controls">
+            <input type="text" name="subject">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Owner') %></label>
+        <div class="controls">
+            <input type="text" name="owner">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Administrators') %></label>
+
+        <div class="controls">
+            <input type="text" name="administrators">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Users') %></label>
+
+        <div class="controls">
+            <input type="text" name="administrators">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Clients') %></label>
+
+        <div class="controls">
+            <input type="text" name="administrators">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Content') %> * </label>
+
+        <div class="controls">
+            <textarea name="content"></textarea>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button class="btn btn-primary submit-form"><%= t('Create') %></button>
+        </div>
+    </div>
+</form>

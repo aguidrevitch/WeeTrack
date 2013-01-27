@@ -14,8 +14,7 @@ require([
     "modules/auth",
     "modules/workspace",
     "modules/project",
-    "modules/home",
-    "modules/search"
+    "modules/home"
 ],
 
     function (app, Router, Models, Collections, Global, Auth) {
