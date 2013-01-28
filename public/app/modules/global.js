@@ -1,4 +1,4 @@
-define(["app", "modules/models", "modules/collections"], function (app, Models, Collections) {
+define(["app", "lodash", "modules/models", "modules/collections"], function (app, _, Models, Collections) {
 
     var Global = app.module();
 
@@ -7,6 +7,10 @@ define(["app", "modules/models", "modules/collections"], function (app, Models, 
     var projects = Global.projects = new Collections.Projects();
     var tasks = Global.tasks = new Collections.Tasks();
     var workspace = Global.workspace = new Models.Workspace();
+
+    _.each([workspaces, projects, tasks], function (obj) {
+        obj.setPermission('cc');
+    });
 
     user.on('authorized', function () {
         workspaces.fetch();
@@ -17,6 +21,7 @@ define(["app", "modules/models", "modules/collections"], function (app, Models, 
             (function () {
                 var workspaces = new Collections.Workspaces();
                 workspaces.setSubdomain(subdomain[1]);
+                workspaces.setPermission('cc');
                 workspaces.fetch({
                     success: function (data) {
                         if (data.models.length) {

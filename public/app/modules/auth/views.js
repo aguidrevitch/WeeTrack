@@ -15,22 +15,15 @@ define([
             tagName: 'ul',
             className: 'nav pull-right',
             template: "auth/user-navigation",
-            chunks: {},
             initialize: function () {
-                this.listenTo(this.model, 'change', this.render);
-                this.listenTo(app, 'navigation-top:add', function (id, html) {
-                    this.chunks[id] = html;
-                    this.render();
-                }, this);
-            },
-            afterRender: function () {
-                _.each(this.chunks, function (chunk, id) {
-                    $('#navigation-top-extend').append(html);
-                });
+                this.workspace = this.options.workspace;
+                this.listenTo(this.model, 'sync', this.render);
+                this.listenTo(this.workspace, 'sync', this.render);
             },
             serialize: function () {
                 return {
-                    user: this.model
+                    user: this.model,
+                    workspace: this.workspace
                 };
             }
         });
@@ -44,13 +37,14 @@ define([
                 'click .btn': 'changeWorkspace'
             },
             initialize: function () {
+                this.workspaces = this.options.workspaces;
                 this.listenTo(this.model, 'sync', this.render);
-                this.listenTo(this.collection, 'sync', this.render);
+                this.listenTo(this.workspaces, 'sync', this.render);
             },
             serialize: function () {
                 return {
-                    currentworkspace: this.model,
-                    workspaces: this.collection
+                    current: this.model,
+                    workspaces: this.workspaces
                 }
             },
             highlightButton: function () {

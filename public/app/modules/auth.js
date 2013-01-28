@@ -44,33 +44,21 @@ define([
         app.on('user:authorized', function (user) {
             app.layout.setViews({
                 ".user-nav": new Views.UserNavigation({
-                    model: user
+                    model: user,
+                    workspace: app.global.workspace
                 }),
+                ".workspace-nav": new Views.WorkspaceNavigation({
+                    model: app.global.workspace,
+                    workspaces: app.global.workspaces
+                })
             });
-
-            var updateWorkspaceNavigation = function () {
-                app.layout.setViews({
-                    ".workspace-nav": new Views.WorkspaceNavigation({
-                        model: app.global.workspace,
-                        collection: app.global.workspaces
-                    })
-                });
-            };
-
-            if (app.global.workspaces.length) {
-                updateWorkspaceNavigation()
-            } else {
-                app.global.workspaces.on('sync', function (workspaces) {
-                    if (workspaces.length)
-                        updateWorkspaceNavigation()
-                });
-            }
         });
 
         app.on('user:deauthorized', function (user) {
             app.layout.setViews({
                 ".user-nav": new Views.UserNavigation({
-                    model: user
+                    model: user,
+                    workspace: app.global.workspace
                 })
             });
             var workspacenav = app.layout.getView('.workspace-nav');

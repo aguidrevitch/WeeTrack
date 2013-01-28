@@ -238,7 +238,6 @@ define([
             saveWorkspace: function () {
                 var view = this;
                 var isNew = this.model.isNew();
-                console.log("!", this.model.id);
                 var workspace = new app.models.Workspace();
                 var attrs = _.extend({ _id: this.model.id }, this.$el.find('form').serializeObject());
                 workspace.save(attrs, {
