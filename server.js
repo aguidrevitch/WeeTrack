@@ -24,6 +24,7 @@
         app.use(express.session({
             secret: config.session.secret,
             cookie: {
+                domain: '.' + config.hostname,
                 maxAge: config.session.maxAge
             },
             store: new RedisStore(config.redis)

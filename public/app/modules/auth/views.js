@@ -11,10 +11,10 @@ define([
 
         var Views = {};
 
-        Views.TopNavigation = Backbone.Layout.extend({
+        Views.UserNavigation = Backbone.Layout.extend({
             tagName: 'ul',
             className: 'nav pull-right',
-            template: "auth/navigation-top",
+            template: "auth/user-navigation",
             chunks: {},
             initialize: function () {
                 this.listenTo(this.model, 'change', this.render);
@@ -32,6 +32,56 @@ define([
                 return {
                     user: this.model
                 };
+            }
+        });
+
+        Views.WorkspaceNavigation = Backbone.Layout.extend({
+            tagName: 'div',
+            className: 'nav pull-right',
+            template: 'auth/workspace-navigation',
+            events: {
+                'change select': 'highlightButton',
+                'click .btn': 'changeWorkspace'
+            },
+            initialize: function () {
+                this.listenTo(this.model, 'sync', this.render);
+                this.listenTo(this.collection, 'sync', this.render);
+            },
+            serialize: function () {
+                return {
+                    currentworkspace: this.model,
+                    workspaces: this.collection
+                }
+            },
+            highlightButton: function () {
+                var workspace_id = $('select', this.$el).val();
+                if (workspace_id != app.global.workspace.id) {
+                    $('.btn', this.$el).addClass('btn-info');
+                } else {
+                    $('.btn', this.$el).removeClass('btn-info');
+                }
+            },
+            changeWorkspace: function () {
+                var workspace_id = $('select', this.$el).val();
+                if (workspace_id != app.global.workspace.id) {
+                    var subdomain = $('select option:selected', this.$el).data('subdomain');
+                    var location = window.location.protocol + '//' + subdomain + '.' + hostname;
+
+                    if (window.location.port) {
+                        location += ':' + window.location.port;
+                    }
+
+                    if (window.location.pathname) {
+                        var pathname = window.location.pathname.match(/^(\/[^\/]+)/);
+                        if (pathname && pathname[1] &&
+                            pathname[1] != '/add' &&
+                            !pathname[1].match(/^\/\d+/)) {
+                            location += pathname[1];
+                        }
+                    }
+
+                    window.location = location;
+                }
             }
         });
 
@@ -53,7 +103,7 @@ define([
                     success: function () {
                         if (location.pathname.indexOf('/login') !== 0)
                             app.router.navigate(location.pathname, true);
-                            //Backbone.history.loadUrl(location.pathname);
+                        //Backbone.history.loadUrl(location.pathname);
                         else
                             app.router.navigate('/search', true);
                     }

@@ -4,131 +4,35 @@ define([
     // Libs
     "backbone",
     "jquery",
-    "lodash",
-
-    "modules/auth"
+    "lodash"
 ],
 
-    function (app, Backbone, $, _, Auth) {
+    function (app, Backbone, $, _) {
 
-        var Views = {};
-
-        Views.Layout = Backbone.Layout.extend({
-            template: "workspace/layout",
-            className: 'row',
-            initialize: function () {
-
-                this.setViews({
-                    "#middle-sidebar": new Views.Info(),
-                    "#left-sidebar": new Views.List({
-                        collection: this.collection
-                    })
-                });
-
-                this.listenTo(app, "workspace:selected", function (id) {
-
-                    var openedForm = this.getView('#middle-sidebar');
-
-                    if (openedForm.model && id == openedForm.model.id)
-                        return;
-
-                    openedForm.close(_.bind(function (yes) {
-                        if (yes) {
-                            if (id && id != 'add') {
-                                app.router.navigate('workspace/' + id);
-                                // existing workspace
-                                var workspace = new app.models.Workspace({ _id: id });
-                                this.setViews({
-                                    "#middle-sidebar": new Views.Form({
-                                        collection: this.collection,
-                                        model: workspace
-                                    })
-                                });
-                                workspace.fetch();
-                            } else {
-                                app.router.navigate('workspace/add');
-                                // new workspace
-                                this.setViews({
-                                    "#middle-sidebar": new Views.Form({
-                                        collection: this.collection,
-                                        model: new app.models.Workspace()
-                                    })
-                                });
-                                this.getView('#middle-sidebar').render();
-                            }
-                        }
-                    }, this));
-                }, this);
-
-                this.listenTo(app, "workspace:deselected", function () {
-                    this.setViews({
-                        "#middle-sidebar": new Views.Info()
-                    });
-                    this.getView('#middle-sidebar').render();
-                    app.router.navigate('workspace');
-                }, this);
-
-                if (this.options.workspace_id)
-                    app.trigger('workspace:selected', this.options.workspace_id);
-            }
-        });
-
-        Views.Info = Backbone.Layout.extend({
-            template: 'workspace/info',
+        return Backbone.Layout.extend({
+            template: "home/form",
             events: {
-                'click .show-form': 'toggleForm'
-            },
-            toggleForm: function () {
-                app.trigger('workspace:selected');
-            },
-            close: function (callback) {
-                callback(true);
-            }
-        });
-
-        Views.List = Backbone.Layout.extend({
-            template: 'workspace/list',
-            id: "workspaces",
-            events: {
-                'click .show-form': 'toggleForm',
-                'click a': 'selected'
-            },
-            initialize: function () {
-                this.listenTo(this.collection, "sync", this.render);
-                this.listenTo(this.collection, "add", this.render);
-            },
-            serialize: function () {
-                return {
-                    workspaces: this.collection
-                };
-            },
-            selected: function (e) {
-                app.trigger('workspace:selected', $(e.target).data('id'));
-                return false;
-            },
-            toggleForm: function () {
-                app.trigger('workspace:selected');
-                return false;
-            }
-        });
-
-        Views.Form = Backbone.Layout.extend({
-            template: "workspace/form",
-            events: {
-                'click .submit-form': 'saveWorkspace',
+                'click .submit-form': 'saveTask',
                 'click .close-form': 'closeForm'
+
             },
             initialize: function () {
+                this.workspaces = this.options.workspaces;
                 this.listenTo(this.model, 'sync', this.render);
                 this.listenTo($(window), 'unload', this.closeForm);
             },
+            initialize: function () {
+                this.projects = this.options.projects
+            },
             serialize: function () {
                 return {
-                    workspace: this.model,
-                    domain: hostname
-                };
+                    task: this.model,
+                    projects: this.projects
+                }
             },
             afterRender: function () {
+                var self = this;
+
                 var select2options = {
                     placeholder: t("Search for a user"),
                     tokenSeparators: [' ', ',', ';'],
@@ -235,19 +139,19 @@ define([
                 this.isDirty = false;
                 this.justSaved = false;
             },
-            saveWorkspace: function () {
+            saveTask: function () {
                 var view = this;
                 var isNew = this.model.isNew();
-                var workspace = new app.models.Workspace({ _id: this.model.id });
-                workspace.save(this.$el.find('form').serializeObject(), {
+                var task = new app.models.Task({ _id: this.model.id });
+                task.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
                         view.model.set(model.attributes);
                         view.justSaved = true;
                         view.render();
                         if (isNew)
                             view.collection.push(model);
-                        app.router.navigate('workspace/' + model.id);
-                        app.trigger('workspace:updated', view.model);
+                        app.router.navigate('home/' + model.id);
+                        app.trigger('task:updated', view.model);
                     },
                     error: function (model, res) {
                         var err;
@@ -283,11 +187,9 @@ define([
             closeForm: function () {
                 this.close(function (yes) {
                     if (yes)
-                        app.trigger('workspace:deselected');
+                        app.trigger('task:deselected');
                 });
             }
         });
 
-        return Views;
-    })
-;
+    });

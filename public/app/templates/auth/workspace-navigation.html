@@ -1,0 +1,6 @@
+<select>
+<% workspaces.each(function (workspace) { %>
+     <option data-subdomain="<%= workspace.escape('subdomain') %>" value="<%= workspace.id %>" <%= workspace.id == currentworkspace.id ? 'selected="selected"' : '' %>><%= workspace.escape('name') %></option>
+<% }); %>
+</select>
+<a class="btn"><i class="icon-forward"></i></a>

@@ -17,6 +17,15 @@
     padding-top: 60px;
 }
 
+.workspace-nav select {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.workspace-nav .btn {
+    margin-top: 0px;
+}
+
 #workspaces .icon-chevron-right,
 #projects .icon-chevron-right {
     float: right;

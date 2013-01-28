@@ -17,7 +17,12 @@
         <label class="control-label"><%= t('Status') %> *</label>
 
         <div class="controls">
-            <input type="text" name="status" value="new">
+            <select name="status">
+                <option value="new">New</option>
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+                <option value="resolved">Resolved</option>
+            </select>
         </div>
     </div>
     <div class="control-group">

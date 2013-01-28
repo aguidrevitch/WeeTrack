@@ -9,6 +9,8 @@ html(lang='en')
       link(rel="stylesheet", href="/dist/release/index.css")
     - else
       link(rel="stylesheet", href="/assets/css/index.css")
+    script
+      var hostname = "#{config.hostname}";
   body
     #main(role="main")
     - if (env.NODE_ENV == 'production')

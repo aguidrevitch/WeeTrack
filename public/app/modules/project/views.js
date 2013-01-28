@@ -19,6 +19,7 @@ define([
             initialize: function () {
 
                 this.workspaces = this.options.workspaces;
+                this.workspace = this.options.workspace;
 
                 this.setViews({
                     "#middle-sidebar": new Views.Info({
@@ -44,9 +45,10 @@ define([
                                 var project = new app.models.Project({ _id: id });
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
+                                        model: project,
                                         collection: this.collection,
                                         workspaces: this.workspaces,
-                                        model: project
+                                        workspace: this.workspace
                                     })
                                 });
                                 project.fetch();
@@ -55,9 +57,10 @@ define([
                                 // new project
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
+                                        model: new app.models.Project(),
                                         collection: this.collection,
                                         workspaces: this.workspaces,
-                                        model: new app.models.Project()
+                                        workspace: this.workspace
                                     })
                                 });
                                 this.getView('#middle-sidebar').render();
@@ -79,6 +82,7 @@ define([
                 if (this.options.project_id)
                     app.trigger('project:selected', this.options.project_id);
             }
+
         });
 
         Views.Info = Backbone.Layout.extend({
@@ -108,23 +112,15 @@ define([
             events: {
                 'click .show-form': 'toggleForm',
                 'click a': 'selected',
-                'change select': 'workspaceChanged'
             },
             initialize: function () {
-                this.workspaces = this.options.workspaces;
-                this.listenTo(this.workspaces, 'sync', this.render);
                 this.listenTo(this.collection, 'sync', this.render);
                 this.listenTo(this.collection, 'add', this.render);
             },
             serialize: function () {
                 return {
-                    projects: this.collection,
-                    workspaces: this.workspaces
+                    projects: this.collection
                 };
-            },
-            workspaceChanged: function (e) {
-                this.collection.setWorkspace($(e.target).val());
-                this.collection.fetch();
             },
             selected: function (e) {
                 app.trigger('project:selected', $(e.target).data('id'));
@@ -144,30 +140,17 @@ define([
 
             },
             initialize: function () {
-                this.workspaces = this.options.workspaces;
+                this.workspace = this.options.workspace;
                 this.listenTo(this.model, 'sync', this.render);
                 this.listenTo($(window), 'unload', this.closeForm);
             },
             serialize: function () {
                 return {
-                    project: this.model,
-                    workspaces: this.workspaces
+                    domain: this.workspace.escape('subdomain') + '.' + hostname,
+                    project: this.model
                 };
             },
             afterRender: function () {
-                var self = this;
-
-                var domain = window.location.hostname.replace(/.*(?:\.\w+\.\w+)/);
-                $('select[name=workspace]', this.$el).on('change', function () {
-                    var select = $(this);
-                    var workspace = self.workspaces.find(function (model) {
-                        return model.id == select.val();
-                    });
-                    if (workspace)
-                        $('.domain', this.$el).html(workspace.escape('subdomain') + '.' + domain);
-                });
-                $('select[name=workspace]', this.$el).val(this.model.get('workspace')).change();
-
                 var select2options = {
                     placeholder: t("Search for a user"),
                     tokenSeparators: [' ', ',', ';'],
@@ -278,7 +261,8 @@ define([
                 var view = this;
                 var isNew = this.model.isNew();
                 var project = new app.models.Project({ _id: this.model.id });
-                project.save(this.$el.find('form').serializeObject(), {
+                var attrs = _.extend({workspace: this.workspace.id }, this.$el.find('form').serializeObject());
+                project.save(attrs, {
                     success: function (model) {
                         view.model.set(model.attributes);
                         view.justSaved = true;

@@ -42,22 +42,26 @@ define([
         Auth.Router = new Router();
 
         app.on('user:authorized', function (user) {
-            //console.log('user:authorized', user.id);
             app.layout.setViews({
-                ".user-nav": new Views.TopNavigation({
+                ".user-nav": new Views.UserNavigation({
                     model: user
+                }),
+                ".workspace-nav": new Views.WorkspaceNavigation({
+                    model: app.global.workspace,
+                    collection: app.global.workspaces
                 })
             });
             app.layout.getView('.user-nav').render();
         });
 
         app.on('user:deauthorized', function (user) {
-            console.log('user:deauthorized', user.id);
             app.layout.setViews({
-                ".user-nav": new Views.TopNavigation({
+                ".user-nav": new Views.UserNavigation({
                     model: user
                 })
             });
+            var workspacenav = app.layout.getView('.workspace-nav');
+            if (workspacenav) workspacenav.remove();
             app.layout.getView('.user-nav').render();
         });
 

@@ -6,15 +6,44 @@ define(["app", "modules/models", "modules/collections"], function (app, Models, 
     var workspaces = Global.workspaces = new Collections.Workspaces();
     var projects = Global.projects = new Collections.Projects();
     var tasks = Global.tasks = new Collections.Tasks();
+    var workspace = Global.workspace = new Models.Workspace();
 
     user.on('authorized', function () {
         workspaces.fetch();
-        projects.fetch();
-        tasks.fetch();
+
+        var domainre = new RegExp("^(.*)?\\." + hostname);
+        var subdomain = document.location.hostname.match(domainre);
+        if (subdomain && subdomain[1] && subdomain[1] != 'app') {
+            (function () {
+                var workspaces = new Collections.Workspaces();
+                workspaces.setSubdomain(subdomain[1]);
+                workspaces.fetch({
+                    success: function (data) {
+                        if (data.models.length) {
+                            workspace.set(data.models[0].attributes);
+                            workspace.trigger("sync", workspace);
+
+                            /* filtering projects */
+                            projects.setWorkspace(workspace.id);
+                            projects.fetch();
+
+                            /* filtering tasks */
+                            tasks.setWorkspace(workspace.id);
+                            tasks.fetch();
+                        }
+                    }
+                });
+
+            })();
+        } else {
+            projects.fetch();
+            workspaces.fetch();
+        }
         app.trigger('user:authorized', user);
     });
 
     user.on('deauthorized', function () {
+        workspace.reset();
         workspaces.reset();
         projects.reset();
         tasks.reset();

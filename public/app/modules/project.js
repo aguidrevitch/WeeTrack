@@ -19,15 +19,23 @@ define([
                 "project/:project_id": "project"
             },
             project: function (project_id) {
-                var projects = new app.collections.Projects();
+                if (app.global.workspace.id) {
+                    this.render(project_id)
+                } else {
+                    app.global.workspace.on('sync', _.bind(function () {
+                        this.render(project_id);
+                    }, this));
+                }
+            },
+            render: function (project_id) {
                 app.layout.setViews({
                     "section": new Views.Layout({
                         project_id: project_id,
-                        collection: projects,
+                        workspace: app.global.workspace,
+                        collection: app.global.projects,
                         workspaces: app.global.workspaces
                     })
                 }).render();
-                projects.fetch();
             }
         });
 

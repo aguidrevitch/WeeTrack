@@ -34,6 +34,7 @@ define([
             i18n.init({
                 load: 'current',
                 fallbackLng: 'en',
+                load: 'unspecific',
                 resStore: window.I18N,
                 postProcess: 'sprintf'
             }, function (t) {
@@ -46,6 +47,7 @@ define([
             i18n.init({
                 load: 'current',
                 fallbackLng: 'en',
+                load: 'unspecific',
                 resGetPath: "/locales/__lng__/__ns__.json",
                 postProcess: 'sprintf'
             }, function (t) {
