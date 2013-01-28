@@ -43,7 +43,7 @@ define(["app", "modules/models", "modules/collections"], function (app, Models, 
     });
 
     user.on('deauthorized', function () {
-        workspace.reset();
+        workspace.clear();
         workspaces.reset();
         projects.reset();
         tasks.reset();

@@ -46,12 +46,25 @@ define([
                 ".user-nav": new Views.UserNavigation({
                     model: user
                 }),
-                ".workspace-nav": new Views.WorkspaceNavigation({
-                    model: app.global.workspace,
-                    collection: app.global.workspaces
-                })
             });
-            app.layout.getView('.user-nav').render();
+
+            var updateWorkspaceNavigation = function () {
+                app.layout.setViews({
+                    ".workspace-nav": new Views.WorkspaceNavigation({
+                        model: app.global.workspace,
+                        collection: app.global.workspaces
+                    })
+                });
+            };
+
+            if (app.global.workspaces.length) {
+                updateWorkspaceNavigation()
+            } else {
+                app.global.workspaces.on('sync', function (workspaces) {
+                    if (workspaces.length)
+                        updateWorkspaceNavigation()
+                });
+            }
         });
 
         app.on('user:deauthorized', function (user) {
@@ -62,7 +75,7 @@ define([
             });
             var workspacenav = app.layout.getView('.workspace-nav');
             if (workspacenav) workspacenav.remove();
-            app.layout.getView('.user-nav').render();
+            //app.layout.getView('.user-nav').render();
         });
 
         app.on('router:unauthorized', function () {

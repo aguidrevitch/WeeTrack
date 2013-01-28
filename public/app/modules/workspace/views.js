@@ -238,8 +238,10 @@ define([
             saveWorkspace: function () {
                 var view = this;
                 var isNew = this.model.isNew();
-                var workspace = new app.models.Workspace({ _id: this.model.id });
-                workspace.save(this.$el.find('form').serializeObject(), {
+                console.log("!", this.model.id);
+                var workspace = new app.models.Workspace();
+                var attrs = _.extend({ _id: this.model.id }, this.$el.find('form').serializeObject());
+                workspace.save(attrs, {
                     success: function (model) {
                         view.model.set(model.attributes);
                         view.justSaved = true;
