@@ -248,6 +248,9 @@ define([
                 }, this));
 
                 $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).on('change', _.bind(function () {
+                    this.isDirty = true;
+                }, this));
+                $("[name=watchers]", this.$el).on('change', _.bind(function () {
                     var data = $("[name=watchers]", this.$el).select2('data');
                     if (_.find(data, function (rec) {
                         return rec.id == app.global.user.id
@@ -256,7 +259,6 @@ define([
                     } else {
                         this.updateWatchButton(false);
                     }
-                    this.isDirty = true;
                 }, this));
 
                 this.isDirty = false;
@@ -345,7 +347,7 @@ define([
         Views.Watch = Backbone.Layout.extend({
             template: 'workspace/watch',
             events: {
-                'click .watch': 'watchWorkspace'
+                'click .watch': 'toggleWatch'
             },
             initialize: function () {
                 this.listenTo(this.model, 'sync', this.render);
@@ -357,7 +359,7 @@ define([
                     workspace: this.model
                 };
             },
-            watchWorkspace: function () {
+            toggleWatch: function () {
                 if (this.model.isWatcher(app.global.user)) {
                     this.model.unwatch({
                         error: _.bind(function () {

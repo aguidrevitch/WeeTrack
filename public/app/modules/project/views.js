@@ -43,15 +43,28 @@ define([
                                 app.router.navigate('project/' + id);
                                 // existing project
                                 var project = new app.models.Project({ _id: id });
-                                this.setViews({
-                                    "#middle-sidebar": new Views.Form({
-                                        model: project,
-                                        collection: this.collection,
-                                        workspaces: this.workspaces,
-                                        workspace: this.workspace
-                                    })
+                                project.setPermission('visible');
+                                project.fetch({
+                                    success: _.bind(function (model) {
+                                        if (model.isAdministrator(app.global.user)) {
+                                            this.setViews({
+                                                "#middle-sidebar": new Views.Form({
+                                                    collection: this.collection,
+                                                    workspace: this.workspace,
+                                                    model: model
+                                                })
+                                            });
+                                        } else {
+                                            this.setViews({
+                                                "#middle-sidebar": new Views.Watch({
+                                                    collection: this.collection,
+                                                    workspace: this.workspace,
+                                                    model: model
+                                                })
+                                            });
+                                        }
+                                    }, this)
                                 });
-                                project.fetch();
                             } else {
                                 app.router.navigate('project/add');
                                 // new project
@@ -137,8 +150,8 @@ define([
             template: "project/form",
             events: {
                 'click .submit-form': 'saveProject',
-                'click .close-form': 'closeForm'
-
+                'click .close-form': 'closeForm',
+                'click .watch': 'toggleWatchButton'
             },
             initialize: function () {
                 this.workspace = this.options.workspace;
@@ -147,6 +160,7 @@ define([
             },
             serialize: function () {
                 return {
+                    user: app.global.user,
                     domain: this.workspace.escape('subdomain') + '.' + hostname,
                     project: this.model
                 };
@@ -220,7 +234,7 @@ define([
                     callback(users);
                 };
 
-                $("[name=administrators], [name=users], [name=clients]", this.$el).css({'opacity': 0});
+                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).css({'opacity': 0});
 
                 $("[name=administrators]", this.$el).select2(_.extend(select2options, {
                     initSelection: _.bind(initSelection, this.model.get('administrators'))
@@ -231,11 +245,14 @@ define([
                 $("[name=clients]", this.$el).select2(_.extend(select2options, {
                     initSelection: _.bind(initSelection, this.model.get('clients'))
                 }));
-                $("[name=administrators], [name=users], [name=clients]", this.$el).on('change', function (e) {
+                $("[name=watchers]", this.$el).select2(_.extend(select2options, {
+                    initSelection: _.bind(initSelection, this.model.get('watchers'))
+                }));
+                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).on('change', function (e) {
                     $(this).data('prev', '');
                 });
-                $("[name=administrators], [name=users], [name=clients]", this.$el).select2('val', []);
-                $("[name=administrators], [name=users], [name=clients]", this.$el).css({'opacity': 1});
+                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).select2('val', []);
+                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).css({'opacity': 1});
 
                 if (this.justSaved) {
                     $('.alert', this.$el).alert();
@@ -251,12 +268,49 @@ define([
                     this.isDirty = true;
                 }, this));
 
-                $("[name=administrators], [name=users], [name=clients]", this.$el).on('change', _.bind(function () {
+                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).on('change', _.bind(function () {
                     this.isDirty = true;
+                }, this));
+
+                $("[name=watchers]", this.$el).on('change', _.bind(function () {
+                    var data = $("[name=watchers]", this.$el).select2('data');
+                    if (_.find(data, function (rec) {
+                        return rec.id == app.global.user.id
+                    })) {
+                        this.updateWatchButton(true);
+                    } else {
+                        this.updateWatchButton(false);
+                    }
                 }, this));
 
                 this.isDirty = false;
                 this.justSaved = false;
+
+                this.updateWatchButton(this.model.isWatcher(app.global.user))
+            },
+            updateWatchButton: function (watching) {
+                if (watching) {
+                    $('.watch', this.el).addClass('active');
+                    $('.watch', this.el).text('Watching');
+                } else {
+                    $('.watch', this.el).removeClass('active');
+                    $('.watch', this.el).text('Watch');
+                }
+            },
+            toggleWatchButton: function () {
+                var data = $("[name=watchers]", this.$el).select2('data');
+                if (_.find(data, function (rec) {
+                    return rec.id == app.global.user.id
+                })) {
+                    data = _.filter(data, function (rec) {
+                        return rec.id != app.global.user.id
+                    });
+                    this.updateWatchButton(false);
+                } else {
+                    data.push({ id: app.global.user.id, text: app.global.user.escape('name') });
+                    this.updateWatchButton(true);
+                }
+                $("[name=watchers]", this.$el).select2('data', data);
             },
             saveProject: function () {
                 var view = this;
@@ -308,6 +362,50 @@ define([
                 this.close(function (yes) {
                     if (yes)
                         app.trigger('project:deselected');
+                });
+            }
+        });
+
+        Views.Watch = Backbone.Layout.extend({
+            template: 'project/watch',
+            events: {
+                'click .watch': 'toggleWatch'
+            },
+            initialize: function () {
+                this.workspace = this.options.workspace;
+                this.listenTo(this.model, 'sync', this.render);
+            },
+            serialize: function () {
+                return {
+                    user: app.global.user,
+                    domain: this.workspace.escape('subdomain') + '.' + hostname,
+                    project: this.model
+                };
+            },
+            toggleWatch: function () {
+                if (this.model.isWatcher(app.global.user)) {
+                    this.model.unwatch({
+                        error: _.bind(function () {
+                            $('.watch', this.$el).addClass('btn-danger');
+                            $(this.$el);
+                        }, this)
+                    });
+                } else {
+                    this.model.watch({
+                        error: _.bind(function () {
+                            $('.watch', this.$el).addClass('btn-danger');
+                            $(this.$el);
+                        }, this)
+                    });
+                }
+            },
+            close: function (callback) {
+                callback(true);
+            },
+            closeForm: function () {
+                this.close(function (yes) {
+                    if (yes)
+                        app.trigger('workspace:deselected');
                 });
             }
         });

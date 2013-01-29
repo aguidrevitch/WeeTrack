@@ -3,9 +3,7 @@
     %><b class="caret"></b></a>
     <ul class="dropdown-menu" role="menu">
         <li><a href="/workspace"><%= t('Workspaces') %></a></li>
-        <% if (workspace.isAdministrator(user)) { %>
         <li><a href="/project"><%= t('Projects') %></a></li>
-        <% } %>
         <li><a href="/logout"><%= t('Logout') %></a></li>
     </ul>
 </li>

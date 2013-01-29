@@ -3,21 +3,23 @@
         <%= t('Settings') %>
         <button type="button" class="close close-form">&times;</button>
         <% if (workspace.canWatch(user)) { %>
-        <button type="button" class="btn pull-right watch <%= workspace.isWatcher(user) ? 'active' : '' %>"><%= workspace.isWatcher(user) ? 'Watching' : 'Watch' %></button>
+        <button type="button" class="btn pull-right watch <%= workspace.isWatcher(user) ? 'active' : '' %>">
+            <%= workspace.isWatcher(user) ? 'Watching' : 'Watch' %>
+        </button>
         <% } %>
     </legend>
     <div class="control-group">
-        <label class="control-label"><%= t('Name') %> * </label>
+        <label class="control-label"><%= t('Name') %></label>
 
         <div class="controls">
-            <input disabled="disabled" type="text" name="name" value="<%= workspace.escape('name') %>">
+            <input disabled="disabled" type="text" name="name" class="input-xxlarge" value="<%= workspace.escape('name') %>">
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label"><%= t('URL') %> * </label>
+        <label class="control-label"><%= t('URL') %></label>
 
         <div class="controls">
-            <input disabled="disabled" type="text" name="subdomain" value="http://<%= workspace.escape('subdomain') + '.' + domain %>">
+            <input disabled="disabled" type="text" name="subdomain" class="input-xxlarge" value="http://<%= workspace.escape('subdomain') + '.' + domain %>">
         </div>
     </div>
 </form>
