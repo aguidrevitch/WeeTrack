@@ -132,12 +132,12 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
 
     Models.Workspace = PermissionModel.extend({
         idAttribute: "_id",
-        baseUrl: '/api/workspace',
+        baseUrl: '/api/workspace'
     });
 
     Models.Project = PermissionModel.extend({
         idAttribute: "_id",
-        baseUrl: '/api/project',
+        baseUrl: '/api/project'
     });
 
     Models.Task = PermissionModel.extend({

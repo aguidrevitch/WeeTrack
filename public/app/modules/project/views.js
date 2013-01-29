@@ -276,7 +276,7 @@ define([
                 $("[name=watchers]", this.$el).on('change', _.bind(function () {
                     var data = $("[name=watchers]", this.$el).select2('data');
                     if (_.find(data, function (rec) {
-                        return rec.id == app.global.user.id
+                        return rec.id == app.global.user.id;
                     })) {
                         this.updateWatchButton(true);
                     } else {
@@ -287,7 +287,7 @@ define([
                 this.isDirty = false;
                 this.justSaved = false;
 
-                this.updateWatchButton(this.model.isWatcher(app.global.user))
+                this.updateWatchButton(this.model.isWatcher(app.global.user));
             },
             updateWatchButton: function (watching) {
                 if (watching) {
@@ -301,10 +301,10 @@ define([
             toggleWatchButton: function () {
                 var data = $("[name=watchers]", this.$el).select2('data');
                 if (_.find(data, function (rec) {
-                    return rec.id == app.global.user.id
+                    return rec.id == app.global.user.id;
                 })) {
                     data = _.filter(data, function (rec) {
-                        return rec.id != app.global.user.id
+                        return rec.id != app.global.user.id;
                     });
                     this.updateWatchButton(false);
                 } else {
