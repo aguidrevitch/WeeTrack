@@ -67,14 +67,14 @@ define([
                         location += ':' + window.location.port;
                     }
 
-                    if (window.location.pathname) {
+                    /*if (window.location.pathname) {
                         var pathname = window.location.pathname.match(/^(\/[^\/]+)/);
                         if (pathname && pathname[1] &&
                             pathname[1] != '/add' &&
                             !pathname[1].match(/^\/\d+/)) {
                             location += pathname[1];
                         }
-                    }
+                    }*/
 
                     window.location = location;
                 }

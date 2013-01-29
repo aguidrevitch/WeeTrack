@@ -156,6 +156,7 @@ define([
             initialize: function () {
                 this.workspace = this.options.workspace;
                 this.listenTo(this.model, 'sync', this.render);
+                this.listenTo(app.global.user, 'sync', this.render);
                 this.listenTo($(window), 'unload', this.closeForm);
             },
             serialize: function () {
@@ -373,6 +374,7 @@ define([
             },
             initialize: function () {
                 this.workspace = this.options.workspace;
+                this.listenTo(app.global.user, 'sync', this.render);
                 this.listenTo(this.model, 'sync', this.render);
             },
             serialize: function () {
