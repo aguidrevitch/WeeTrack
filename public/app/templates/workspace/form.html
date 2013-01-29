@@ -2,6 +2,7 @@
     <legend>
         <%= t('Settings') %>
         <button type="button" class="close close-form">&times;</button>
+        <button type="button" class="btn pull-right watch <%= workspace.isWatcher(user) ? 'active' : '' %>"><%= workspace.isWatcher(user) ? 'Watching' : 'Watch' %></button>
     </legend>
     <div class="control-group">
         <label class="control-label"><%= t('Name') %> * </label>
@@ -41,6 +42,14 @@
 
         <div class="controls">
             <input type="text" class="input-xxlarge" name="clients">
+            <span class="help-inline error"></span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Watchers') %></label>
+
+        <div class="controls">
+            <input type="text" class="input-xxlarge" name="watchers">
             <span class="help-inline error"></span>
         </div>
     </div>

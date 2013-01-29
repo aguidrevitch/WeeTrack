@@ -19,15 +19,6 @@ define([
                 "project/:project_id": "project"
             },
             project: function (project_id) {
-                if (app.global.workspace.id) {
-                    this.render(project_id)
-                } else {
-                    app.global.workspace.on('sync', _.bind(function () {
-                        this.render(project_id);
-                    }, this));
-                }
-            },
-            render: function (project_id) {
                 app.layout.setViews({
                     "section": new Views.Layout({
                         project_id: project_id,

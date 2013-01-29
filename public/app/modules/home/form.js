@@ -18,17 +18,15 @@ define([
             },
             initialize: function () {
                 this.workspaces = this.options.workspaces;
+                this.projects = this.options.projects;
                 this.listenTo(this.model, 'sync', this.render);
                 this.listenTo($(window), 'unload', this.closeForm);
-            },
-            initialize: function () {
-                this.projects = this.options.projects
             },
             serialize: function () {
                 return {
                     task: this.model,
                     projects: this.projects
-                }
+                };
             },
             afterRender: function () {
                 var self = this;

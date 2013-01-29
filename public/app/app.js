@@ -32,9 +32,8 @@ define([
 
         if (window.I18N) {
             i18n.init({
-                load: 'current',
-                fallbackLng: 'en',
                 load: 'unspecific',
+                fallbackLng: 'en',
                 resStore: window.I18N,
                 postProcess: 'sprintf'
             }, function (t) {
@@ -45,9 +44,8 @@ define([
             });
         } else {
             i18n.init({
-                load: 'current',
-                fallbackLng: 'en',
                 load: 'unspecific',
+                fallbackLng: 'en',
                 resGetPath: "/locales/__lng__/__ns__.json",
                 postProcess: 'sprintf'
             }, function (t) {

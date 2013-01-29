@@ -100,7 +100,7 @@ define([
             id: "tasks",
             events: {
                 'click .show-form': 'toggleForm',
-                'click a': 'selected',
+                'click a': 'selected'
             },
             initialize: function () {
                 this.listenTo(this.collection, 'add', this.render);

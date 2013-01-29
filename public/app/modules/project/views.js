@@ -111,7 +111,7 @@ define([
             id: "projects",
             events: {
                 'click .show-form': 'toggleForm',
-                'click a': 'selected',
+                'click a': 'selected'
             },
             initialize: function () {
                 this.listenTo(this.collection, 'sync', this.render);
@@ -119,6 +119,7 @@ define([
             },
             serialize: function () {
                 return {
+                    user: app.global.user,
                     projects: this.collection
                 };
             },

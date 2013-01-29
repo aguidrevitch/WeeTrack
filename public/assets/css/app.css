@@ -24,6 +24,11 @@
 
 .workspace-nav .btn {
     margin-top: 0px;
+    margin-right: 10px;
+}
+
+.watch {
+    margin-right: 10px;
 }
 
 #workspaces .icon-chevron-right,

@@ -9,7 +9,7 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
     var workspace = Global.workspace = new Models.Workspace();
 
     _.each([workspaces, projects, tasks], function (obj) {
-        obj.setPermission('cc');
+        obj.setPermission('visible');
     });
 
     user.on('authorized', function () {
@@ -21,7 +21,7 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
             (function () {
                 var workspaces = new Collections.Workspaces();
                 workspaces.setSubdomain(subdomain[1]);
-                workspaces.setPermission('cc');
+                workspaces.setPermission('visible');
                 workspaces.fetch({
                     success: function (data) {
                         if (data.models.length) {

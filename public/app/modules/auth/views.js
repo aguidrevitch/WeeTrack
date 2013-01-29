@@ -17,12 +17,13 @@ define([
             template: "auth/user-navigation",
             initialize: function () {
                 this.workspace = this.options.workspace;
-                this.listenTo(this.model, 'sync', this.render);
+                this.user = this.options.user;
+                this.listenTo(this.user, 'sync', this.render);
                 this.listenTo(this.workspace, 'sync', this.render);
             },
             serialize: function () {
                 return {
-                    user: this.model,
+                    user: this.user,
                     workspace: this.workspace
                 };
             }
@@ -37,15 +38,16 @@ define([
                 'click .btn': 'changeWorkspace'
             },
             initialize: function () {
+                this.workspace = this.options.workspace;
                 this.workspaces = this.options.workspaces;
-                this.listenTo(this.model, 'sync', this.render);
+                this.listenTo(this.workspace, 'sync', this.render);
                 this.listenTo(this.workspaces, 'sync', this.render);
             },
             serialize: function () {
                 return {
-                    current: this.model,
+                    workspace: this.workspace,
                     workspaces: this.workspaces
-                }
+                };
             },
             highlightButton: function () {
                 var workspace_id = $('select', this.$el).val();

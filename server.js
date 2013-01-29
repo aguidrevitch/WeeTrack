@@ -56,6 +56,16 @@
         app.use(gzippo.staticGzip(__dirname + "/public"));
         app.use(gzippo.compress());
 
+        app.use(function (req, res, next) {
+            if (req.session.user_id) {
+                // denying access
+                //res.render('error', 'Access Denied');
+                next();
+            } else {
+                next();
+            }
+        });
+
         /* modal */
         app.use(function (req, res, next) {
             res.modal = function (code, err) {
@@ -111,6 +121,23 @@
         controller = require("./lib/controllers/" + name);
         controller.setup(app);
     });
+
+    var http = require('http'),
+        httpProxy = require('http-proxy');
+
+    if (config)
+    httpProxy.createServer(function (req, res, proxy) {
+
+        var buffer = httpProxy.buffer(req);
+
+        setTimeout(function () {
+            proxy.proxyRequest(req, res, {
+                host: 'localhost',
+                port: config.port,
+                buffer: buffer
+            });
+        }, 500);
+    }).listen(8000);
 
     var server = app.listen(config.port);
     var socket = io.listen(server);

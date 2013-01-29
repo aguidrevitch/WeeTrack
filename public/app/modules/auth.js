@@ -44,11 +44,11 @@ define([
         app.on('user:authorized', function (user) {
             app.layout.setViews({
                 ".user-nav": new Views.UserNavigation({
-                    model: user,
+                    user: app.global.user,
                     workspace: app.global.workspace
                 }),
                 ".workspace-nav": new Views.WorkspaceNavigation({
-                    model: app.global.workspace,
+                    workspace: app.global.workspace,
                     workspaces: app.global.workspaces
                 })
             });
@@ -57,13 +57,12 @@ define([
         app.on('user:deauthorized', function (user) {
             app.layout.setViews({
                 ".user-nav": new Views.UserNavigation({
-                    model: user,
+                    user: app.global.user,
                     workspace: app.global.workspace
                 })
             });
             var workspacenav = app.layout.getView('.workspace-nav');
             if (workspacenav) workspacenav.remove();
-            //app.layout.getView('.user-nav').render();
         });
 
         app.on('router:unauthorized', function () {
