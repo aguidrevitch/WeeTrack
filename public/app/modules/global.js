@@ -44,7 +44,7 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
             })();
         } else {
             projects.fetch().done(finish);
-            workspaces.fetch().done(finish);
+            finish(); //workspaces.fetch().done(finish);
         }
     });
 

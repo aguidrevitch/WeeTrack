@@ -2,8 +2,8 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib');
     grunt.loadNpmTasks('bbb');
-    grunt.file.setBase("./public");
-    grunt.loadTasks('./public');
+    grunt.file.setBase("public");
+    grunt.loadTasks('public');
 
     grunt.registerTask("development", function () {
         grunt.tasks("release", {}, function () {

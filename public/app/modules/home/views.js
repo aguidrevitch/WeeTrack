@@ -20,24 +20,17 @@ define([
             template: "home/layout",
             className: 'row',
             initialize: function () {
-                this.workspace = this.options.workspace;
-                this.workspaces = this.options.workspaces;
-                this.projects = this.options.projects;
-
                 this.setViews({
                     "#top-sidebar": new Views.Filter({
-                        workspaces: this.workspaces,
-                        projects: this.projects
                     }),
                     "#left-sidebar": new Views.List({
-                        collection: this.collection
                     }),
                     "#right-sidebar": new Views.Info({
-                        //model: new app.models.Task()
                     })
                 });
 
                 this.listenTo(app, 'task:selected', function (id) {
+                    var task;
                     var openedForm = this.getView('#right-sidebar');
 
                     if (openedForm.model && id == openedForm.model.id)
@@ -48,11 +41,10 @@ define([
                             if (id && id != 'add') {
                                 app.router.navigate(id);
                                 // existing project
-                                var task = new app.models.Task({ id: id });
+                                task = new app.models.Task({ id: id });
                                 task.setWorkspace(app.global.workspace.id);
                                 this.setViews({
                                     "#right-sidebar": new Views.Form({
-                                        projects: this.projects,
                                         model: task
                                     })
                                 });
@@ -60,12 +52,11 @@ define([
                             } else {
                                 app.router.navigate('add');
 
-                                var task = new app.models.Task();
+                                task = new app.models.Task();
                                 task.setWorkspace(app.global.workspace.id);
                                 // new project
                                 this.setViews({
                                     "#right-sidebar": new Views.Form({
-                                        projects: this.projects,
                                         model: task
                                     })
                                 });
@@ -109,12 +100,12 @@ define([
                 'click a': 'selected'
             },
             initialize: function () {
-                this.listenTo(this.collection, 'add', this.render);
+                this.listenTo(app.global.tasks, 'add', this.render);
             },
             serialize: function () {
                 return {
                     tasks: this.collection,
-                    workspaces: this.workspaces
+                    workspaces: app.global.workspaces
                 };
             },
             selected: function (e) {

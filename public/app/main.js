@@ -11,17 +11,19 @@ require([
 
     // Modules
     "modules/global",
-    "modules/auth",
-    "modules/workspace",
-    "modules/project",
-    "modules/home"
+    "modules/views"
 ],
 
-    function (app, Router, Models, Collections, Global, Auth) {
+    function (app, Router, Models, Collections, Global, Views) {
 
         // Set stacktrace limit for Chrome
         if (Error.stackTraceLimit)
             Error.stackTraceLimit = 1000;
+
+        app.models = Models;
+        app.collections = Collections;
+        app.global = Global;
+        app.views = Views;
 
         // Set default layout
         app.useLayout("main");
@@ -29,10 +31,6 @@ require([
         // Define your master router on the application namespace and trigger all
         // navigation from this instance.
         app.router = new Router();
-
-        app.models = Models;
-        app.collections = Collections;
-        app.global = Global;
 
         // All navigation that is relative should be passed through the navigate
         // method, to be processed by the router. If the link has a `data-bypass`
@@ -73,7 +71,15 @@ require([
             app.trigger('router:unauthorized');
         });
 
-        // trying to authorize by session
-        app.global.user.authorizeSession();
+        // loading controllers
+        require([
+            "modules/auth",
+            "modules/workspace",
+            "modules/project",
+            "modules/home"
+        ], function (Auth) {
+            // trying to authorize by session
+            app.global.user.authorizeSession();
+        });
 
     });

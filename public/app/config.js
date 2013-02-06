@@ -4,6 +4,13 @@ require.config({
     // Initialize the application with the main application file.
     deps: ["main"],
 
+    include: [
+        "modules/auth",
+        "modules/workspace",
+        "modules/project",
+        "modules/home"
+    ],
+
     paths: {
         // JavaScript folders.
         libs: "../assets/js/libs",
@@ -18,7 +25,6 @@ require.config({
         i18next: "../assets/vendor/i18next/js/i18next",
         moment: "../assets/vendor/moment/js/moment",
         select2: "../assets/vendor/select2/js/select2"
-        //"jquery.ui.widget": "../assets/js/libs/jquery.ui.widget",
     },
 
     shim: {
