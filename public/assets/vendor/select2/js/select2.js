@@ -1625,7 +1625,6 @@ the specific language governing permissions and limitations under the Apache Lic
         // single
         initSelection: function () {
             var selected;
-            console.log(1, this.opts.initSelection);
             if (this.opts.element.val() === "" && this.opts.element.text() === "") {
                 this.close();
                 this.setPlaceholder();

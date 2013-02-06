@@ -12,6 +12,6 @@
 @import "../vendor/select2/css/select2.css";
 @import "../vendor/jquery-fileupload/css/jquery.fileupload-ui.css";
 @import "app.css";
-@import "search.css";
+@import "task.css";
 
 /* Put development-only CSS below this line. */

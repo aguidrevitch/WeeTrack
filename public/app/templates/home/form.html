@@ -1,12 +1,43 @@
-<form id="form-task-add" class="form form-horizontal">
-    <legend><%= t('New Task') %>
-        <button type="button" class="close">&times;</button>
-    </legend>
+<form id="form-task-add" class="form-horizontal">
+    <div class="row subject">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label"><%= t('Status') %> *</label>
+
+                <div class="controls">
+                    <select name="status">
+                        <option value="new"><%= t('New') %></option>
+                        <option value="open"><%= t('Open') %></option>
+                        <option value="closed"><%= t('Closed') %></option>
+                        <option value="resolved"><%= t('Resolved') %></option>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="row owner">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label"><%= t('Owner') %></label>
+
+                <div class="controls">
+                    <input type="text" id="owner" name="owner">
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Subject') %></label>
+
+        <div class="controls">
+            <textarea name="subject" class="input-xxlarge"><%= task.escape('subject') %></textarea>
+        </div>
+    </div>
     <div class="control-group">
         <label class="control-label"><%= t('Project') %></label>
 
         <div class="controls">
-            <select name="project">
+            <select name="project" class="input-xxlarge">
                 <% projects.each(function (project) { %>
                 <option value="<%= project.id %>"><%= project.escape('name') %></option>
                 <% }) %>
@@ -14,56 +45,31 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label"><%= t('Status') %> *</label>
-
-        <div class="controls">
-            <select name="status">
-                <option value="new">New</option>
-                <option value="open">Open</option>
-                <option value="closed">Closed</option>
-                <option value="resolved">Resolved</option>
-            </select>
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label"><%= t('Subject') %> *</label>
-
-        <div class="controls">
-            <input type="text" name="subject">
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label"><%= t('Owner') %></label>
-        <div class="controls">
-            <input type="text" name="owner">
-        </div>
-    </div>
-    <div class="control-group">
         <label class="control-label"><%= t('Administrators') %></label>
 
         <div class="controls">
-            <input type="text" name="administrators">
+            <input type="text" name="admin"  class="input-xxlarge">
         </div>
     </div>
     <div class="control-group">
         <label class="control-label"><%= t('Users') %></label>
 
         <div class="controls">
-            <input type="text" name="administrators">
+            <input type="text" name="admincc" class="input-xxlarge">
         </div>
     </div>
     <div class="control-group">
         <label class="control-label"><%= t('Clients') %></label>
 
         <div class="controls">
-            <input type="text" name="administrators">
+            <input type="text" name="cc"  class="input-xxlarge">
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label"><%= t('Content') %> * </label>
+        <label class="control-label"><%= t('Watchers') %></label>
 
         <div class="controls">
-            <textarea name="content"></textarea>
+            <input type="text" name="watch" class="input-xxlarge">
         </div>
     </div>
     <div class="control-group">
@@ -71,4 +77,5 @@
             <button class="btn btn-primary submit-form"><%= t('Create') %></button>
         </div>
     </div>
+    </fieldset>
 </form>

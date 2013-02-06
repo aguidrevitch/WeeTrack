@@ -74,11 +74,9 @@ define(['backbone', 'modules/models', 'modules/transaction'], function (Backbone
 
     Collections.Tasks = Backbone.Collection.extend({
         model: Models.Task,
+        workspace: 'all',
         url: function () {
             var query = {};
-
-            if (this.workspace)
-                query.workspace = this.workspace;
 
             if (this.perm)
                 query.perm = this.perm;
@@ -88,9 +86,9 @@ define(['backbone', 'modules/models', 'modules/transaction'], function (Backbone
                 _.each(query, function (value, key) {
                     qs.push(key + '=' + value);
                 });
-                return '/api/task/?' + qs.join('&');
+                return '/api/task/' + this.workspace + '/?' + qs.join('&');
             } else {
-                return '/api/task/';
+                return '/api/task/' + this.workspace;
             }
         },
         setWorkspace: function (id) {

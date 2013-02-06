@@ -15,10 +15,12 @@ define([
         var Views = {
             Form: Form
         };
+
         Views.Layout = Backbone.Layout.extend({
             template: "home/layout",
             className: 'row',
             initialize: function () {
+                this.workspace = this.options.workspace;
                 this.workspaces = this.options.workspaces;
                 this.projects = this.options.projects;
 
@@ -31,7 +33,7 @@ define([
                         collection: this.collection
                     }),
                     "#right-sidebar": new Views.Info({
-                        model: new app.models.Task()
+                        //model: new app.models.Task()
                     })
                 });
 
@@ -46,7 +48,8 @@ define([
                             if (id && id != 'add') {
                                 app.router.navigate(id);
                                 // existing project
-                                var task = new app.models.Task({ _id: id });
+                                var task = new app.models.Task({ id: id });
+                                task.setWorkspace(app.global.workspace.id);
                                 this.setViews({
                                     "#right-sidebar": new Views.Form({
                                         projects: this.projects,
@@ -56,11 +59,14 @@ define([
                                 task.fetch();
                             } else {
                                 app.router.navigate('add');
+
+                                var task = new app.models.Task();
+                                task.setWorkspace(app.global.workspace.id);
                                 // new project
                                 this.setViews({
                                     "#right-sidebar": new Views.Form({
                                         projects: this.projects,
-                                        model: new app.models.Task()
+                                        model: task
                                     })
                                 });
                                 this.getView('#right-sidebar').render();
@@ -112,7 +118,7 @@ define([
                 };
             },
             selected: function (e) {
-                app.trigger('task:selected', $(e.target).data('id'));
+                // app.trigger('task:selected', $(e.target).data('id'));
                 return false;
             },
             toggleForm: function () {

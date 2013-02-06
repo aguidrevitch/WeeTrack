@@ -235,25 +235,25 @@ define([
                     callback(users);
                 };
 
-                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).css({'opacity': 0});
+                $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).css({'opacity': 0});
 
-                $("[name=administrators]", this.$el).select2(_.extend(select2options, {
-                    initSelection: _.bind(initSelection, this.model.get('administrators'))
+                $("[name=admin]", this.$el).select2(_.extend(select2options, {
+                    initSelection: _.bind(initSelection, this.model.get('admin'))
                 }));
-                $("[name=users]", this.$el).select2(_.extend(select2options, {
-                    initSelection: _.bind(initSelection, this.model.get('users'))
+                $("[name=admincc]", this.$el).select2(_.extend(select2options, {
+                    initSelection: _.bind(initSelection, this.model.get('admincc'))
                 }));
-                $("[name=clients]", this.$el).select2(_.extend(select2options, {
-                    initSelection: _.bind(initSelection, this.model.get('clients'))
+                $("[name=cc]", this.$el).select2(_.extend(select2options, {
+                    initSelection: _.bind(initSelection, this.model.get('cc'))
                 }));
-                $("[name=watchers]", this.$el).select2(_.extend(select2options, {
-                    initSelection: _.bind(initSelection, this.model.get('watchers'))
+                $("[name=watch]", this.$el).select2(_.extend(select2options, {
+                    initSelection: _.bind(initSelection, this.model.get('watch'))
                 }));
-                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).on('change', function (e) {
+                $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).on('change', function (e) {
                     $(this).data('prev', '');
                 });
-                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).select2('val', []);
-                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).css({'opacity': 1});
+                $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).select2('val', []);
+                $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).css({'opacity': 1});
 
                 if (this.justSaved) {
                     $('.alert', this.$el).alert();
@@ -269,12 +269,12 @@ define([
                     this.isDirty = true;
                 }, this));
 
-                $("[name=administrators], [name=users], [name=clients], [name=watchers]", this.$el).on('change', _.bind(function () {
+                $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).on('change', _.bind(function () {
                     this.isDirty = true;
                 }, this));
 
-                $("[name=watchers]", this.$el).on('change', _.bind(function () {
-                    var data = $("[name=watchers]", this.$el).select2('data');
+                $("[name=watch]", this.$el).on('change', _.bind(function () {
+                    var data = $("[name=watch]", this.$el).select2('data');
                     if (_.find(data, function (rec) {
                         return rec.id == app.global.user.id;
                     })) {
@@ -299,7 +299,7 @@ define([
                 }
             },
             toggleWatchButton: function () {
-                var data = $("[name=watchers]", this.$el).select2('data');
+                var data = $("[name=watch]", this.$el).select2('data');
                 if (_.find(data, function (rec) {
                     return rec.id == app.global.user.id;
                 })) {
@@ -311,7 +311,8 @@ define([
                     data.push({ id: app.global.user.id, text: app.global.user.escape('name') });
                     this.updateWatchButton(true);
                 }
-                $("[name=watchers]", this.$el).select2('data', data);
+                $("[name=watch]", this.$el).select2('data', data);
+                this.isDirty = true;
             },
             saveProject: function () {
                 var view = this;

@@ -110,6 +110,49 @@
 .span10 #tasks .label {
     max-width: 200px;
 }
+
+#form-task-add .input-xxlarge {
+   width: 430px;
+}
+
+#form-task-add .subject,
+#form-task-add .owner{
+    float: left;
+    min-height: 1px;
+    margin-left: 0px;
+}
+
+#form-task-add .subject {
+    width: 240px;
+}
+
+#form-task-add .owner {
+    width: 330px;
+}
+
+#form-task-add .control-label {
+    width: 110px;
+}
+
+#form-task-add .controls {
+    margin-left: 120px;
+}
+
+#form-task-add select[name=status] {
+    width: 120px
+}
+
+#form-task-add input[name=owner],
+#form-task-add #s2id_owner {
+    width: 190px
+}
+
+#form-task-add textarea[name=subject] {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+
 /*
 #form-task-add .control-label {
     width: 60px;

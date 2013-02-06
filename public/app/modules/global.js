@@ -8,12 +8,14 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
     var tasks = Global.tasks = new Collections.Tasks();
     var workspace = Global.workspace = new Models.Workspace();
 
-    _.each([workspaces, projects, tasks], function (obj) {
-        obj.setPermission('visible');
-    });
-
     user.on('authorized', function () {
-        workspaces.fetch();
+
+        var counter = 3;
+        var finish = function () {
+            if (!--counter) app.trigger('user:authorized', user);
+        };
+
+        workspaces.fetch().done(finish);
 
         var domainre = new RegExp("^(.*)?\\." + hostname);
         var subdomain = document.location.hostname.match(domainre);
@@ -21,7 +23,6 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
             (function () {
                 var workspaces = new Collections.Workspaces();
                 workspaces.setSubdomain(subdomain[1]);
-                workspaces.setPermission('visible');
                 workspaces.fetch({
                     success: function (data) {
                         if (data.models.length) {
@@ -30,21 +31,21 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
 
                             /* filtering projects */
                             projects.setWorkspace(workspace.id);
-                            projects.fetch();
+                            projects.fetch().done(finish);
 
                             /* filtering tasks */
                             tasks.setWorkspace(workspace.id);
-                            tasks.fetch();
+                            tasks.fetch().done(finish);
+
                         }
                     }
                 });
 
             })();
         } else {
-            projects.fetch();
-            workspaces.fetch();
+            projects.fetch().done(finish);
+            workspaces.fetch().done(finish);
         }
-        app.trigger('user:authorized', user);
     });
 
     user.on('deauthorized', function () {

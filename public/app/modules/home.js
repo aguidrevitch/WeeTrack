@@ -23,6 +23,7 @@ define([
             home: function (task_id) {
                 app.layout.setViews({
                     "section": new Views.Layout({
+                        workspace: app.global.workspace,
                         workspaces: app.global.workspaces,
                         projects: app.global.projects,
                         collection: app.global.tasks,

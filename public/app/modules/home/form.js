@@ -11,15 +11,17 @@ define([
 
         return Backbone.Layout.extend({
             template: "home/form",
+            className: "row",
             events: {
                 'click .submit-form': 'saveTask',
                 'click .close-form': 'closeForm'
 
             },
             initialize: function () {
-                this.workspaces = this.options.workspaces;
                 this.projects = this.options.projects;
                 this.listenTo(this.model, 'sync', this.render);
+                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(this.projects, 'sync', this.render);
                 this.listenTo($(window), 'unload', this.closeForm);
             },
             serialize: function () {
@@ -86,35 +88,42 @@ define([
                                 }
                             });
                         }
+                    },
+                    initSelection: function () {
+                        // do nothing
                     }
                 };
 
-                var initSelection = function (element, callback) {
-                    var users = [];
-                    $.each(this, function (i, user) {
-                        var data = { id: user._id };
-                        data.text = user.name ? user.name : user.email;
-                        users.push(data);
+                var toData = function (users) {
+                    var data = [];
+                    _.each(users, function (user) {
+                        if (user) {
+                            var rec = { id: user._id };
+                            rec.text = user.name ? user.name : user.email;
+                            data.push(rec);
+                        }
                     });
-                    callback(users);
+                    return(data);
                 };
 
-                $("[name=administrators], [name=users], [name=clients]", this.$el).css({'opacity': 0});
+                $("[name=owner]", this.$el).select2(_.extend({}, select2options, {
+                    multiple: false,
+                    allowClear: true,
+                }));
+                $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).select2(select2options);
+                if (this.model.get('owner'))
+                    $("[name=owner]").select2("data", toData([this.model.get('owner')])[0]);
 
-                $("[name=administrators]", this.$el).select2(_.extend(select2options, {
-                    initSelection: _.bind(initSelection, this.model.get('administrators'))
-                }));
-                $("[name=users]", this.$el).select2(_.extend(select2options, {
-                    initSelection: _.bind(initSelection, this.model.get('users'))
-                }));
-                $("[name=clients]", this.$el).select2(_.extend(select2options, {
-                    initSelection: _.bind(initSelection, this.model.get('clients'))
-                }));
-                $("[name=administrators], [name=users], [name=clients]", this.$el).on('change', function (e) {
+                _.each(['admin', 'admincc', 'cc', 'watch'], function (perm) {
+                    if (this.model.get(perm))
+                        $("[name=" + perm + "]").select2("data", toData(this.model.get(perm)));
+                }, this);
+
+                $("[name=owner], [name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).on('change', function (e) {
                     $(this).data('prev', '');
                 });
-                $("[name=administrators], [name=users], [name=clients]", this.$el).select2('val', []);
-                $("[name=administrators], [name=users], [name=clients]", this.$el).css({'opacity': 1});
+                $("[name=project]", this.$el).select2();
+                $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).select2('val', []);
 
                 if (this.justSaved) {
                     $('.alert', this.$el).alert();
@@ -130,7 +139,7 @@ define([
                     this.isDirty = true;
                 }, this));
 
-                $("[name=administrators], [name=users], [name=clients]", this.$el).on('change', _.bind(function () {
+                $("[name=owner], [name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).on('change', _.bind(function () {
                     this.isDirty = true;
                 }, this));
 
@@ -140,15 +149,16 @@ define([
             saveTask: function () {
                 var view = this;
                 var isNew = this.model.isNew();
-                var task = new app.models.Task({ _id: this.model.id });
+                var task = new app.models.Task({ id: this.model.id });
+                task.setWorkspace(this.model.getWorkspace());
                 task.save(this.$el.find('form').serializeObject(), {
                     success: function (model) {
                         view.model.set(model.attributes);
+                        view.model.trigger('change');
                         view.justSaved = true;
-                        view.render();
-                        if (isNew)
-                            view.collection.push(model);
-                        app.router.navigate('home/' + model.id);
+                        //if (isNew)
+                        //    view.collection.push(model);
+                        app.router.navigate('/' + model.id);
                         app.trigger('task:updated', view.model);
                     },
                     error: function (model, res) {

@@ -13,7 +13,6 @@
     "Validator \"syntax\" failed for path subdomain": "Disallowed sybmols",
     "Validator \"workspace update\" failed for path workspace": "Not allowed yet",
     "Validator \"taken\" failed for path email": "Already taken",
-
-   "Unsaved changes": "The data was updated but not saved. Discard changes ?"
-
+    "Validator \"list\" failed for path admin": "Not a list",
+    "Unsaved changes": "The data was updated but not saved. Discard changes ?"
 }
