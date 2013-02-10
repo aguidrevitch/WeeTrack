@@ -1,5 +1,5 @@
 <form id="form-task-add" class="form-horizontal">
-    <div class="row subject">
+    <div class="row status">
         <fieldset>
             <div class="control-group">
                 <label class="control-label"><%= t('Status') %> *</label>
@@ -27,7 +27,7 @@
         </fieldset>
     </div>
     <div class="control-group">
-        <label class="control-label"><%= t('Subject') %></label>
+        <label class="control-label"><%= t('Subject') %> *</label>
 
         <div class="controls">
             <textarea name="subject" class="input-xxlarge"><%= task.escape('subject') %></textarea>
@@ -70,6 +70,26 @@
 
         <div class="controls">
             <input type="text" name="watch" class="input-xxlarge">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Content') %> * </label>
+
+        <div class="controls">
+            <textarea name="content" class="input-xxlarge"></textarea>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Files') %></label>
+
+        <div class="controls">
+                <span class="btn btn-success fileinput-button">
+                    <i class="icon-plus icon-white"></i>
+                    <span><%= t('Attach') %>...</span>
+                    <input id="fileupload" type="file" data-url="/upload" multiple>
+                </span>
+
+            <div id="upload-progress"></div>
         </div>
     </div>
     <div class="control-group">

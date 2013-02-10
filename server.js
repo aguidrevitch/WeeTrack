@@ -74,9 +74,6 @@
                     code = 500;
                 }
 
-                if (err instanceof Error)
-                    err = err.message;
-
                 res.json(code, {
                     error: {
                         _modal: {
@@ -84,6 +81,19 @@
                         }
                     }
                 });
+            };
+            res.error = function (err) {
+                if (err instanceof Error) {
+                    if (err.errors) {
+                        res.json(500, {
+                            error: err.errors
+                        });
+                    } else {
+                        res.modal(err.message);
+                    }
+                } else {
+                    throw new Error('Unknown error class');
+                }
             };
             next();
         });
@@ -126,18 +136,18 @@
         httpProxy = require('http-proxy');
 
     if (config)
-    httpProxy.createServer(function (req, res, proxy) {
+        httpProxy.createServer(function (req, res, proxy) {
 
-        var buffer = httpProxy.buffer(req);
+            var buffer = httpProxy.buffer(req);
 
-        setTimeout(function () {
-            proxy.proxyRequest(req, res, {
-                host: 'localhost',
-                port: config.port,
-                buffer: buffer
-            });
-        }, 500);
-    }).listen(8000);
+            setTimeout(function () {
+                proxy.proxyRequest(req, res, {
+                    host: 'localhost',
+                    port: config.port,
+                    buffer: buffer
+                });
+            }, 500);
+        }).listen(8000);
 
     var server = app.listen(config.port);
     var socket = io.listen(server);

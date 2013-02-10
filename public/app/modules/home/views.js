@@ -13,7 +13,7 @@ define([
     function (app, Backbone, $, _, Form) {
 
         var Views = {
-            Form: Form
+            Form: Form.Form
         };
 
         Views.Layout = Backbone.Layout.extend({
@@ -117,6 +117,7 @@ define([
                 return false;
             }
         });
+
 
         return Views;
     });

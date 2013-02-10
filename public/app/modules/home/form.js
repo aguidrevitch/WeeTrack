@@ -9,9 +9,12 @@ define([
 
     function (app, Backbone, $, _) {
 
-        return app.views.Form.extend({
+        var Views = {};
+
+        Views.Form = app.views.Form.extend({
             template: "home/form",
             className: "row",
+            uploads: {},
             events: {
                 'click .submit-form': 'saveTask',
                 'click .close-form': 'closeForm'
@@ -57,6 +60,30 @@ define([
                 $("[name=project]", this.$el).on('change', _.bind(function () {
                     this.isDirty = true;
                 }, this));
+
+                $('#fileupload').fileupload({ dataType: 'json',
+                    add: function (e, data) {
+                        _.each(data.files, function (file) {
+                            var view = self.uploads[file.name] = new Views.UploadedFile({
+                                model: file,
+                                jqXHR: data.submit()
+                            });
+                            self.insertView("#upload-progress", view).render();
+                        }, this);
+                    }
+                });
+
+                $('#fileupload').bind('fileuploadprogress', function (e, data) {
+                    _.each(data.files, function (file) {
+                        self.uploads[file.name].onUploadProgress(data);
+                    });
+                });
+
+                $('#fileupload').bind('fileuploaddone', function (e, data) {
+                    _.each(data.files, function (file) {
+                        self.uploads[file.name].onUploadDone(data);
+                    });
+                });
 
                 this.constructor.__super__.afterRender.call(this);
                 //this.__super__.method.call(this);
@@ -114,5 +141,74 @@ define([
                 });
             }
         });
+
+        Views.UploadedFile = Backbone.Layout.extend({
+            template: "home/uploaded-file",
+            keep: true,
+            initialize: function () {
+                var self = this;
+                this.options.jqXHR.error(function (jqXHR, textStatus, errorThrown) {
+                    var progress = self.$el.find('.upload-progress span');
+                    if (errorThrown == 'abort')
+                        progress.text(t(errorThrown));
+                    else
+                        progress.text(t('error'));
+                    progress.removeClass('label-info').addClass('label-important');
+                    self.$el.find('.upload-close').off('click');
+                    self.$el.find('.upload-close').on('click', function () {
+                        self.remove();
+                    });
+                });
+            },
+            afterRender: function () {
+                var self = this;
+                this.$el.find('.upload-close').on('click', function () {
+                    self.options.jqXHR.abort();
+                });
+            },
+            onUploadProgress: function (data) {
+                this.$el.find('.upload-progress span').html(parseInt(data.loaded / data.total * 100, 10) + "%");
+            },
+            onUploadDone: function (data) {
+                this.$el.find('.upload-progress span').text("done").removeClass('label-info').addClass('label-success');
+                var self = this;
+                this.$el.find('.upload-close').off('click');
+                _.each(data.files, function (file, index) {
+                    if (file.name == self.model.name) {
+                        //console.log(data.result[index]);
+                        self.$el.append('<input type="hidden" name="upload" value="' + data.result[index].name + '">');
+                        if (data.result[index].thumbnail_url) {
+                            var thumbnail = new Image();
+                            thumbnail.onload = function () {
+                                self.$el.tooltip({
+                                    html: true,
+                                    title: '<img src="' + thumbnail.src + '">',
+                                    trigger: 'hover',
+                                    placement: 'left'
+                                });
+                            };
+                            thumbnail.src = data.result[index].thumbnail_url;
+                        }
+                        self.$el.find('.upload-close').on('click', function () {
+                            self.$el.tooltip('destroy');
+                            $.ajax({
+                                type: 'DELETE',
+                                url: data.result[index].delete_url,
+                                success: function () {
+                                    self.remove();
+                                }
+                            });
+                        });
+                    }
+                });
+            },
+            serialize: function () {
+                return {
+                    file: this.model
+                };
+            }
+        });
+
+        return Views;
 
     });

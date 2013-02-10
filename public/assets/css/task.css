@@ -115,14 +115,14 @@
    width: 430px;
 }
 
-#form-task-add .subject,
+#form-task-add .status,
 #form-task-add .owner{
     float: left;
     min-height: 1px;
     margin-left: 0px;
 }
 
-#form-task-add .subject {
+#form-task-add .status {
     width: 240px;
 }
 
