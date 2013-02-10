@@ -6,10 +6,9 @@
 
                 <div class="controls">
                     <select name="status">
-                        <option value="new"><%= t('New') %></option>
-                        <option value="open"><%= t('Open') %></option>
-                        <option value="closed"><%= t('Closed') %></option>
-                        <option value="resolved"><%= t('Resolved') %></option>
+                        <% _.each(['new', 'open', 'closed', 'resolved'], function (val) { %>
+                            <option value="<%= val %>" <%= task.get('status') == val ? 'selected="selected"' : '' %>><%= t(val) %></option>
+                        <% }) %>
                     </select>
                 </div>
             </div>
