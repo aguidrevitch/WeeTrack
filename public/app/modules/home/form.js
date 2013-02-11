@@ -61,47 +61,60 @@ define([
                     this.isDirty = true;
                 }, this));
 
-                $('#fileupload').fileupload({ dataType: 'json',
-                    add: function (e, data) {
-                        _.each(data.files, function (file) {
-                            var view = self.uploads[file.name] = new Views.UploadedFile({
-                                model: file,
-                                jqXHR: data.submit()
-                            });
-                            self.insertView("#upload-progress", view).render();
-                        }, this);
-                    }
-                });
+                this.uploads = [];
+                $('#fileupload', this.$el).off('change');
+                $('#fileupload', this.$el).on('change', function (e) {
+                    var files = e.target.files, file;
 
-                $('#fileupload').bind('fileuploadprogress', function (e, data) {
-                    _.each(data.files, function (file) {
-                        self.uploads[file.name].onUploadProgress(data);
-                    });
-                });
+                    if (!files || files.length == 0) return;
+                    file = files[0];
 
-                $('#fileupload').bind('fileuploaddone', function (e, data) {
-                    _.each(data.files, function (file) {
-                        self.uploads[file.name].onUploadDone(data);
-                    });
+                    var fileReader = new FileReader();
+                    fileReader.onload = _.bind(function (e) {
+                        // http://aymkdn.github.com/FileToDataURI/
+                        // ATTENTION: to have the same result than the Flash object we need to split
+                        // our result to keep only the Base64 part
+                        var view = new Views.UploadedFile({
+                            model: _.extend({}, file, { data: e.target.result })
+                        });
+                        self.uploads.push(view);
+                        self.insertView("#upload-progress", view).render();
+                    }, this);
+                    fileReader.readAsDataURL(file);
                 });
 
                 this.constructor.__super__.afterRender.call(this);
-                //this.__super__.method.call(this);
             },
             saveTask: function () {
                 var view = this;
+                var id = this.model.id
                 var isNew = this.model.isNew();
-                var task = new app.models.Task({ id: this.model.id });
-                task.setWorkspace(this.model.getWorkspace());
-                task.save(this.$el.find('form').serializeObject(), {
+                var workspace = this.model.getWorkspace();
+
+                var attributes = this.$el.find('form').serializeObject();
+
+                var task = new app.models.Task({ id: id });
+                task.setWorkspace(workspace);
+                task.validateOnServer(attributes, {
                     success: function (model) {
-                        view.model.set(model.attributes);
-                        view.model.trigger('change');
-                        view.justSaved = true;
-                        //if (isNew)
-                        //    view.collection.push(model);
-                        app.router.navigate('/' + model.id);
-                        app.trigger('task:updated', view.model);
+                        console.log(model);
+                        var task = new app.models.Task({ id: id });
+                        task.setWorkspace(workspace);
+                        attributes.files = [];
+                        _.each(view.uploads, function (view) {
+                            attributes.files.push(view.model);
+                        });
+                        task.save(attributes, {
+                            success: function (model) {
+                                view.model.set(model.attributes);
+                                view.model.trigger('change');
+                                view.justSaved = true;
+                                //if (isNew)
+                                //    view.collection.push(model);
+                                app.router.navigate('/' + model.id);
+                                app.trigger('task:updated', view.model);
+                            }
+                        })
                     },
                     error: function (model, res) {
                         var err;
@@ -144,68 +157,29 @@ define([
 
         Views.UploadedFile = Backbone.Layout.extend({
             template: "home/uploaded-file",
-            keep: true,
-            initialize: function () {
-                var self = this;
-                this.options.jqXHR.error(function (jqXHR, textStatus, errorThrown) {
-                    var progress = self.$el.find('.upload-progress span');
-                    if (errorThrown == 'abort')
-                        progress.text(t(errorThrown));
-                    else
-                        progress.text(t('error'));
-                    progress.removeClass('label-info').addClass('label-important');
-                    self.$el.find('.upload-close').off('click');
-                    self.$el.find('.upload-close').on('click', function () {
-                        self.remove();
-                    });
-                });
-            },
-            afterRender: function () {
-                var self = this;
-                this.$el.find('.upload-close').on('click', function () {
-                    self.options.jqXHR.abort();
-                });
-            },
-            onUploadProgress: function (data) {
-                this.$el.find('.upload-progress span').html(parseInt(data.loaded / data.total * 100, 10) + "%");
-            },
-            onUploadDone: function (data) {
-                this.$el.find('.upload-progress span').text("done").removeClass('label-info').addClass('label-success');
-                var self = this;
-                this.$el.find('.upload-close').off('click');
-                _.each(data.files, function (file, index) {
-                    if (file.name == self.model.name) {
-                        //console.log(data.result[index]);
-                        self.$el.append('<input type="hidden" name="upload" value="' + data.result[index].name + '">');
-                        if (data.result[index].thumbnail_url) {
-                            var thumbnail = new Image();
-                            thumbnail.onload = function () {
-                                self.$el.tooltip({
-                                    html: true,
-                                    title: '<img src="' + thumbnail.src + '">',
-                                    trigger: 'hover',
-                                    placement: 'left'
-                                });
-                            };
-                            thumbnail.src = data.result[index].thumbnail_url;
-                        }
-                        self.$el.find('.upload-close').on('click', function () {
-                            self.$el.tooltip('destroy');
-                            $.ajax({
-                                type: 'DELETE',
-                                url: data.result[index].delete_url,
-                                success: function () {
-                                    self.remove();
-                                }
-                            });
-                        });
-                    }
-                });
-            },
             serialize: function () {
                 return {
                     file: this.model
                 };
+            },
+            afterRender: function () {
+                var self = this;
+                if (this.model.type.match(/^image\//)) {
+                    var img = new Image();
+                    img.onload = function () {
+                        self.$el.tooltip({
+                            html: true,
+                            title: '<img src="' + self.model.data + '" width="' + img.width + '" height="' + img.height + '">',
+                            trigger: 'hover',
+                            placement: 'left'
+                        });
+                    };
+                    img.src = self.model.data;
+                }
+                this.$el.find('.upload-close').on('click', function () {
+                    self.$el.tooltip('destroy');
+                    self.remove();
+                });
             }
         });
 

@@ -153,6 +153,9 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
             if (this._watch)
                 query.watch = this._watch;
 
+            if (this._validateOnServer)
+                query.validate = this._validateOnServer;
+
             if (_.keys(query).length) {
                 var qs = [];
                 _.each(query, function (value, key) {
@@ -180,6 +183,20 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
             this.transactions.reset(response.transactions);
             delete response.transactions;
             return response;
+        },
+        validateOnServer: function (attributes, options) {
+            var self = this;
+            this._validateOnServer = 'true';
+            this.save(attributes, {
+                success: function (model) {
+                    delete(self._validateOnServer);
+                    if (options.success) options.success(model);
+                },
+                error: function (model, res) {
+                    delete(self._validateOnServer);
+                    if (options.error) options.error(model, res);
+                }
+            });
         }
     });
 

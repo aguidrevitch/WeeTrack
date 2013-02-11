@@ -9,20 +9,18 @@
 #upload-progress {
     clear: both;
 }
-
-#upload-progress .upload-item {
-    position: relative;
-    line-height: 20px;
+.upload-item {
+    height: 17px;
+    line-height: 17px;
     padding: 8px 0px;
     border-bottom: 1px solid gray;
 }
 
-#upload-progress .upload-item .upload-progress {
-    position: absolute;
-    top: 0px;
-    right: 16px;
-    line-height: 20px;
-    padding: 8px 0px;
+.upload-item span {
+    width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    float: left;
 }
 
 #left-sidebar, #middle-sidebar, #right-sidebar {
