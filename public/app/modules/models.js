@@ -178,8 +178,8 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
                 this.transactions.reset(attributes.transactions);
         },
         parse: function (response) {
-            if (!this.transactions)
-                this.transactions = new Transaction.Collection();
+            //if (!this.transactions)
+            this.transactions = new Transaction.Collection();
             this.transactions.reset(response.transactions);
             delete response.transactions;
             return response;

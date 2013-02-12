@@ -1,15 +1,16 @@
 <% if (transaction.get('subtype') == 'text') { %>
 <div>
+    <%= transaction.get('creator').name %>
+    <%= (transaction.get('type') == 'reply') ? t('replied') : t('commented') %>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
-    <%= t('by') %> <%= transaction.get('owner').name %>
 </div>
-<div><%= transaction.escape('content') %></div>
+<div><%= transaction.escape('value') %></div>
+
 <% } else if (transaction.get('subtype') == 'file') { %>
 <div>
+    <%= transaction.get('creator').name %>
+    <%= t('attached') %>
+    <a data-bypass="true" href="/api/file/<%= workspace.id %>/<%= task.id %>/<%= transaction.get('value') %>"><%= transaction.get('meta').name %></a>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
-    <%= t('by') %> <%= transaction.get('owner').name %>
-</div>
-<div>
-    <a data-bypass="true" href="<%= transaction.escape('url') %>" thumbnail_url="<%= transaction.escape('thumbnail_url') %>"><%= transaction.escape('filename') %></a>
 </div>
 <% } %>

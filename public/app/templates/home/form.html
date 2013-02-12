@@ -1,4 +1,9 @@
 <form id="form-task-add" class="form-horizontal">
+    <legend>
+        <%= t('New Task') %>
+        <button type="button" class="close close-form">&times;</button>
+        <button type="button" class="btn pull-right watch"><%= t('Watch') %></button>
+    </legend>
     <div class="row status">
         <fieldset>
             <div class="control-group">
@@ -29,7 +34,7 @@
         <label class="control-label"><%= t('Subject') %> *</label>
 
         <div class="controls">
-            <textarea name="subject" class="input-xxlarge"><%= task.escape('subject') %></textarea>
+            <input type="text" name="subject" class="input-xxlarge" value="<%= task.escape('subject') %>">
         </div>
     </div>
     <div class="control-group">

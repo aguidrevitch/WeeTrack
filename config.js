@@ -13,8 +13,7 @@ var config = {
             secret: "secret",
             maxAge: 60000 * 60 * 24 * 365
         },
-        uploadDir: __dirname + '/public/uploads',
-        uploadUrl: '/uploads'
+        uploadDir: __dirname + '/storage'
     },
     production: {
         hostname: 'bladetracker.com',
@@ -31,8 +30,7 @@ var config = {
             secret: "secret",
             maxAge: 60000 * 60 * 24 * 365
         },
-        uploadDir: __dirname + '/public/uploads',
-        uploadUrl: '/uploads'
+        uploadDir: __dirname + '/storage'
     }
 };
 

@@ -1,11 +1,11 @@
 <div id="task-header">
     <button type="button" class="close close-details">&times;</button>
     <h2><%= task.escape('subject') %></h2>
-    <ul id="task-comments">
+    <ul id="transactions">
 
     </ul>
     <div class="form-fixed">
-        <form id="form-transaction-add" class="form form-horizontal span5">
+        <form id="form-transaction-add" class="form form-horizontal">
             <legend><%= t('New Comment') %>
                 <button type="button" class="close close-form">&times;</button>
             </legend>
@@ -34,7 +34,7 @@
                     <button class="btn btn-primary submit-form"><%= t('Create') %></button>
                 </div>
             </div>
-            <input type="hidden" name="task" value="<%= task.escape(" id") %>">
+            <input type="hidden" name="task" value="<%= task.escape("id") %>">
         </form>
     </div>
 </div>

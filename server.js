@@ -9,7 +9,6 @@
         User = require("./lib/models/user"),
         Workspace = require("./lib/models/workspace"),
         RedisStore = require('connect-redis')(express),
-        upload = require('jquery-file-upload-middleware'),
         _ = require('lodash');
 
     var app = express();
@@ -35,22 +34,6 @@
             layout: false,
             pretty: true
         });
-
-        // must go before bodyParser
-        upload.configure({
-            uploadDir: app.locals.config.uploadDir + '/.tmp',
-            uploadUrl: app.locals.config.uploadUrl + '/.tmp',
-            targetDir: app.locals.config.uploadDir,
-            targetUrl: app.locals.config.uploadUrl,
-            imageVersions: {
-                thumbnail: {
-                    width: 80,
-                    height: 80
-                }
-            }
-        });
-
-        app.use('/upload', upload.fileHandler());
 
         app.use(express.bodyParser());
         app.use(gzippo.staticGzip(__dirname + "/public"));
@@ -113,12 +96,6 @@
             }
         });
 
-        /* upload file manager */
-        app.use('/api', function (req, res, next) {
-            req.filemanager = upload.fileManager();
-            next();
-        });
-
         app.use(app.router);
         app.use(express.errorHandler({
             dumpExceptions: true,
@@ -132,6 +109,7 @@
         controller.setup(app);
     });
 
+    /*
     var http = require('http'),
         httpProxy = require('http-proxy');
 
@@ -148,6 +126,7 @@
                 });
             }, 500);
         }).listen(8000);
+    */
 
     var server = app.listen(config.port);
     var socket = io.listen(server);

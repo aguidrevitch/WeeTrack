@@ -1,6 +1,6 @@
 {
-    "name": "weetrack",
-    "description": "http://weetrack.com",
+    "name": "bladetracker",
+    "description": "http://bladetracker.com",
     "version": "0.0.1",
     "dependencies": {
         "mongoose": ">= 3.3.1",
@@ -21,6 +21,7 @@
         "validator": ">= 0.4.12",
         "jquery-file-upload-middleware": ">= 0.0.2",
         "chain": "git://github.com/aguidrevitch/node-chain.git",
+        "node-uuid": ">= 1.4.0",
         "mkdirp": "*"
     },
     "engines": {

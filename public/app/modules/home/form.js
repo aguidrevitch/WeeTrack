@@ -12,22 +12,51 @@ define([
         var Views = {};
 
         Views.Form = app.views.Form.extend({
-            template: "home/form",
-            className: "row",
-            uploads: {},
-            events: {
-                'click .submit-form': 'saveTask',
-                'click .close-form': 'closeForm'
-
-            },
             constructor: function () {
                 this.app = app;
-                this.events = _.extend({}, this.constructor.__super__.events, this.events);
-                this.constructor.__super__.constructor.apply(this, arguments);
+                app.views.Form.prototype.constructor.apply(this, arguments);
             },
+            afterRender: function () {
+                this.uploads = [];
+
+                $('#fileupload', this.$el).off('change');
+                $('#fileupload', this.$el).on('change', _.bind(function (e) {
+                    var files = e.target.files, file;
+
+                    if (!files || files.length == 0) return;
+                    file = files[0];
+
+                    var fileReader = new FileReader();
+                    fileReader.onload = _.bind(function (e) {
+                        // http://aymkdn.github.com/FileToDataURI/
+                        // ATTENTION: to have the same result than the Flash object we need to split
+                        // our result to keep only the Base64 part
+                        var view = new Views.UploadedFile({
+                            model: _.extend({}, file, { data: e.target.result })
+                        });
+                        this.uploads.push(view);
+                        this.insertView("#upload-progress", view).render();
+                    }, this);
+                    fileReader.readAsDataURL(file);
+                }, this));
+                app.views.Form.prototype.afterRender.call(this);
+            },
+            closeForm: function () {
+                this.close(function (yes) {
+                    if (yes)
+                        app.trigger('task:deselected');
+                });
+            }
+        });
+
+        Views.Add = Views.Form.extend({
+            template: "home/form",
+            className: "row",
+            events: _.extend({
+                'click .submit-form': 'saveTask',
+                'click .close-form': 'closeForm'
+            }, Views.Form.prototype.events),
             initialize: function () {
-                this.listenTo(this.model, 'sync', this.render);
-                this.listenTo(this.model, 'change', this.render);
                 this.listenTo(app.global.projects, 'sync', this.render);
                 this.listenTo($(window), 'unload', this.closeForm);
             },
@@ -38,8 +67,6 @@ define([
                 };
             },
             afterRender: function () {
-
-                var self = this;
 
                 $("[name=owner]", this.$el).select2(
                     this.userListSelect2Options({
@@ -60,98 +87,113 @@ define([
                 $("[name=project]", this.$el).on('change', _.bind(function () {
                     this.isDirty = true;
                 }, this));
-
-                this.uploads = [];
-                $('#fileupload', this.$el).off('change');
-                $('#fileupload', this.$el).on('change', function (e) {
-                    var files = e.target.files, file;
-
-                    if (!files || files.length == 0) return;
-                    file = files[0];
-
-                    var fileReader = new FileReader();
-                    fileReader.onload = _.bind(function (e) {
-                        // http://aymkdn.github.com/FileToDataURI/
-                        // ATTENTION: to have the same result than the Flash object we need to split
-                        // our result to keep only the Base64 part
-                        var view = new Views.UploadedFile({
-                            model: _.extend({}, file, { data: e.target.result })
-                        });
-                        self.uploads.push(view);
-                        self.insertView("#upload-progress", view).render();
-                    }, this);
-                    fileReader.readAsDataURL(file);
-                });
-
+                console.log('Views.Add afterrender');
                 this.constructor.__super__.afterRender.call(this);
             },
             saveTask: function () {
                 var view = this;
-                var id = this.model.id
-                var isNew = this.model.isNew();
                 var workspace = this.model.getWorkspace();
 
-                var attributes = this.$el.find('form').serializeObject();
-
-                var task = new app.models.Task({ id: id });
+                var task = new app.models.Task();
                 task.setWorkspace(workspace);
+
+                var attributes = _.extend({type: 'reply'}, this.$el.find('form').serializeObject());
                 task.validateOnServer(attributes, {
                     success: function (model) {
-                        console.log(model);
-                        var task = new app.models.Task({ id: id });
+                        var task = new app.models.Task();
                         task.setWorkspace(workspace);
+
                         attributes.files = [];
                         _.each(view.uploads, function (view) {
                             attributes.files.push(view.model);
                         });
+
                         task.save(attributes, {
                             success: function (model) {
-                                view.model.set(model.attributes);
-                                view.model.trigger('change');
-                                view.justSaved = true;
                                 //if (isNew)
                                 //    view.collection.push(model);
-                                app.router.navigate('/' + model.id);
-                                app.trigger('task:updated', view.model);
-                            }
+                                view.isDirty = false;
+                                app.trigger('task:selected', model.id);
+                            },
+                            error: _.bind(app.views.defaultErrorHandler, this, app)
                         })
                     },
-                    error: function (model, res) {
-                        var err;
-                        try {
-                            err = ($.parseJSON(res.responseText)).error;
-                        } catch (e) {
-                            return;
-                        }
-
-                        if (err._modal)
-                            app.showModal(err._modal.message);
-
-                        $(':input + .error', self.el).html('');
-                        $(':input', self.el).parents('.control-group').removeClass('error');
-                        _.each(err, function (value, field) {
-                            var selector = '[name="' + field + '"]:input';
-                            $(selector, self.el).parents('.control-group').addClass('error');
-                            $(selector, self.el).siblings('.error').html(t(value.message));
-                        });
-                    }
+                    error: _.bind(app.views.defaultErrorHandler, this, app)
                 });
                 return false;
-            },
-            close: function (callback) {
-                if (this.isDirty) {
-                    app.showConfirm(t('Unsaved changes'), function (yes) {
-                        callback(yes);
-                    });
-                } else {
-                    callback(true);
+            }
+        });
+
+        Views.Transaction = Backbone.Layout.extend({
+            template: "home/transaction",
+            serialize: function () {
+                return {
+                    workspace: app.global.workspace,
+                    task: this.options.task,
+                    transaction: this.model
                 }
+            }
+        });
+
+        Views.View = Views.Form.extend({
+            template: "home/view",
+            className: "row",
+            uploads: {},
+            events: _.extend({
+                'click .close-form': 'closeForm'
+            }, Views.Form.prototype.events),
+            initialize: function () {
+                this.listenTo(this.model, 'sync', this.render);
+                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(app.global.projects, 'sync', this.render);
+                this.listenTo($(window), 'unload', this.closeForm);
             },
-            closeForm: function () {
-                this.close(function (yes) {
-                    if (yes)
-                        app.trigger('task:deselected');
-                });
+            beforeRender: function () {
+                this.model.transactions.each(function (transaction) {
+                    this.insertView('#transactions', new Views.Transaction({
+                        task: this.model,
+                        model: transaction
+                    }));
+                }, this);
+            },
+            serialize: function () {
+                return {
+                    task: this.model,
+                    projects: app.global.projects
+                };
+            },
+            saveTask: function () {
+                /*
+                 var view = this;
+                 var id = this.model.id
+                 var workspace = this.model.getWorkspace();
+                 var attributes = this.$el.find('form').serializeObject();
+                 var task = new app.models.Task({ id: id });
+                 task.setWorkspace(workspace);
+                 task.validateOnServer(attributes, {
+                 success: function (model) {
+                 console.log(model);
+                 var task = new app.models.Task({ id: id });
+                 task.setWorkspace(workspace);
+                 attributes.files = [];
+                 _.each(view.uploads, function (view) {
+                 attributes.files.push(view.model);
+                 });
+                 task.save(attributes, {
+                 success: function (model) {
+                 view.model.set(model.attributes);
+                 view.model.trigger('change');
+                 view.justSaved = true;
+                 //if (isNew)
+                 //    view.collection.push(model);
+                 app.router.navigate('/' + model.id);
+                 app.trigger('task:updated', view.model);
+                 }
+                 })
+                 },
+                 });
+                 */
+                return false;
             }
         });
 
@@ -176,6 +218,7 @@ define([
                     };
                     img.src = self.model.data;
                 }
+                console.log(self.model.data);
                 this.$el.find('.upload-close').on('click', function () {
                     self.$el.tooltip('destroy');
                     self.remove();

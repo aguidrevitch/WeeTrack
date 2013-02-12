@@ -5,5 +5,6 @@ module.exports = [
     'api/project',
     'api/task',
     'api/transaction',
+    'api/file',
     'default'
     ];

@@ -7,7 +7,6 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
             'click .watch': 'toggleWatchButton'
         },
         userListSelect2Options: function (options) {
-
             return _.extend({}, {
                 placeholder: t("Search for a user"),
                 tokenSeparators: [' ', ',', ';'],
@@ -167,6 +166,28 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
             }
         }
     });
+
+    Views.defaultErrorHandler = function (app, model, res) {
+        var err;
+        try {
+            err = ($.parseJSON(res.responseText)).error;
+        } catch (e) {
+            app.showModal(t('Unknown error'));
+            return;
+        }
+
+        if (err._modal)
+            app.showModal(err._modal.message);
+
+        $(':input + .error', this.$el).html('');
+        $(':input', this.$el).parents('.control-group').removeClass('error');
+
+        _.each(err, function (value, field) {
+            var selector = '[name="' + field + '"]:input';
+            $(selector, this.$el).parents('.control-group').addClass('error');
+            $(selector, this.$el).siblings('.error').html(t(value.message));
+        });
+    };
 
     return Views;
 });

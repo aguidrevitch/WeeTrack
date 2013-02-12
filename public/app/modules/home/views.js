@@ -13,7 +13,8 @@ define([
     function (app, Backbone, $, _, Form) {
 
         var Views = {
-            Form: Form.Form
+            Add: Form.Add,
+            View: Form.View
         };
 
         Views.Layout = Backbone.Layout.extend({
@@ -39,24 +40,24 @@ define([
                     openedForm.close(_.bind(function (yes) {
                         if (yes) {
                             if (id && id != 'add') {
-                                app.router.navigate(id);
+                                app.router.navigate('/' + id);
                                 // existing project
                                 task = new app.models.Task({ id: id });
                                 task.setWorkspace(app.global.workspace.id);
                                 this.setViews({
-                                    "#right-sidebar": new Views.Form({
+                                    "#right-sidebar": new Views.View({
                                         model: task
                                     })
                                 });
                                 task.fetch();
                             } else {
-                                app.router.navigate('add');
+                                app.router.navigate('/add');
 
                                 task = new app.models.Task();
                                 task.setWorkspace(app.global.workspace.id);
                                 // new project
                                 this.setViews({
-                                    "#right-sidebar": new Views.Form({
+                                    "#right-sidebar": new Views.Add({
                                         model: task
                                     })
                                 });
