@@ -39,16 +39,6 @@
         app.use(gzippo.staticGzip(__dirname + "/public"));
         app.use(gzippo.compress());
 
-        app.use(function (req, res, next) {
-            if (req.session.user_id) {
-                // denying access
-                //res.render('error', 'Access Denied');
-                next();
-            } else {
-                next();
-            }
-        });
-
         /* modal */
         app.use(function (req, res, next) {
             res.modal = function (code, err) {
@@ -106,7 +96,15 @@
     var controllers = require("./controllers-config");
     controllers.map(function (name) {
         controller = require("./lib/controllers/" + name);
-        controller.setup(app);
+        controller.setup(app, function (req, res, next) {
+            if (req.session.user_id) {
+                next();
+            } else {
+                // denying access
+                res.error(new Error('Access Denied'));
+                return;
+            }
+        });
     });
 
     /*
