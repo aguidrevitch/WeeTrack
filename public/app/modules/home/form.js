@@ -51,7 +51,6 @@ define([
 
         Views.Add = Views.Form.extend({
             template: "home/form",
-            className: "row",
             events: _.extend({
                 'click .submit-form': 'saveTask',
                 'click .close-form': 'closeForm'
@@ -136,25 +135,12 @@ define([
         });
 
         Views.View = Views.Form.extend({
-            template: "home/view",
-            className: "row",
-            uploads: {},
-            events: _.extend({
-                'click .close-form': 'closeForm'
-            }, Views.Form.prototype.events),
+            template: 'home/view',
+            id: "task-details",
             initialize: function () {
                 this.listenTo(this.model, 'sync', this.render);
                 this.listenTo(this.model, 'change', this.render);
                 this.listenTo(app.global.projects, 'sync', this.render);
-                this.listenTo($(window), 'unload', this.closeForm);
-            },
-            beforeRender: function () {
-                this.model.transactions.each(function (transaction) {
-                    this.insertView('#transactions', new Views.Transaction({
-                        task: this.model,
-                        model: transaction
-                    }));
-                }, this);
             },
             serialize: function () {
                 return {
@@ -162,38 +148,72 @@ define([
                     projects: app.global.projects
                 };
             },
-            saveTask: function () {
-                /*
-                 var view = this;
-                 var id = this.model.id
-                 var workspace = this.model.getWorkspace();
-                 var attributes = this.$el.find('form').serializeObject();
-                 var task = new app.models.Task({ id: id });
-                 task.setWorkspace(workspace);
-                 task.validateOnServer(attributes, {
-                 success: function (model) {
-                 console.log(model);
-                 var task = new app.models.Task({ id: id });
-                 task.setWorkspace(workspace);
-                 attributes.files = [];
-                 _.each(view.uploads, function (view) {
-                 attributes.files.push(view.model);
-                 });
-                 task.save(attributes, {
-                 success: function (model) {
-                 view.model.set(model.attributes);
-                 view.model.trigger('change');
-                 view.justSaved = true;
-                 //if (isNew)
-                 //    view.collection.push(model);
-                 app.router.navigate('/' + model.id);
-                 app.trigger('task:updated', view.model);
-                 }
-                 })
-                 },
-                 });
-                 */
+            beforeRender: function () {
+                console.log(this.model.transactions);
+                this.model.transactions.each(function (transaction) {
+                    this.insertView('#transactions', new Views.Transaction({
+                        task: this.model,
+                        model: transaction
+                    }));
+                }, this);
+                this.insertView('.form-container', new Views.TransactionForm({
+                    model: this.model
+                }));
+            }
+        });
+
+        Views.TransactionForm = Views.Form.extend({
+            template: "home/transaction-form",
+            className: "row",
+            uploads: {},
+            events: _.extend({
+                'click .submit-form': 'saveComment',
+                'click .close-form': 'closeForm'
+            }, Views.Form.prototype.events),
+            initialize: function () {
+                this.listenTo($(window), 'unload', this.closeForm);
+            },
+            serialize: function () {
+                return {
+                    task: this.model
+                };
+            },
+            saveComment: function () {
+                var view = this;
+
+                var comment = new app.models.Comment();
+                comment.setWorkspace(app.global.workspace.id);
+                comment.setTask(this.model.id);
+
+                var attributes = this.$el.find('form').serializeObject();
+                if (this.uploads.length)
+                    attributes.files = [ true ];
+
+                comment.validateOnServer(attributes, {
+                    success: function () {
+                        var comment = new app.models.Comment();
+                        comment.setWorkspace(app.global.workspace.id);
+                        comment.setTask(view.model.id);
+                        attributes.files = [];
+                        _.each(view.uploads, function (view) {
+                            attributes.files.push(view.model);
+                        });
+                        comment.save(attributes, {
+                            success: function (model) {
+                                view.model.transactions.add(model.transactions.models);
+                                view.model.trigger('change');
+                                view.justSaved = true;
+                            },
+                            error: _.bind(app.views.defaultErrorHandler, this, app)
+                        })
+                    },
+                    error: _.bind(app.views.defaultErrorHandler, this, app)
+                });
+
                 return false;
+            },
+            closeForm: function () {
+                this.remove();
             }
         });
 
@@ -218,7 +238,6 @@ define([
                     };
                     img.src = self.model.data;
                 }
-                console.log(self.model.data);
                 this.$el.find('.upload-close').on('click', function () {
                     self.$el.tooltip('destroy');
                     self.remove();

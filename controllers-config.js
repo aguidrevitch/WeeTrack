@@ -4,7 +4,7 @@ module.exports = [
     'api/workspace',
     'api/project',
     'api/task',
-    'api/transaction',
+    'api/comment',
     'api/file',
     'default'
     ];

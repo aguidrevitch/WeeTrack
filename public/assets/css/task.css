@@ -40,12 +40,6 @@
     float: right;
 }
 
-#projects form, #tasks form, #task-details form {
-    display: none;
-    margin: 0px;
-
-}
-
 #workspaces .form-fixed,
 #projects .form-fixed,
 #tasks .form-fixed,
@@ -109,34 +103,46 @@
     max-width: 200px;
 }
 
-#form-task-add .input-xxlarge {
+#form-task-add .input-xxlarge,
+#form-transaction-add .input-xxlarge
+{
    width: 430px;
 }
 
 #form-task-add .status,
-#form-task-add .owner{
+#form-task-add .owner,
+#form-transaction-add .type,
+#form-transaction-add .status
+{
     float: left;
     min-height: 1px;
     margin-left: 0px;
 }
 
-#form-task-add .status {
+#form-task-add .status,
+#form-transaction-add .type {
     width: 240px;
 }
 
-#form-task-add .owner {
+#form-task-add .owner,
+#form-transaction-add .status {
     width: 330px;
 }
 
-#form-task-add .control-label {
+#form-task-add .control-label,
+#form-transaction-add .control-label {
     width: 110px;
 }
 
-#form-task-add .controls {
+
+#form-task-add .controls,
+#form-transaction-add .controls {
     margin-left: 120px;
 }
 
-#form-task-add select[name=status] {
+#form-task-add select[name=status],
+#form-transaction-add select[name=status],
+#form-transaction-add select[name=type] {
     width: 120px
 }
 
@@ -149,32 +155,3 @@
     font-size: 24px;
     font-weight: 600;
 }
-
-
-/*
-#form-task-add .control-label {
-    width: 60px;
-}
-
-#form-task-add .controls {
-    margin-left: 80px;
-}
-
-@media (max-width: 767px) {
-    #form-project-add input.span1 {
-        display: inline-block;
-        width: inherit;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 979px) {
-    #form-project-add input.span1 {
-        width: 40px;
-    }
-}
-@media (min-width: 1200px) {
-    #form-project-add input.span1 {
-        width: 106px;
-    }
-}
-*/

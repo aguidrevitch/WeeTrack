@@ -178,7 +178,6 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
                 this.transactions.reset(attributes.transactions);
         },
         parse: function (response) {
-            //if (!this.transactions)
             this.transactions = new Transaction.Collection();
             this.transactions.reset(response.transactions);
             delete response.transactions;
@@ -199,6 +198,63 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
             });
         }
     });
+
+    Models.Comment = Backbone.Model.extend({
+        idAttribute: '_id',
+        baseUrl: '/api/comment',
+        url: function () {
+            var url = this.id
+                ? this.baseUrl + '/' + this.workspace + '/' + this.task + '/' + this.id
+                : this.baseUrl + '/' + this.workspace + '/' + this.task
+
+            var query = {};
+
+            if (this._validateOnServer)
+                query.validate = this._validateOnServer;
+
+            if (_.keys(query).length) {
+                var qs = [];
+                _.each(query, function (value, key) {
+                    qs.push(key + '=' + value);
+                });
+                return url + '?' + qs.join('&');
+            } else {
+                return url;
+            }
+        },
+        setWorkspace: function (id) {
+            this.workspace = id;
+        },
+        getWorkspace: function () {
+            return this.workspace;
+        },
+        setTask: function (id) {
+            this.task = id;
+        },
+        getTask: function () {
+            return this.task;
+        },
+        parse: function (response) {
+            this.transactions = new Transaction.Collection();
+            this.transactions.reset(response.transactions);
+            delete response.transactions;
+            return response;
+        },
+        validateOnServer: function (attributes, options) {
+            var self = this;
+            this._validateOnServer = 'true';
+            this.save(attributes, {
+                success: function (model) {
+                    delete(self._validateOnServer);
+                    if (options.success) options.success(model);
+                },
+                error: function (model, res) {
+                    delete(self._validateOnServer);
+                    if (options.error) options.error(model, res);
+                }
+            });
+        }
+    })
 
     Models.Transaction = Transaction.Model;
 
