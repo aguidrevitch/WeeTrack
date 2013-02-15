@@ -50,7 +50,7 @@ define([
                                             });
                                         } else {
                                             this.setViews({
-                                                "#middle-sidebar": new Views.Watch({
+                                                "#middle-sidebar": new Views.Readonly({
                                                     collection: this.collection,
                                                     model: model
                                                 })
@@ -172,11 +172,8 @@ define([
             }
         });
 
-        Views.Watch = Backbone.Layout.extend({
-            template: 'workspace/watch',
-            events: {
-                'click .watch': 'toggleWatch'
-            },
+        Views.Readonly = Backbone.Layout.extend({
+            template: 'workspace/readonly',
             initialize: function () {
                 this.listenTo(this.model, 'sync', this.render);
                 this.listenTo(app.global.user, 'sync', this.render);
@@ -187,23 +184,6 @@ define([
                     domain: hostname,
                     workspace: this.model
                 };
-            },
-            toggleWatch: function () {
-                if (this.model.isWatcher(app.global.user)) {
-                    this.model.unwatch({
-                        error: _.bind(function () {
-                            $('.watch', this.$el).addClass('btn-danger');
-                            $(this.$el);
-                        }, this)
-                    });
-                } else {
-                    this.model.watch({
-                        error: _.bind(function () {
-                            $('.watch', this.$el).addClass('btn-danger');
-                            $(this.$el);
-                        }, this)
-                    });
-                }
             },
             close: function (callback) {
                 callback(true);

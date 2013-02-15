@@ -72,9 +72,6 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
                 }),
                 cc: _.filter(this.get('cc'), function (o) {
                     return user.id == o._id;
-                }),
-                watch: _.filter(this.get('watch'), function (o) {
-                    return user.id == o._id;
                 })
             };
         },
@@ -86,13 +83,6 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
         },
         isClient: function (user) {
             return (this.getAccess(user)).cc.length > 0;
-        },
-        isWatcher: function (user) {
-            return (this.getAccess(user)).watch.length > 0;
-        },
-        canWatch: function (user) {
-            var access = this.getAccess(user);
-            return access.admin.length + access.admincc.length + access.cc.length > 0;
         },
         setPermission: function (perm) {
             this.perm = perm;
@@ -107,9 +97,6 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
             if (this.perm)
                 query.perm = this.perm;
 
-            if (this._watch)
-                query.watch = this._watch;
-
             if (_.keys(query).length) {
                 var qs = [];
                 _.each(query, function (value, key) {
@@ -119,14 +106,6 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
             } else {
                 return url;
             }
-        },
-        watch: function (options) {
-            this._watch = 'true';
-            this.save({}, options);
-        },
-        unwatch: function (options) {
-            this._watch = 'false';
-            this.save({}, options);
         }
     });
 
@@ -149,9 +128,6 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
 
             if (this.perm)
                 query.perm = this.perm;
-
-            if (this._watch)
-                query.watch = this._watch;
 
             if (this._validateOnServer)
                 query.validate = this._validateOnServer;
