@@ -1,0 +1,105 @@
+<form id="form-task-add" class="form-horizontal">
+    <legend>
+        <%= t('New Task') %>
+        <button type="button" class="close close-form">&times;</button>
+        <button type="button" class="btn pull-right watch"><%= t('Watch') %></button>
+    </legend>
+    <div class="row status">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label"><%= t('Status') %> *</label>
+
+                <div class="controls">
+                    <select name="status">
+                        <% _.each(['new', 'open', 'closed', 'resolved'], function (val) { %>
+                            <option value="<%= val %>" <%= task.get('status') == val ? 'selected="selected"' : '' %>><%= t(val) %></option>
+                        <% }) %>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="row owner">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label"><%= t('Owner') %></label>
+
+                <div class="controls">
+                    <input type="text" id="owner" name="owner">
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Subject') %> *</label>
+
+        <div class="controls">
+            <input type="text" name="subject" class="input-xxlarge" value="<%= task.escape('subject') %>">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Project') %></label>
+
+        <div class="controls">
+            <select name="project" class="input-xxlarge">
+                <% projects.each(function (project) { %>
+                <option value="<%= project.id %>"><%= project.escape('name') %></option>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Administrators') %></label>
+
+        <div class="controls">
+            <input type="text" name="admin"  class="input-xxlarge">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Users') %></label>
+
+        <div class="controls">
+            <input type="text" name="admincc" class="input-xxlarge">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Clients') %></label>
+
+        <div class="controls">
+            <input type="text" name="cc"  class="input-xxlarge">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Watchers') %></label>
+
+        <div class="controls">
+            <input type="text" name="watch" class="input-xxlarge">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Content') %> * </label>
+
+        <div class="controls">
+            <textarea name="content" class="input-xxlarge"></textarea>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label"><%= t('Files') %></label>
+
+        <div class="controls">
+                <span class="btn btn-success fileinput-button">
+                    <i class="icon-plus icon-white"></i>
+                    <span><%= t('Attach') %>...</span>
+                    <input id="fileupload" type="file" multiple>
+                </span>
+
+            <div id="upload-progress"></div>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button class="btn btn-primary submit-form"><%= t('Create') %></button>
+        </div>
+    </div>
+    </fieldset>
+</form>
