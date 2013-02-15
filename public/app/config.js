@@ -19,7 +19,7 @@ require.config({
 
         // Libraries.
         jquery: "../assets/js/libs/jquery",
-        lodash: "../assets/js/libs/lodash",
+        lodash: "../assets/js/libs/lodash.underscore",
         backbone: "../assets/js/libs/backbone",
         bootstrap: "../assets/vendor/bootstrap/js/bootstrap",
         i18next: "../assets/vendor/i18next/js/i18next",
@@ -28,7 +28,10 @@ require.config({
     },
 
     shim: {
-        // Backbone library depends on lodash and jQuery.
+        lodash: {
+            exports: '_'    
+        },
+        // Backbone library depends on underscore and jQuery.
         backbone: {
             deps: [ "lodash", "jquery" ],
             exports: "Backbone"
@@ -36,9 +39,6 @@ require.config({
         bootstrap: [ "jquery" ],
         select2: [ "jquery" ],
 
-        "plugins/jquery.ui.widget": [ "jquery" ],
-        "plugins/jquery.iframe-transport": [ "jquery" ],
-        "plugins/jquery.fileupload": [ "jquery" ],
         "plugins/jquery.serializeObject": [ "jquery" ],
 
         // Backbone.LayoutManager depends on Backbone.

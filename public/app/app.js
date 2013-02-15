@@ -10,9 +10,6 @@ define([
 
     // Plugins.
     "plugins/backbone.layoutmanager",
-    "plugins/jquery.ui.widget",
-    "plugins/jquery.iframe-transport",
-    "plugins/jquery.fileupload",
     "plugins/jquery.serializeObject",
 
     // Locales

@@ -146,25 +146,20 @@ define([
             }
         });
 
-        Views.Form = Backbone.Layout.extend({
+        Views.Form = app.views.Form.extend({
             template: "project/form",
-            events: {
+            events: _.extend({
                 'click .submit-form': 'saveProject'
-            },
-            constructor: function () {
-                this.app = app;
-                this.events = _.extend({}, this.constructor.__super__.events, this.events);
-                this.constructor.__super__.constructor.apply(this, arguments);
-            },
+            }, app.views.Form.prototype.events),
             initialize: function () {
-                this.workspace = this.options.workspace;
+                this.workspace = app.global.workspace;
+                this.user = app.global.user;
                 this.listenTo(this.model, 'sync', this.render);
-                this.listenTo(app.global.user, 'sync', this.render);
-                this.listenTo($(window), 'unload', this.closeForm);
+                this.listenTo($(window), 'beforeunload', this.closeInternal);
             },
             serialize: function () {
                 return {
-                    user: app.global.user,
+                    user: this.user,
                     domain: this.workspace.escape('subdomain') + '.' + hostname,
                     project: this.model
                 };
@@ -181,32 +176,16 @@ define([
                         view.render();
                         if (isNew)
                             view.collection.push(model);
-                        app.router.navigate('project/' + model.id);
+                        app.trigger('project:selected', view.model.id);
                         app.trigger('project:updated', view.model);
                     },
-                    error: function (model, res) {
-                        var err;
-                        try {
-                            err = ($.parseJSON(res.responseText)).error;
-                        } catch (e) {
-                            return;
-                        }
-
-                        if (err._modal)
-                            app.showModal(err._modal.message);
-
-                        $(':input + .error', self.el).html('');
-                        $(':input', self.el).parents('.control-group').removeClass('error');
-                        _.each(err, function (value, field) {
-                            var selector = '[name="' + field + '"]:input';
-                            $(selector, self.el).parents('.control-group').addClass('error');
-                            $(selector, self.el).siblings('.error').html(t(value.message));
-                        });
-                    }
+                    error: _.bind(app.views.defaultErrorHandler, this)
                 });
                 return false;
             },
-            closeForm: function () {
+            showConfirm: app.showConfirm,
+            showModal: app.showModal,
+            closeInternal: function () {
                 this.close(function (yes) {
                     if (yes)
                         app.trigger('project:deselected');
@@ -251,7 +230,7 @@ define([
             close: function (callback) {
                 callback(true);
             },
-            closeForm: function () {
+            closeInternal: function () {
                 this.close(function (yes) {
                     if (yes)
                         app.trigger('workspace:deselected');

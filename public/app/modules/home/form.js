@@ -12,13 +12,10 @@ define([
         var Views = {};
 
         Views.Form = app.views.Form.extend({
-            constructor: function () {
-                this.app = app;
-                app.views.Form.prototype.constructor.apply(this, arguments);
-            },
+            showConfirm: app.showConfirm,
+            showModal: app.showModal,
             afterRender: function () {
                 this.uploads = [];
-
                 $('#fileupload', this.$el).off('change');
                 $('#fileupload', this.$el).on('change', _.bind(function (e) {
                     var files = e.target.files, file;
@@ -35,29 +32,30 @@ define([
                             model: _.extend({}, file, { data: e.target.result })
                         });
                         this.uploads.push(view);
+
+                        this.isDirty = true;
                         this.insertView("#upload-progress", view).render();
                     }, this);
                     fileReader.readAsDataURL(file);
                 }, this));
-                app.views.Form.prototype.afterRender.call(this);
-            },
-            closeForm: function () {
-                this.close(function (yes) {
-                    if (yes)
-                        app.trigger('task:deselected');
+
+                $('[name=content]').on('keyup', function () {
+                    this.isDirty = true;
                 });
+
+                app.views.Form.prototype.afterRender.call(this);
             }
         });
 
         Views.Add = Views.Form.extend({
-            template: "home/form",
+            template: "home/form-add",
             events: _.extend({
                 'click .submit-form': 'saveTask',
-                'click .close-form': 'closeForm'
             }, Views.Form.prototype.events),
             initialize: function () {
+                this.user = app.global.user;
                 this.listenTo(app.global.projects, 'sync', this.render);
-                this.listenTo($(window), 'unload', this.closeForm);
+                this.listenTo($(window), 'unload', this.closeInternal);
             },
             serialize: function () {
                 return {
@@ -86,8 +84,8 @@ define([
                 $("[name=project]", this.$el).on('change', _.bind(function () {
                     this.isDirty = true;
                 }, this));
-                console.log('Views.Add afterrender');
-                this.constructor.__super__.afterRender.call(this);
+
+                Views.Form.prototype.afterRender.call(this);
             },
             saveTask: function () {
                 var view = this;
@@ -114,29 +112,57 @@ define([
                                 view.isDirty = false;
                                 app.trigger('task:selected', model.id);
                             },
-                            error: _.bind(app.views.defaultErrorHandler, this, app)
+                            error: _.bind(app.views.defaultErrorHandler, this)
                         })
                     },
-                    error: _.bind(app.views.defaultErrorHandler, this, app)
+                    error: _.bind(app.views.defaultErrorHandler, this)
                 });
                 return false;
+            },
+            closeInternal: function () {
+                this.close(function (yes) {
+                    if (yes)
+                        app.trigger('task:deselected');
+                });
             }
         });
 
-        Views.Transaction = Backbone.Layout.extend({
-            template: "home/transaction",
-            serialize: function () {
-                return {
-                    workspace: app.global.workspace,
-                    task: this.options.task,
-                    transaction: this.model
-                }
+        Views.Edit = Views.Add.extend({
+            template: 'home/form-edit',
+            events: _.extend({
+                'click .cancel': 'closeInternal',
+            }, Views.Add.prototype.events),
+            initialize: function () {
+                this.user = app.global.user;
+                this.listenTo(this.model, 'sync', this.render);
+                //this.listenTo(this.model, 'change', this.render);
+                this.listenTo($(window), 'beforeunload', this.closeInternal);
+            },
+            saveTask: function () {
+                var view = this;
+                var workspace = this.model.getWorkspace();
+                var attributes = this.$el.find('form').serializeObject();
+                this.model.save(attributes, {
+                    success: function (model) {
+                        view.isDirty = false;
+                        app.trigger('task:selected', model.id, true);
+                    },
+                    error: _.bind(app.views.defaultErrorHandler, this)
+                });
+                return false;
+            },
+            closeInternal: function () {
+                app.trigger('task:selected', this.model.id, true);
             }
         });
 
-        Views.View = Views.Form.extend({
+        Views.View = Backbone.Layout.extend({
             template: 'home/view',
             id: "task-details",
+            events: {
+                'click .edit': 'edit',
+                'click .show-form': 'toggleForm'
+            },
             initialize: function () {
                 this.listenTo(this.model, 'sync', this.render);
                 this.listenTo(this.model, 'change', this.render);
@@ -149,34 +175,52 @@ define([
                 };
             },
             beforeRender: function () {
-                console.log(this.model.transactions);
                 this.model.transactions.each(function (transaction) {
                     this.insertView('#transactions', new Views.Transaction({
                         task: this.model,
                         model: transaction
                     }));
                 }, this);
-                this.insertView('.form-container', new Views.TransactionForm({
-                    model: this.model
-                }));
+            },
+            toggleForm: function () {
+                var form = this.getView('.transaction-form-container');
+                if (form) {
+                    form.closeInternal()
+                } else {
+                    this.insertView('.transaction-form-container', new Views.TransactionForm({
+                        model: this.model
+                    })).render();
+                }
+            },
+            edit: function () {
+                app.trigger('task:edit', this.model.id);
+            },
+            close: function (callback) {
+                var form = this.getView('.transaction-form-container');
+                if (form)
+                    form.close(callback);
+                else
+                    callback(true);
             }
         });
 
         Views.TransactionForm = Views.Form.extend({
             template: "home/transaction-form",
-            className: "row",
-            uploads: {},
             events: _.extend({
-                'click .submit-form': 'saveComment',
-                'click .close-form': 'closeForm'
+                'click .submit-form': 'saveComment'
             }, Views.Form.prototype.events),
             initialize: function () {
-                this.listenTo($(window), 'unload', this.closeForm);
+                this.user = app.global.user;
+                this.listenTo($(window), 'unload', this.closeInternal);
             },
             serialize: function () {
                 return {
                     task: this.model
                 };
+            },
+            afterRender: function () {
+                Views.Form.prototype.afterRender.call(this);
+                $('textarea').focus();
             },
             saveComment: function () {
                 var view = this;
@@ -186,8 +230,9 @@ define([
                 comment.setTask(this.model.id);
 
                 var attributes = this.$el.find('form').serializeObject();
+
                 if (this.uploads.length)
-                    attributes.files = [ true ];
+                    attributes.files = [true];
 
                 comment.validateOnServer(attributes, {
                     success: function () {
@@ -201,19 +246,34 @@ define([
                         comment.save(attributes, {
                             success: function (model) {
                                 view.model.transactions.add(model.transactions.models);
+                                view.model.set('status', model.get('status'));
                                 view.model.trigger('change');
                                 view.justSaved = true;
                             },
-                            error: _.bind(app.views.defaultErrorHandler, this, app)
+                            error: _.bind(app.views.defaultErrorHandler, this)
                         })
                     },
-                    error: _.bind(app.views.defaultErrorHandler, this, app)
+                    error: _.bind(app.views.defaultErrorHandler, this)
                 });
 
                 return false;
             },
-            closeForm: function () {
-                this.remove();
+            closeInternal: function () {
+                this.close(_.bind(function (yes) {
+                    if (yes)
+                        this.remove();
+                }, this));
+            }
+        });
+
+        Views.Transaction = Backbone.Layout.extend({
+            template: "home/transaction",
+            serialize: function () {
+                return {
+                    workspace: app.global.workspace,
+                    task: this.options.task,
+                    transaction: this.model
+                }
             }
         });
 

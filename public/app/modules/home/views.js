@@ -14,6 +14,7 @@ define([
 
         var Views = {
             Add: Form.Add,
+            Edit: Form.Edit,
             View: Form.View
         };
 
@@ -30,11 +31,11 @@ define([
                     })
                 });
 
-                this.listenTo(app, 'task:selected', function (id) {
+                this.listenTo(app, 'task:selected', function (id, forceClose) {
                     var task;
                     var openedForm = this.getView('#right-sidebar');
 
-                    if (openedForm.model && id == openedForm.model.id)
+                    if (!forceClose && openedForm.model && id == openedForm.model.id)
                         return;
 
                     openedForm.close(_.bind(function (yes) {
@@ -67,13 +68,34 @@ define([
                     }, this));
                 }, this);
 
+                this.listenTo(app, 'task:edit', function (id) {
+                    var task;
+                    var openedForm = this.getView('#right-sidebar');
+
+                    openedForm.close(_.bind(function (yes) {
+                        if (yes) {
+                            if (id && id != 'add') {
+                                app.router.navigate('/' + id);
+                                // existing project
+                                task = new app.models.Task({ id: id });
+                                task.setWorkspace(app.global.workspace.id);
+                                this.setViews({
+                                    "#right-sidebar": new Views.Edit({
+                                        model: task
+                                    })
+                                });
+                                this.getView('#right-sidebar').render();
+                                task.fetch();
+                            }
+                        }
+                    }, this));
+                }, this);
+
                 this.listenTo(app, 'task:deselected', function () {
                     this.setViews({
-                        "#right-sidebar": new Views.Info({
-                            model: new app.models.Task()
-                        })
+                        "#right-sidebar": new Views.Info()
                     });
-                    this.getView('#rigth-sidebar').render();
+                    this.getView('#right-sidebar').render();
                     app.router.navigate('');
                 }, this);
 

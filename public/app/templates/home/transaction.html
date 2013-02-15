@@ -1,16 +1,26 @@
 <% if (transaction.get('subtype') == 'text') { %>
-<div>
+<div class="well well-small">
     <%= transaction.get('creator').name %>
     <%= (transaction.get('type') == 'reply') ? t('replied') : t('commented') %>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
+    <div class="well-small"><%= transaction.escape('value') %></div>
 </div>
-<div><%= transaction.escape('value') %></div>
 
 <% } else if (transaction.get('subtype') == 'file') { %>
-<div>
+<div  class="alert alert-success">
     <%= transaction.get('creator').name %>
     <%= t('attached') %>
     <a data-bypass="true" href="/api/file/<%= workspace.id %>/<%= task.id %>/<%= transaction.get('value') %>"><%= transaction.get('meta').name %></a>
+    <%= moment(new Date(transaction.get('created'))).fromNow() %>
+</div>
+
+<% } else if (transaction.get('subtype') == 'status') { %>
+<div class="alert alert-info">
+    <%= transaction.get('creator').name %>
+    <%= t('changed status from') %>
+    <strong><%= transaction.get('previousValue') %></strong>
+    <%= t('to') %>
+    <strong><%= transaction.get('value') %></strong>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
 </div>
 <% } %>

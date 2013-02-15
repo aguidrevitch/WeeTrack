@@ -1,7 +1,14 @@
 <div id="task-header">
     <button type="button" class="close close-details">&times;</button>
     <button type="button" class="btn pull-right watch"><%= t('Watch') %></button>
+    <button type="button" class="btn pull-right edit"><%= t('Edit') %></button>
     <h2><%= task.escape('subject') %></h2>
-    <ul id="transactions"></ul>
 </div>
-<div class="form-container form-fixed"></div>
+<ul id="transactions"></ul>
+<div class="form-fixed">
+    <div class="transaction-form-container"></div>
+    <a class="btn show-form"><i class="icon-plus"></i><%= t('Add Comment') %></a>
+</div>
+
+
+

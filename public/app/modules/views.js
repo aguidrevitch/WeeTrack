@@ -4,7 +4,8 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
 
     Views.Form = Backbone.Layout.extend({
         events: {
-            'click .watch': 'toggleWatchButton'
+            'click .watch': 'toggleWatchButton',
+            'click .close-form': 'closeInternal'
         },
         userListSelect2Options: function (options) {
             return _.extend({}, {
@@ -68,15 +69,15 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
                 }
             }, options);
         },
-        userListToSelect2Data: function (users) {
+        userListToSelect2Data: function (users, checkUser) {
             var data = [];
             _.each(users, function (user) {
-                if (user) {
+                if (user && (!checkUser || user._id != this.user.id)) {
                     var rec = { id: user._id };
                     rec.text = user.name ? user.name : user.email;
                     data.push(rec);
                 }
-            });
+            }, this);
             return(data);
         },
         afterRender: function () {
@@ -85,10 +86,13 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
                 this.userListSelect2Options()
             );
 
-            _.each(['admin', 'admincc', 'cc', 'watch'], function (perm) {
+            _.each(['admin', 'admincc', 'cc'], function (perm) {
                 if (this.model.get(perm))
-                    $("[name=" + perm + "]").select2("data", this.userListToSelect2Data(this.model.get(perm)));
+                    $("[name=" + perm + "]").select2("data", this.userListToSelect2Data(this.model.get(perm), true));
             }, this);
+
+            if (this.model.get('watch'))
+                $("[name=watch]").select2("data", this.userListToSelect2Data(this.model.get('watch')));
 
             $("[name=admin], [name=admincc], [name=cc], [name=watch]", this.$el).on('change', function (e) {
                 $(this).data('prev', '');
@@ -115,7 +119,7 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
             $("[name=watch]", this.$el).on('change', _.bind(function () {
                 var data = $("[name=watch]", this.$el).select2('data');
                 if (_.find(data, function (rec) {
-                    return rec.id == this.app.global.user.id;
+                    return rec.id == this.user.id;
                 }, this)) {
                     this.updateWatchButton(true);
                 } else {
@@ -126,7 +130,7 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
             this.isDirty = false;
             this.justSaved = false;
 
-            this.updateWatchButton(this.model.isWatcher(this.app.global.user));
+            this.updateWatchButton(this.model.isWatcher(this.user));
         },
         updateWatchButton: function (watching) {
             if (watching) {
@@ -140,16 +144,16 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
         toggleWatchButton: function () {
             var data = $("[name=watch]", this.$el).select2('data');
             if (_.find(data, function (rec) {
-                return rec.id == this.app.global.user.id;
+                return rec.id == this.user.id;
             }, this)) {
                 data = _.filter(data, function (rec) {
-                    return rec.id != this.app.global.user.id;
+                    return rec.id != this.user.id;
                 }, this);
                 this.updateWatchButton(false);
             } else {
                 data.push({
-                    id: this.app.global.user.id,
-                    text: this.app.global.user.escape('name')
+                    id: this.user.id,
+                    text: this.user.escape('name')
                 });
                 this.updateWatchButton(true);
             }
@@ -158,7 +162,7 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
         },
         close: function (callback) {
             if (this.isDirty) {
-                this.app.showConfirm(t('Unsaved changes'), function (yes) {
+                this.showConfirm(t('Unsaved changes'), function (yes) {
                     callback(yes);
                 });
             } else {
@@ -167,17 +171,17 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
         }
     });
 
-    Views.defaultErrorHandler = function (app, model, res) {
+    Views.defaultErrorHandler = function (model, res) {
         var err;
         try {
             err = ($.parseJSON(res.responseText)).error;
         } catch (e) {
-            app.showModal(t('Unknown error'));
+            this.showModal(t('Unknown error'));
             return;
         }
 
         if (err._modal)
-            app.showModal(err._modal.message);
+            this.showModal(err._modal.message);
 
         $(':input + .error', this.$el).html('');
         $(':input', this.$el).parents('.control-group').removeClass('error');
@@ -185,7 +189,16 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
         _.each(err, function (value, field) {
             var selector = '[name="' + field + '"]:input';
             $(selector, this.$el).parents('.control-group').addClass('error');
-            $(selector, this.$el).siblings('.error').html(t(value.message));
+            if ($(selector, this.$el).siblings('.error').length) {
+                $(selector, this.$el).siblings('.error').html(t(value.message));
+            } else {
+                $(selector).tooltip({
+                    html: true,
+                    title: t(value.message),
+                    trigger: 'hover',
+                    placement: 'top'
+                });
+            }
         });
     };
 
