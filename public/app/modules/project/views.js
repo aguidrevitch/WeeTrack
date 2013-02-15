@@ -194,7 +194,7 @@ define([
         });
 
         Views.Readonly = Backbone.Layout.extend({
-            template: 'project/watch',
+            template: 'project/readonly',
             initialize: function () {
                 this.workspace = this.options.workspace;
                 this.listenTo(app.global.user, 'sync', this.render);

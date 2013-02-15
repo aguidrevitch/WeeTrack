@@ -68,10 +68,10 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
                 }
             }, options);
         },
-        userListToSelect2Data: function (users, checkUser) {
+        userListToSelect2Data: function (users) {
             var data = [];
             _.each(users, function (user) {
-                if (user && (!checkUser || user._id != this.user.id)) {
+                if (user && user._id != this.user.id) {
                     var rec = { id: user._id };
                     rec.text = user.name ? user.name : user.email;
                     data.push(rec);
@@ -87,7 +87,7 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
 
             _.each(['admin', 'admincc', 'cc'], function (perm) {
                 if (this.model.get(perm))
-                    $("[name=" + perm + "]").select2("data", this.userListToSelect2Data(this.model.get(perm), true));
+                    $("[name=" + perm + "]").select2("data", this.userListToSelect2Data(this.model.get(perm)));
             }, this);
 
             $("[name=admin], [name=admincc], [name=cc]", this.$el).on('change', function (e) {
