@@ -88,7 +88,6 @@ define([
                 Views.Form.prototype.afterRender.call(this);
             },
             saveTask: function () {
-                var view = this;
                 var workspace = this.model.getWorkspace();
 
                 var task = new app.models.Task();
@@ -96,25 +95,24 @@ define([
 
                 var attributes = _.extend({type: 'reply'}, this.$el.find('form').serializeObject());
                 task.validateOnServer(attributes, {
-                    success: function (model) {
+                    success: _.bind(function (model) {
                         var task = new app.models.Task();
                         task.setWorkspace(workspace);
 
                         attributes.files = [];
-                        _.each(view.uploads, function (view) {
-                            attributes.files.push(view.model);
-                        });
+                        _.each(this.uploads, function (view) {
+                            attributes.files.push(this.model);
+                        }, this);
 
                         task.save(attributes, {
-                            success: function (model) {
-                                //if (isNew)
-                                //    view.collection.push(model);
-                                view.isDirty = false;
+                            success: _.bind(function (model) {
+                                this.isDirty = false;
+                                app.global.tasks.push(model);
                                 app.trigger('task:selected', model.id);
-                            },
+                            }, this),
                             error: _.bind(app.views.defaultErrorHandler, this)
                         })
-                    },
+                    }, this),
                     error: _.bind(app.views.defaultErrorHandler, this)
                 });
                 return false;
@@ -235,7 +233,7 @@ define([
                     attributes.files = [true];
 
                 comment.validateOnServer(attributes, {
-                    success: function () {
+                    success: _.bind(function () {
                         var comment = new app.models.Comment();
                         comment.setWorkspace(app.global.workspace.id);
                         comment.setTask(view.model.id);
@@ -252,7 +250,7 @@ define([
                             },
                             error: _.bind(app.views.defaultErrorHandler, this)
                         })
-                    },
+                    }, this),
                     error: _.bind(app.views.defaultErrorHandler, this)
                 });
 

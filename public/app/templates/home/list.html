@@ -1,6 +1,13 @@
-<% if (1 || tasks.length) { %>
-<div id="list"></div>
+<ul class="nav nav-tabs nav-stacked tasks">
+    <% tasks.each(function (task) { %>
+    <li>
+        <a data-id="<%= task.id %>" href="/<%= task.id %>">
+            <i class="icon-chevron-right"></i>
+            <%= task.escape("subject") %>
+        </a>
+    </li>
+    <% }) %>
+</ul>
 <div class="form-fixed">
     <a class="btn show-form"><i class="icon-plus"></i> <%= t('Add Task') %></a>
 </div>
-<% } %>

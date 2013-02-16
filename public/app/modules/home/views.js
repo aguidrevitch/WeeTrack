@@ -26,6 +26,7 @@ define([
                     "#top-sidebar": new Views.Filter({
                     }),
                     "#left-sidebar": new Views.List({
+                        collection: app.global.tasks
                     }),
                     "#right-sidebar": new Views.Info({
                     })
@@ -119,28 +120,48 @@ define([
             template: 'home/list',
             id: "tasks",
             events: {
-                'click .show-form': 'toggleForm',
                 'click a': 'selected'
             },
+            selectedId: null,
             initialize: function () {
-                this.listenTo(app.global.tasks, 'add', this.render);
+                this.listenTo(this.collection, 'sync', this.render);
+                this.listenTo(this.collection, 'add', this.render);
+
+                this.listenTo(app, 'task:selected', function (id) {
+                    this.selectedId = id;
+                    $('.selected', this.$el).removeClass('selected');
+                    $('[data-id=' + id + ']', this.$el).addClass('selected');
+                });
+
+                this.listenTo(app, 'task:deselected', function () {
+                    $('.selected', this.$el).removeClass('selected');
+                    this.selectedId = null;
+                });
+            },
+            updateSelectedElement: function (oldId, newId) {
+                $('.selected', this.$el).removeClass('selected');
             },
             serialize: function () {
                 return {
-                    tasks: this.collection,
-                    workspaces: app.global.workspaces
+                    tasks: this.collection
                 };
             },
-            selected: function (e) {
-                // app.trigger('task:selected', $(e.target).data('id'));
-                return false;
+            afterRender: function () {
+                if (this.selectedId) {
+                    var el = $('[data-id=' + this.selectedId + ']', this.$el);
+                    if (el.length) {
+                        el.addClass('selected');
+                        $(this.$el).animate({
+                            scrollTop: el.offset().top
+                        }, 1000);
+                    }
+                }
             },
-            toggleForm: function () {
-                app.trigger('task:selected');
+            selected: function (e) {
+                app.trigger('task:selected', $(e.target).data('id'));
                 return false;
             }
         });
-
 
         return Views;
     });

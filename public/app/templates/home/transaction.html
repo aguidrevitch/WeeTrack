@@ -7,7 +7,7 @@
 </div>
 
 <% } else if (transaction.get('subtype') == 'file') { %>
-<div  class="alert alert-success">
+<div class="alert alert-success">
     <%= transaction.get('creator').name %>
     <%= t('attached') %>
     <a data-bypass="true" href="/api/file/<%= workspace.id %>/<%= task.id %>/<%= transaction.get('value') %>"><%= transaction.get('meta').name %></a>
