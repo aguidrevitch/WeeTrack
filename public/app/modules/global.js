@@ -9,7 +9,6 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
     var workspace = Global.workspace = new Models.Workspace();
 
     user.on('authorized', function () {
-
         var counter = 3;
         var finish = function () {
             if (!--counter) app.trigger('user:authorized', user);
@@ -36,7 +35,6 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
                             /* filtering tasks */
                             tasks.setWorkspace(workspace.id);
                             tasks.fetch().done(finish);
-
                         }
                     }
                 });

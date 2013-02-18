@@ -2,9 +2,11 @@ define([
     // Application.
     "app"
     ],
-    
+
     function(app) {
-        
+
+        var Authorized = false;
+
         var Router = Backbone.Router.extend({
             constructor: function(options) {
                 if (!options) options = {};
@@ -14,17 +16,17 @@ define([
                     this.authorized = options.authorized;
                 if (options.unauthorized)
                     this.unauthorized = options.unauthorized;
-                
+
                 this._bindRoutes(this.routes);
                 this._bindRoutes(this.authorized, function () {
-                    if (!Router._authorized) {
+                    if (!Authorized) {
                         Backbone.history.trigger('unauthorized');
                         return false;
                     }
                     return true;
                 });
                 this._bindRoutes(this.unauthorized, function () {
-                    return !Router._authorized;
+                    return !Authorized;
                 });
                 this.initialize.apply(this, arguments);
             },
@@ -39,12 +41,11 @@ define([
                 }
             },
             route: function(route, name, callback, check) {
-                if (!Backbone.history) Backbone.history = new Backbone.History();
                 if (!_.isRegExp(route)) route = this._routeToRegExp(route);
                 if (!callback) callback = this[name];
                 Backbone.history.route(route, _.bind(function(fragment) {
-                    if (check && !check.call(this))
-                        return;
+                    console.log(fragment);
+                    if (check && !check()) return;
                     var args = this._extractParameters(route, fragment);
                     if (callback) callback.apply(this, args);
                     this.trigger.apply(this, ['route:' + name].concat(args));
@@ -53,10 +54,10 @@ define([
                 return this;
             },
             setAuthorized: function (value) {
-                Router._authorized = value;
+                Authorized = value;
             }
         });
-        
+
         return Router;
-    
+
     });

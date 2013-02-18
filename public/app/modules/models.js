@@ -6,57 +6,50 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
         idAttribute: "_id",
         url: '/api/auth',
         authorizeSession: function () {
-            var self = this;
             this.fetch({
-                error: function () {
-                    self.trigger('deauthorized');
-                },
-                success: function () {
-                    self.trigger('authorized');
-                }
+                error: _.bind(function () {
+                    this.trigger('deauthorized');
+                }, this),
+                success: _.bind(function () {
+                    this.trigger('authorized');
+                }, this)
             });
         },
         authorize: function (attrs, options) {
-            var self = this;
             this.fetch({
-                data: {
-                    email: attrs.email,
-                    password: attrs.password,
-                    remember_me: attrs.remember_me
-                },
-                error: function (model, res) {
+                data: attrs,
+                error: _.bind(function (model, res) {
                     var error = ($.parseJSON(res.responseText)).error;
 
-                    self.set({ _id: null });
+                    this.set({ _id: null });
+                    this.trigger('deauthorized');
 
-                    self.trigger('deauthorized');
                     if (options.error)
                         options.error(error);
-                },
-                success: function (model, res) {
-                    self.trigger('authorized');
+                }, this),
+                success: _.bind(function (model, res) {
+                    this.trigger('authorized');
                     if (options.success)
                         options.success(model, res);
-                }
+                }, this)
             });
         },
         deauthorize: function () {
-            var self = this;
-            self.destroy({
-                success: function () {
-                    self.set({ _id: null });
-                    self.trigger('deauthorized');
-                }
+            this.destroy({
+                success: _.bind(function () {
+                    this.set({ _id: null });
+                    this.trigger('deauthorized');
+                }, this)
             });
         },
         save: function (attrs, options) {
             options = options || {};
             var success = options.success;
-            options.success = function (model, xhr, options) {
-                model.trigger('authorized');
+            options.success = _.bind(function (model, xhr, options) {
+                this.trigger('authorized');
                 if (success)
                     success(model, xhr, options);
-            };
+            }, this);
             Backbone.Model.prototype.save.call(this, attrs, options);
         }
     });
