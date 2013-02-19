@@ -16,15 +16,13 @@ define([
             className: 'nav pull-right',
             template: "auth/user-navigation",
             initialize: function () {
-                this.workspace = this.options.workspace;
-                this.user = this.options.user;
-                this.listenTo(this.user, 'sync', this.render);
-                this.listenTo(this.workspace, 'sync', this.render);
+                this.listenTo(app.global.user, 'sync', this.render);
+                this.listenTo(app.global.workspace, 'sync', this.render);
             },
             serialize: function () {
                 return {
-                    user: this.user,
-                    workspace: this.workspace
+                    user: app.global.user,
+                    workspace: app.global.workspace
                 };
             }
         });
@@ -38,15 +36,13 @@ define([
                 'click .btn': 'changeWorkspace'
             },
             initialize: function () {
-                this.workspace = this.options.workspace;
-                this.workspaces = this.options.workspaces;
-                this.listenTo(this.workspace, 'sync', this.render);
-                this.listenTo(this.workspaces, 'sync', this.render);
+                this.listenTo(app.global.workspace, 'sync', this.render);
+                this.listenTo(app.global.workspaces, 'sync', this.render);
             },
             serialize: function () {
                 return {
-                    workspace: this.workspace,
-                    workspaces: this.workspaces
+                    workspace: app.global.workspace,
+                    workspaces: app.global.workspaces
                 };
             },
             highlightButton: function () {
@@ -86,8 +82,7 @@ define([
                 });
             },
             login: function () {
-                var data = this.$el.find('form').serializeObject();
-                this.model.authorize(data, {
+                this.model.authorize(this.$el.find('form').serializeObject(), {
                     error: function (err) {
                         if (err._modal)
                             app.showModal(err._modal.message);
@@ -109,8 +104,7 @@ define([
             },
             showModal: app.showModal,
             register: function (e) {
-                var data = this.$el.find('form').serializeObject();
-                this.model.save(data, {
+                this.model.save(this.$el.find('form').serializeObject(), {
                     error: _.bind(app.views.defaultErrorHandler, this)
                 });
                 return false;

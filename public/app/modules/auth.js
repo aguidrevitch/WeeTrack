@@ -43,23 +43,14 @@ define([
 
         app.on('user:authorized', function (user) {
             app.layout.setViews({
-                ".user-nav": new Views.UserNavigation({
-                    user: app.global.user,
-                    workspace: app.global.workspace
-                }),
-                ".workspace-nav": new Views.WorkspaceNavigation({
-                    workspace: app.global.workspace,
-                    workspaces: app.global.workspaces
-                })
+                ".user-nav": new Views.UserNavigation(),
+                ".workspace-nav": new Views.WorkspaceNavigation()
             });
         });
 
         app.on('user:deauthorized', function (user) {
             app.layout.setViews({
-                ".user-nav": new Views.UserNavigation({
-                    user: app.global.user,
-                    workspace: app.global.workspace
-                })
+                ".user-nav": new Views.UserNavigation()
             });
             var workspacenav = app.layout.getView('.workspace-nav');
             if (workspacenav) workspacenav.remove();
