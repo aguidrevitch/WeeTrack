@@ -55,27 +55,8 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
     });
 
     var PermissionModel = Backbone.Model.extend({
-        getAccess: function (user) {
-            return {
-                admin: _.filter(this.get('admin'), function (o) {
-                    return user.id == o._id;
-                }),
-                admincc: _.filter(this.get('admincc'), function (o) {
-                    return user.id == o._id;
-                }),
-                cc: _.filter(this.get('cc'), function (o) {
-                    return user.id == o._id;
-                })
-            };
-        },
-        isAdministrator: function (user) {
-            return (this.getAccess(user)).admin.length > 0;
-        },
-        isUser: function (user) {
-            return (this.getAccess(user)).admincc.length > 0;
-        },
-        isClient: function (user) {
-            return (this.getAccess(user)).cc.length > 0;
+        hasPermission: function (perm) {
+            return _.indexOf(this.get('permissions'), perm) != -1;
         },
         setPermission: function (perm) {
             this.perm = perm;

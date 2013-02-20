@@ -41,21 +41,12 @@ define([
                                 workspace.setPermission('visible');
                                 workspace.fetch({
                                     success: _.bind(function (model) {
-                                        if (model.isAdministrator(app.global.user)) {
-                                            this.setViews({
-                                                "#middle-sidebar": new Views.Form({
-                                                    collection: this.collection,
-                                                    model: model
-                                                })
-                                            });
-                                        } else {
-                                            this.setViews({
-                                                "#middle-sidebar": new Views.Readonly({
-                                                    collection: this.collection,
-                                                    model: model
-                                                })
-                                            });
-                                        }
+                                        this.setViews({
+                                            "#middle-sidebar": new Views.Form({
+                                                collection: this.collection,
+                                                model: model
+                                            })
+                                        });
                                     }, this)
                                 });
                             } else {
@@ -164,30 +155,6 @@ define([
             },
             showConfirm: app.showConfirm,
             showModal: app.showModal,
-            closeInternal: function () {
-                this.close(function (yes) {
-                    if (yes)
-                        app.trigger('workspace:deselected');
-                });
-            }
-        });
-
-        Views.Readonly = Backbone.Layout.extend({
-            template: 'workspace/readonly',
-            initialize: function () {
-                this.listenTo(this.model, 'sync', this.render);
-                this.listenTo(app.global.user, 'sync', this.render);
-            },
-            serialize: function () {
-                return {
-                    user: app.global.user,
-                    domain: hostname,
-                    workspace: this.model
-                };
-            },
-            close: function (callback) {
-                callback(true);
-            },
             closeInternal: function () {
                 this.close(function (yes) {
                     if (yes)

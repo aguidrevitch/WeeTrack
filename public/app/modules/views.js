@@ -81,18 +81,26 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
         },
         afterRender: function () {
 
-            $("[name=admin], [name=admincc], [name=cc]", this.$el).select2(
-                this.userListSelect2Options()
-            );
-
+            var allowed = false;
             _.each(['admin', 'admincc', 'cc'], function (perm) {
-                if (this.model.get(perm))
-                    $("[name=" + perm + "]").select2("data", this.userListToSelect2Data(this.model.get(perm)));
-            }, this);
 
-            $("[name=admin], [name=admincc], [name=cc]", this.$el).on('change', function (e) {
-                $(this).data('prev', '');
-            });
+                var $el = $("[name=" + perm + "]", this.$el);
+                //console.log(this.model.isNew, allowed, perm, this.model.hasPermission(perm));
+                if (this.model.isNew() || allowed || this.model.hasPermission(perm)) {
+                    $el.select2(this.userListSelect2Options());
+
+                    if (this.model.get(perm))
+                        $el.select2("data", this.userListToSelect2Data(this.model.get(perm)));
+
+                    $el.on('change', function (e) {
+                        $(this).data('prev', '');
+                    });
+                    allowed = true;
+                } else {
+                    $el.parents('.control-group').hide();
+                }
+
+            }, this);
 
             if (this.justSaved) {
                 $('.alert', this.$el).alert();

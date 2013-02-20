@@ -46,23 +46,13 @@ define([
                                 project.setPermission('visible');
                                 project.fetch({
                                     success: _.bind(function (model) {
-                                        if (model.isAdministrator(app.global.user)) {
-                                            this.setViews({
-                                                "#middle-sidebar": new Views.Form({
-                                                    collection: this.collection,
-                                                    workspace: this.workspace,
-                                                    model: model
-                                                })
-                                            });
-                                        } else {
-                                            this.setViews({
-                                                "#middle-sidebar": new Views.Readonly({
-                                                    collection: this.collection,
-                                                    workspace: this.workspace,
-                                                    model: model
-                                                })
-                                            });
-                                        }
+                                        this.setViews({
+                                            "#middle-sidebar": new Views.Form({
+                                                collection: this.collection,
+                                                workspace: this.workspace,
+                                                model: model
+                                            })
+                                        });
                                     }, this)
                                 });
                             } else {
@@ -189,31 +179,6 @@ define([
                 this.close(function (yes) {
                     if (yes)
                         app.trigger('project:deselected');
-                });
-            }
-        });
-
-        Views.Readonly = Backbone.Layout.extend({
-            template: 'project/readonly',
-            initialize: function () {
-                this.workspace = this.options.workspace;
-                this.listenTo(app.global.user, 'sync', this.render);
-                this.listenTo(this.model, 'sync', this.render);
-            },
-            serialize: function () {
-                return {
-                    user: app.global.user,
-                    domain: this.workspace.escape('subdomain') + '.' + hostname,
-                    project: this.model
-                };
-            },
-            close: function (callback) {
-                callback(true);
-            },
-            closeInternal: function () {
-                this.close(function (yes) {
-                    if (yes)
-                        app.trigger('workspace:deselected');
                 });
             }
         });
