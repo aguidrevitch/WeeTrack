@@ -82,6 +82,7 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
         afterRender: function () {
 
             var allowed = false;
+
             _.each(['admin', 'admincc', 'cc'], function (perm) {
 
                 var $el = $("[name=" + perm + "]", this.$el);
@@ -101,6 +102,9 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
                 }
 
             }, this);
+
+            if (!allowed)
+                this.$el.find("[type=submit]").prop("disabled", true);
 
             if (this.justSaved) {
                 $('.alert', this.$el).alert();
