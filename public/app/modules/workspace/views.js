@@ -20,9 +20,7 @@ define([
 
                 this.setViews({
                     "#middle-sidebar": new Views.Info(),
-                    "#left-sidebar": new Views.List({
-                        collection: this.collection
-                    })
+                    "#left-sidebar": new Views.List()
                 });
 
                 this.listenTo(app, "workspace:selected", function (id) {
@@ -43,7 +41,6 @@ define([
                                     success: _.bind(function (model) {
                                         this.setViews({
                                             "#middle-sidebar": new Views.Form({
-                                                collection: this.collection,
                                                 model: model
                                             })
                                         });
@@ -54,7 +51,6 @@ define([
                                 // new workspace
                                 this.setViews({
                                     "#middle-sidebar": new Views.Form({
-                                        collection: this.collection,
                                         model: new app.models.Workspace()
                                     })
                                 });
@@ -98,13 +94,14 @@ define([
                 'click a': 'selected'
             },
             initialize: function () {
-                this.listenTo(this.collection, "sync", this.render);
-                this.listenTo(this.collection, "add", this.render);
+                this.listenTo(app.global.user, "sync", this.render);
+                this.listenTo(app.global.workspaces, "sync", this.render);
+                this.listenTo(app.global.workspaces, "add", this.render);
             },
             serialize: function () {
                 return {
                     user: app.global.user,
-                    workspaces: this.collection
+                    workspaces: app.global.workspaces
                 };
             },
             selected: function (e) {
@@ -129,10 +126,16 @@ define([
             },
             serialize: function () {
                 return {
-                    user: app.global.user,
+                    user: this.user,
                     workspace: this.model,
                     domain: hostname
                 };
+            },
+            afterRender: function () {
+                if (!this.model.isNew() && !this.model.hasPermission('admin')) {
+                    $('[name=name], [name=subdomain]').prop("disabled", true);
+                }
+                app.views.Form.prototype.afterRender.apply(this);
             },
             saveWorkspace: function () {
                 var view = this;
@@ -144,8 +147,6 @@ define([
                         view.model.set(model.attributes);
                         view.justSaved = true;
                         view.render();
-                        if (isNew)
-                            view.collection.push(model);
                         app.trigger('workspace:selected', model.id);
                         app.trigger('workspace:updated', view.model);
                     },

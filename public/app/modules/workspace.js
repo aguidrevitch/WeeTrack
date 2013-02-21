@@ -21,8 +21,7 @@ define([
             workspace: function (workspace_id) {
                 app.layout.setViews({
                     "section": new Views.Layout({
-                        workspace_id: workspace_id,
-                        collection: app.global.workspaces
+                        workspace_id: workspace_id
                     })
                 }).render();
             }

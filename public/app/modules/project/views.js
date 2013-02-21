@@ -154,6 +154,13 @@ define([
                     project: this.model
                 };
             },
+            afterRender: function () {
+                if (!this.model.isNew() && !this.model.hasPermission('admin')) {
+                    console.log(this.model.isNew()),
+                    $('[name=name], [name=email]').prop("disabled", true);
+                }
+                app.views.Form.prototype.afterRender.apply(this);
+            },
             saveProject: function () {
                 var view = this;
                 var isNew = this.model.isNew();

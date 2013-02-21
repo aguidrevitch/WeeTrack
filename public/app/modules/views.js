@@ -151,18 +151,22 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
 
         _.each(err, function (value, field) {
             var selector = '[name="' + field + '"]:input';
-            $(selector, this.$el).parents('.control-group').addClass('error');
-            if ($(selector, this.$el).siblings('.error').length) {
-                $(selector, this.$el).siblings('.error').html(t(value.message));
+            if ($(selector, this.$el).length) {
+                $(selector, this.$el).parents('.control-group').addClass('error');
+                if ($(selector, this.$el).siblings('.error').length) {
+                    $(selector, this.$el).siblings('.error').html(t(value.message));
+                } else {
+                    $(selector).tooltip({
+                        html: true,
+                        title: t(value.message),
+                        trigger: 'hover',
+                        placement: 'top'
+                    });
+                }
             } else {
-                $(selector).tooltip({
-                    html: true,
-                    title: t(value.message),
-                    trigger: 'hover',
-                    placement: 'top'
-                });
+                this.showModal(t(value.message));
             }
-        });
+        }, this);
     };
 
     return Views;
