@@ -217,6 +217,21 @@ define([
                 };
             },
             afterRender: function () {
+
+                $("[name=owner]", this.$el).select2(
+                    this.userListSelect2Options({
+                        multiple: false,
+                        allowClear: true
+                    })
+                );
+
+                if (this.model.get('owner'))
+                    $("[name=owner]").select2("data", this.userListToSelect2Data([this.model.get('owner')])[0]);
+
+                $("[name=owner]", this.$el).on('change', function (e) {
+                    $(this).data('prev', '');
+                });
+
                 Views.Form.prototype.afterRender.call(this);
                 $('textarea').focus();
             },
@@ -243,9 +258,10 @@ define([
                         });
                         comment.save(attributes, {
                             success: function (model) {
-                                view.model.transactions.add(model.transactions.models);
-                                view.model.set('status', model.get('status'));
-                                view.model.trigger('change');
+                                view.model.fetch();
+                                //view.model.transactions.add(model.transactions.models);
+                                //view.model.set('status', model.get('status'));
+                                //view.model.trigger('change');
                                 view.justSaved = true;
                             },
                             error: _.bind(app.views.defaultErrorHandler, this)

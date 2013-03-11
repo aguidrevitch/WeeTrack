@@ -1,7 +1,7 @@
 var config = {
     development: {
         port: 3006,
-        hostname: 'bladetracker.com',
+        hostname: 'tracker.com',
         mongodb: {
             uri: "mongodb://localhost:27017/weetrack_dev"
         },

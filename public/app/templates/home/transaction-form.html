@@ -2,6 +2,28 @@
     <legend><%= t('New Comment') %>
         <button type="button" class="close close-form">&times;</button>
     </legend>
+    <div class="row priority">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label"><%= t('Priority') %></label>
+
+                <div class="controls">
+                    <input type="text" name="priority"  class="input-small" value="<%= task.get('priority') %>">
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="row owner">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label"><%= t('Owner') %></label>
+
+                <div class="controls">
+                    <input type="text" id="owner" name="owner" class="input-medium">
+                </div>
+            </div>
+        </fieldset>
+    </div>
     <div class="row type">
         <fieldset>
             <div class="control-group">
@@ -19,7 +41,7 @@
     <div class="row status">
         <fieldset>
             <div class="control-group">
-                <label class="control-label"><%= t('Status') %> *</label>
+                <label class="control-label"><%= t('Status') %></label>
 
                 <div class="controls">
                     <select name="status">

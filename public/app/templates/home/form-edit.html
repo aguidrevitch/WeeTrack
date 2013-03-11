@@ -31,6 +31,13 @@
         </fieldset>
     </div>
     <div class="control-group">
+        <label class="control-label"><%= t('Priority') %> *</label>
+
+        <div class="controls">
+            <input type="text" name="priority" class="input-mini" value="<%= task.escape('priority') %>">
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label"><%= t('Subject') %> *</label>
 
         <div class="controls">

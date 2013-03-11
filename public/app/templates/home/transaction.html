@@ -23,4 +23,25 @@
     <strong><%= transaction.get('value') %></strong>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
 </div>
+
+<% } else if (transaction.get('subtype') == 'priority') { %>
+<div class="alert alert-info">
+    <%= transaction.get('creator').name %>
+    <%= t('changed priority from') %>
+    <strong><%= transaction.get('previousValue') %></strong>
+    <%= t('to') %>
+    <strong><%= transaction.get('value') %></strong>
+    <%= moment(new Date(transaction.get('created'))).fromNow() %>
+</div>
+
+<% } else if (transaction.get('subtype') == 'owner') { %>
+<div class="alert alert-info">
+    <%= transaction.get('creator').name %>
+    <%= t('changed owner from') %>
+    <strong><%= (transaction.get('previousValue') || {}).name || (transaction.get('previousValue') || {}).email || 'nobody' %></strong>
+    <%= t('to') %>
+    <strong><%= (transaction.get('value') || {}).name || (transaction.get('value') || {}).email || 'nobody' %></strong>
+    <%= moment(new Date(transaction.get('created'))).fromNow() %>
+</div>
+
 <% } %>

@@ -145,7 +145,9 @@
 #form-task-add .status,
 #form-task-add .owner,
 #form-transaction-add .type,
-#form-transaction-add .status
+#form-transaction-add .status,
+#form-transaction-add .priority,
+#form-transaction-add .owner
 {
     float: left;
     min-height: 1px;
@@ -153,12 +155,14 @@
 }
 
 #form-task-add .status,
-#form-transaction-add .type {
+#form-transaction-add .type,
+#form-transaction-add .priority {
     width: 240px;
 }
 
 #form-task-add .owner,
-#form-transaction-add .status {
+#form-transaction-add .status,
+#form-transaction-add .owner {
     width: 330px;
 }
 
