@@ -17,10 +17,10 @@ var config = {
     },
     production: {
         hostname: 'bladetracker.com',
-        port: 3006,
+        port: 3010,
         serveMerged: true,
         mongodb: {
-            uri: "mongodb://localhost:27017/weetrack_dev"
+            uri: "mongodb://localhost:27017/weetrack"
         },
         redis: {
             db: 0,
