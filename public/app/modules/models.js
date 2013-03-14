@@ -153,9 +153,7 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
         idAttribute: '_id',
         baseUrl: '/api/comment',
         url: function () {
-            var url = this.id
-                ? this.baseUrl + '/' + this.workspace + '/' + this.task + '/' + this.id
-                : this.baseUrl + '/' + this.workspace + '/' + this.task
+            var url = this.id ? this.baseUrl + '/' + this.workspace + '/' + this.task + '/' + this.id : this.baseUrl + '/' + this.workspace + '/' + this.task;
 
             var query = {};
 
@@ -204,7 +202,7 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
                 }
             });
         }
-    })
+    });
 
     Models.Transaction = Transaction.Model;
 

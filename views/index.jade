@@ -5,7 +5,7 @@ html(lang='en')
     meta(name="viewport", content="width=device-width, maximum-scale=1")
     meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    - if (env.NODE_ENV == 'production')
+    - if (env.NODE_ENV == 'production' || env.NODE_ENV == 'staging')
       link(rel="stylesheet", href="/dist/release/index.css")
     - else
       link(rel="stylesheet", href="/assets/css/index.css")
@@ -13,7 +13,7 @@ html(lang='en')
       var hostname = "#{config.hostname}";
   body
     #main(role="main")
-    - if (env.NODE_ENV == 'production')
+    - if (env.NODE_ENV == 'production' || env.NODE_ENV == 'staging')
       script(data-main="/app/config",src="/dist/release/require.js")
     - else
       script(data-main="/app/config",src="/assets/js/libs/require.js")

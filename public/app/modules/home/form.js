@@ -20,7 +20,7 @@ define([
                 $('#fileupload', this.$el).on('change', _.bind(function (e) {
                     var files = e.target.files, file;
 
-                    if (!files || files.length == 0) return;
+                    if (!files || files.length === 0) return;
                     file = files[0];
 
                     var fileReader = new FileReader();
@@ -50,7 +50,7 @@ define([
         Views.Add = Views.Form.extend({
             template: "home/form-add",
             events: _.extend({
-                'click .submit-form': 'saveTask',
+                'click .submit-form': 'saveTask'
             }, Views.Form.prototype.events),
             initialize: function () {
                 this.user = app.global.user;
@@ -111,7 +111,7 @@ define([
                                 app.trigger('task:selected', model.id);
                             }, this),
                             error: _.bind(app.views.defaultErrorHandler, this)
-                        })
+                        });
                     }, this),
                     error: _.bind(app.views.defaultErrorHandler, this)
                 });
@@ -128,7 +128,7 @@ define([
         Views.Edit = Views.Add.extend({
             template: 'home/form-edit',
             events: _.extend({
-                'click .cancel': 'closeInternal',
+                'click .cancel': 'closeInternal'
             }, Views.Add.prototype.events),
             initialize: function () {
                 this.user = app.global.user;
@@ -183,7 +183,7 @@ define([
             toggleForm: function () {
                 var form = this.getView('.transaction-form-container');
                 if (form) {
-                    form.closeInternal()
+                    form.closeInternal();
                 } else {
                     this.insertView('.transaction-form-container', new Views.TransactionForm({
                         model: this.model
@@ -265,7 +265,7 @@ define([
                                 view.justSaved = true;
                             },
                             error: _.bind(app.views.defaultErrorHandler, this)
-                        })
+                        });
                     }, this),
                     error: _.bind(app.views.defaultErrorHandler, this)
                 });
@@ -287,7 +287,7 @@ define([
                     workspace: app.global.workspace,
                     task: this.options.task,
                     transaction: this.model
-                }
+                };
             }
         });
 

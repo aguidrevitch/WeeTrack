@@ -45,13 +45,13 @@ define([
             app.layout.setViews({
                 ".user-nav": new Views.UserNavigation(),
                 ".workspace-nav": new Views.WorkspaceNavigation()
-            });
+            }).render();
         });
 
         app.on('user:deauthorized', function (user) {
             app.layout.setViews({
                 ".user-nav": new Views.UserNavigation()
-            });
+            }).render();
             var workspacenav = app.layout.getView('.workspace-nav');
             if (workspacenav) workspacenav.remove();
         });

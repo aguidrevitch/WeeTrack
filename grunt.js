@@ -6,8 +6,13 @@ module.exports = function(grunt) {
     grunt.loadTasks('public');
 
     grunt.registerTask("development", function () {
+        process.env.NODE_ENV = 'development';
+        require('./server');
+    });
+
+    grunt.registerTask("staging", function () {
         grunt.tasks("release", {}, function () {
-            process.env.NODE_ENV = 'development';
+            process.env.NODE_ENV = 'staging';
             require('./server');
         });
     });
