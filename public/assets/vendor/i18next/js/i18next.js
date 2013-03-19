@@ -1,18 +1,14 @@
-// i18next, v1.5.6
-// Copyright (c)2012 Jan Mühlemann (jamuhl).
+// i18next, v1.6.0
+// Copyright (c)2013 Jan Mühlemann (jamuhl).
 // Distributed under MIT license
 // http://i18next.com
 (function (root, factory) {
     if (typeof exports === 'object') {
-
         module.exports = factory();
-
     } else if (typeof define === 'function' && define.amd) {
-
         define([], factory);
-
-    } 
-}(this, function () {
+    }
+}(this, function() {
 
     // add indexOf to non ECMA-262 standard compliant browsers
     if (!Array.prototype.indexOf) {  
@@ -48,13 +44,27 @@
         }
     } 
 
-    var $ = undefined
-        , i18n = {}
-        , resStore = {}
-        , currentLng
-        , replacementCounter = 0
-        , languages = [];
+    var root = this
+      , $ = root.jQuery
+      , i18n = {}
+      , resStore = {}
+      , currentLng
+      , replacementCounter = 0
+      , languages = [];
 
+
+    // Export the i18next object for **CommonJS**. 
+    // If we're not in CommonJS, add `i18n` to the
+    // global object or to jquery.
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = i18n;
+    } else {
+        if ($) {
+            $.i18n = $.i18n || i18n;
+        }
+        
+        root.i18n = root.i18n || i18n;
+    }
     // defaults
     var o = {
         lng: undefined,
@@ -63,9 +73,12 @@
         lowerCaseLng: false,
         returnObjectTrees: false,
         fallbackLng: 'dev',
+        detectLngQS: 'setLng',
         ns: 'translation',
+        fallbackToDefaultNS: false,
         nsseparator: ':',
         keyseparator: '.',
+        selectorAttr: 'data-i18n',
         debug: false,
         
         resGetPath: 'locales/__lng__/__ns__.json',
@@ -92,11 +105,15 @@
         contextNotFound: ['context_not_found', Math.random()].join(''),
     
         setJqueryExt: true,
+        defaultValueFromContent: true,
         useDataAttrOptions: false,
         cookieExpirationTime: undefined,
+        useCookie: true,
+        cookieName: 'i18next',
     
         postProcess: undefined
     };
+    
     function _extend(target, source) {
         if (!source || typeof source === 'function') {
             return target;
@@ -308,8 +325,14 @@
                 }
     
                 // Merge the query string and attach it to the url.
-                queryString = '?' + queryString.join('&');
-                url += queryString !== '?' ? queryString : '';
+                queryString = queryString.join('&');
+                if (queryString.length > 1) {
+                    if (url.indexOf('?') > -1) {
+                        url += '&' + queryString;
+                    } else {
+                        url += '?' + queryString;
+                    }
+                }
     
                 // Make a JSONP call if neccessary.
                 if(options.jsonp) {
@@ -418,9 +441,9 @@
         };
     
     
-        var methode = options.sendType ? options.sendType.toLowerCase() : 'get';
+        var methode = options.type ? options.type.toLowerCase() : 'get';
     
-        http[methode](options.url, {async: options.async}, function (status, data) {
+        http[methode](options.url, options, function (status, data) {
             if (status === 200) {
                 options.success(data.json(), status, null);
             } else {
@@ -474,11 +497,11 @@
         cookie: typeof document !== 'undefined' ? _cookie : cookie_noop,
         detectLanguage: detectLanguage,
         log: function(str) {
-            if (o.debug) console.log(str);
+            if (o.debug && typeof console !== "undefined") console.log(str);
         },
         toLanguages: function(lng) {
             var languages = [];
-            if (lng.indexOf('-') === 2 && lng.length === 5) {
+            if (typeof lng === 'string' && lng.indexOf('-') > -1) {
                 var parts = lng.split('-');
     
                 lng = o.lowerCaseLng ? 
@@ -486,7 +509,7 @@
                     parts[0].toLowerCase() +  '-' + parts[1].toUpperCase();
     
                 if (o.load !== 'unspecific') languages.push(lng);
-                if (o.load !== 'current') languages.push(lng.substr(0, 2));
+                if (o.load !== 'current') languages.push(parts[0]);
             } else {
                 languages.push(lng);
             }
@@ -494,6 +517,9 @@
             if (languages.indexOf(o.fallbackLng) === -1 && o.fallbackLng) languages.push(o.fallbackLng);
     
             return languages;
+        },
+        regexEscape: function(str) {
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
         }
     };
     function init(options, cb) {
@@ -512,13 +538,17 @@
             o.ns = { namespaces: [o.ns], defaultNs: o.ns};
         }
     
+        // escape prefix/suffix
+        o.interpolationPrefixEscaped = f.regexEscape(o.interpolationPrefix);
+        o.interpolationSuffixEscaped = f.regexEscape(o.interpolationSuffix);
+    
         if (!o.lng) o.lng = f.detectLanguage(); 
         if (o.lng) {
             // set cookie with lng set (as detectLanguage will set cookie on need)
-            f.cookie.create('i18next', o.lng, o.cookieExpirationTime);
+            if (o.useCookie) f.cookie.create(o.cookieName, o.lng, o.cookieExpirationTime);
         } else {
             o.lng =  o.fallbackLng;
-            f.cookie.remove('i18next');
+            if (o.useCookie) f.cookie.remove(o.cookieName);
         }
     
         languages = f.toLanguages(o.lng);
@@ -541,7 +571,8 @@
             resStore = o.resStore;
             if (cb) cb(translate);
             if (deferred) deferred.resolve();
-            return deferred;
+            if (deferred) return deferred.promise();
+            return;
         }
     
         // languages to load
@@ -564,7 +595,7 @@
             if (deferred) deferred.resolve();
         });
     
-        return deferred;
+        if (deferred) return deferred.promise();
     }
     function preload(lngs, cb) {
         if (typeof lngs === 'string') lngs = [lngs];
@@ -574,6 +605,85 @@
             }
         }
         return init(cb);
+    }
+    
+    function addResourceBundle(lng, ns, resources) {
+        if (typeof ns !== 'string') {
+            resources = ns;
+            ns = o.ns.defaultNs;
+        }
+    
+        resStore[lng] = resStore[lng] || {};
+        resStore[lng][ns] = resStore[lng][ns] || {};
+    
+        f.extend(resStore[lng][ns], resources);
+    }
+    
+    function setDefaultNamespace(ns) {
+        o.ns.defaultNs = ns;
+    }
+    
+    function loadNamespace(namespace, cb) {
+        loadNamespaces([namespace], cb);
+    }
+    
+    function loadNamespaces(namespaces, cb) {
+        var opts = {
+            dynamicLoad: o.dynamicLoad,
+            resGetPath: o.resGetPath,
+            getAsync: o.getAsync,
+            ns: { namespaces: namespaces, defaultNs: ''} /* new namespaces to load */
+        };
+    
+        // languages to load
+        var lngsToLoad = f.toLanguages(o.lng);
+        if (typeof o.preload === 'string') o.preload = [o.preload];
+        for (var i = 0, l = o.preload.length; i < l; i++) {
+            var pres = f.toLanguages(o.preload[i]);
+            for (var y = 0, len = pres.length; y < len; y++) {
+                if (lngsToLoad.indexOf(pres[y]) < 0) {
+                    lngsToLoad.push(pres[y]);
+                }
+            }
+        }
+    
+        // check if we have to load
+        var lngNeedLoad = [];
+        for (var a = 0, lenA = lngsToLoad.length; a < lenA; a++) {
+            var needLoad = false;
+            var resSet = resStore[lngsToLoad[a]];
+            if (resSet) {
+                for (var b = 0, lenB = namespaces.length; b < lenB; b++) {
+                    if (!resSet[namespaces[b]]) needLoad = true;
+                }
+            } else {
+                needLoad = true;
+            }
+    
+            if (needLoad) lngNeedLoad.push(lngsToLoad[a]);
+        }
+    
+        if (lngNeedLoad.length) {
+            i18n.sync._fetch(lngNeedLoad, opts, function(err, store) {
+                var todo = namespaces.length * lngNeedLoad.length;
+    
+                // load each file individual
+                f.each(namespaces, function(nsIndex, nsValue) {
+                    f.each(lngNeedLoad, function(lngIndex, lngValue) {
+                        resStore[lngValue] = resStore[lngValue] || {};
+                        resStore[lngValue][nsValue] = store[lngValue][nsValue];
+    
+                        todo--; // wait for all done befor callback
+                        if (todo === 0 && cb) {
+                            if (o.useLocalStorage) i18n.sync._storeLocal(resStore);
+                            cb();
+                        }
+                    });
+                });
+            });
+        } else {
+            if (cb) cb();
+        }
     }
     
     function setLng(lng, cb) {
@@ -604,21 +714,27 @@
     
             var optionsToUse;
             if (attr === 'html') {
-                optionsToUse = $.extend({ defaultValue: ele.html() }, options);
+                optionsToUse = o.defaultValueFromContent ? $.extend({ defaultValue: ele.html() }, options) : options;
                 ele.html($.t(key, optionsToUse));
             } 
             else if (attr === 'text') {
-                optionsToUse = $.extend({ defaultValue: ele.text() }, options);
+                optionsToUse = o.defaultValueFromContent ? $.extend({ defaultValue: ele.text() }, options) : options;
                 ele.text($.t(key, optionsToUse));
             } else {
-                optionsToUse = $.extend({ defaultValue: ele.attr(attr) }, options);
+                optionsToUse = o.defaultValueFromContent ? $.extend({ defaultValue: ele.attr(attr) }, options) : options;
                 ele.attr(attr, $.t(key, optionsToUse));
             }
         }
     
         function localize(ele, options) {
-            var key = ele.attr('data-i18n');
+            var key = ele.attr(o.selectorAttr);
             if (!key) return;
+    
+            var target = ele
+              , targetSelector = ele.data("i18n-target");
+            if (targetSelector) {
+                target = ele.find(targetSelector) || ele;
+            }
     
             if (!options && o.useDataAttrOptions === true) {
                 options = ele.data("i18n-options");
@@ -629,11 +745,11 @@
                 var keys = key.split(';');
     
                 $.each(keys, function(m, k) {
-                    parse(ele, k, options);
+                    parse(target, k, options);
                 });
     
             } else {
-                parse(ele, k, options);
+                parse(target, k, options);
             }
     
             if (o.useDataAttrOptions === true) ele.data("i18n-options", options);
@@ -646,27 +762,36 @@
                 localize($(this), options);
     
                 // localize childs
-                var elements =  $(this).find('[data-i18n]');
+                var elements =  $(this).find('[' + o.selectorAttr + ']');
                 elements.each(function() { 
                     localize($(this), options);
                 });
             });
         };
     }
-    function applyReplacement(str, replacementHash, nestedKey) {
-        if (str.indexOf(o.interpolationPrefix) < 0) return str;
+    
+    function applyReplacement(str, replacementHash, nestedKey, options) {
+        options = options || replacementHash; // first call uses replacement hash combined with options
+        if (str.indexOf(options.interpolationPrefix || o.interpolationPrefix) < 0) return str;
+    
+        var prefix = options.interpolationPrefix ? f.regexEscape(options.interpolationPrefix) : o.interpolationPrefixEscaped
+          , suffix = options.interpolationSuffix ? f.regexEscape(options.interpolationSuffix) : o.interpolationSuffixEscaped;
     
         f.each(replacementHash, function(key, value) {
-            if (typeof value === 'object') {
-                str = applyReplacement(str, value, key);
+            if (typeof value === 'object' && value !== null) {
+                str = applyReplacement(str, value, nestedKey ? nestedKey + o.keyseparator + key : key, options);
             } else {
-                str = str.replace(new RegExp([o.interpolationPrefix, nestedKey ? nestedKey + '.' + key : key, o.interpolationSuffix].join(''), 'g'), value);
+                str = str.replace(new RegExp([prefix, nestedKey ? nestedKey + o.keyseparator + key : key, suffix].join(''), 'g'), value);
             }
         });
         return str;
     }
     
-    function applyReuse(translated, options){
+    function applyReuse(translated, options) {
+        var comma = ',';
+        var options_open = '{';
+        var options_close = '}';
+    
         var opts = f.extend({}, options);
         delete opts.postProcess;
     
@@ -676,8 +801,23 @@
             var index_of_opening = translated.indexOf(o.reusePrefix);
             var index_of_end_of_closing = translated.indexOf(o.reuseSuffix, index_of_opening) + o.reuseSuffix.length;
             var token = translated.substring(index_of_opening, index_of_end_of_closing);
-            var token_sans_symbols = token.replace(o.reusePrefix, '').replace(o.reuseSuffix, '');
-            var translated_token = _translate(token_sans_symbols, opts);
+            var token_without_symbols = token.replace(o.reusePrefix, '').replace(o.reuseSuffix, '');
+            
+    
+            if (token_without_symbols.indexOf(comma) != -1) {
+                var index_of_token_end_of_closing = token_without_symbols.indexOf(comma);
+                if (token_without_symbols.indexOf(options_open, index_of_token_end_of_closing) != -1 && token_without_symbols.indexOf(options_close, index_of_token_end_of_closing) != -1) {
+                    var index_of_opts_opening = token_without_symbols.indexOf(options_open, index_of_token_end_of_closing);
+                    var index_of_opts_end_of_closing = token_without_symbols.indexOf(options_close, index_of_opts_opening) + options_close.length;
+                    try {
+                        opts = f.extend(opts, JSON.parse(token_without_symbols.substring(index_of_opts_opening, index_of_opts_end_of_closing)));
+                        token_without_symbols = token_without_symbols.substring(0, index_of_token_end_of_closing);
+                    } catch (e) {
+                    }
+                }
+            }
+    
+            var translated_token = _translate(token_without_symbols, opts);
             translated = translated.replace(token, translated_token);
         }
         return translated;
@@ -699,7 +839,9 @@
     function _translate(key, options){
         options = options || {};
     
-        var optionsSansCount, translated
+        if (!resStore) { return notfound; } // no resStore to translate from
+    
+        var optionWithoutCount, translated
           , notfound = options.defaultValue || key
           , lngs = languages;
     
@@ -717,9 +859,7 @@
             }
         }
     
-        if (!resStore) { return notfound; } // no resStore to translate from
-    
-        var ns = o.ns.defaultNs;
+        var ns = options.ns || o.ns.defaultNs;
         if (key.indexOf(o.nsseparator) > -1) {
             var parts = key.split(o.nsseparator);
             ns = parts[0];
@@ -727,32 +867,32 @@
         }
     
         if (hasContext(options)) {
-            optionsSansCount = f.extend({}, options);
-            delete optionsSansCount.context;
-            optionsSansCount.defaultValue = o.contextNotFound;
+            optionWithoutCount = f.extend({}, options);
+            delete optionWithoutCount.context;
+            optionWithoutCount.defaultValue = o.contextNotFound;
     
-            var contextKey = ns + ':' + key + '_' + options.context;
+            var contextKey = ns + o.nsseparator + key + '_' + options.context;
             
-            translated = translate(contextKey, optionsSansCount);
+            translated = translate(contextKey, optionWithoutCount);
             if (translated != o.contextNotFound) {
                 return applyReplacement(translated, { context: options.context }); // apply replacement for context only
             } // else continue translation with original/nonContext key
         }
     
         if (needsPlural(options)) {
-            optionsSansCount = f.extend({}, options);
-            delete optionsSansCount.count;
-            optionsSansCount.defaultValue = o.pluralNotFound;
+            optionWithoutCount = f.extend({}, options);
+            delete optionWithoutCount.count;
+            optionWithoutCount.defaultValue = o.pluralNotFound;
     
-            var pluralKey = ns + ':' + key + o.pluralSuffix;
+            var pluralKey = ns + o.nsseparator + key + o.pluralSuffix;
             var pluralExtension = pluralExtensions.get(currentLng, options.count);
             if (pluralExtension >= 0) { 
                 pluralKey = pluralKey + '_' + pluralExtension; 
             } else if (pluralExtension === 1) {
-                pluralKey = ns + ':' + key; // singular
+                pluralKey = ns + o.nsseparator + key; // singular
             }
             
-            translated = translate(pluralKey, optionsSansCount);
+            translated = translate(pluralKey, optionWithoutCount);
             if (translated != o.pluralNotFound) {
                 return applyReplacement(translated, { count: options.count }); // apply replacement for count only
             } // else continue translation with original/singular key
@@ -771,7 +911,7 @@
                 value = value && value[keys[x]];
                 x++;
             }
-            if (value) {
+            if (value !== undefined) {
                 if (typeof value === 'string') {
                     value = applyReplacement(value, options);
                     value = applyReuse(value, options);
@@ -785,38 +925,45 @@
                                 'returned a object instead of string.';
                         f.log(value);
                     } else {
+                        var copy = {}; // apply child translation on a copy
                         for (var m in value) {
                             // apply translation on childs
-                            value[m] = _translate(key + '.' + m, options);
+                            copy[m] = _translate(ns + o.nsseparator + key + o.keyseparator + m, options);
                         }
+                        value = copy;
                     }
                 }
                 found = value;
             }
         }
+        
+        if (found === undefined && o.fallbackToDefaultNS) {
+            found = _translate(key, options);
+        }
     
-        if (!found && o.sendMissing) {
+        if (found === undefined && o.sendMissing) {
             if (options.lng) {
-                sync.postMissing(options.lng, ns, key, notfound, lngs);
+                sync.postMissing(lngs[0], ns, key, notfound, lngs);
             } else {
                 sync.postMissing(o.lng, ns, key, notfound, lngs);
             }
         }
     
         var postProcessor = options.postProcess || o.postProcess;
-        if (found && postProcessor) {
+        if (found !== undefined && postProcessor) {
             if (postProcessors[postProcessor]) {
                 found = postProcessors[postProcessor](found, key, options);
             }
         }
     
-        if (!found) {
+        if (found === undefined) {
             notfound = applyReplacement(notfound, options);
             notfound = applyReuse(notfound, options);
         }
     
-        return (found) ? found : notfound;
+        return (found !== undefined) ? found : notfound;
     }
+    
     function detectLanguage() {
         var detectedLng;
     
@@ -835,14 +982,14 @@
                     }
                 }
             })();
-            if (qsParm.setLng) {
-                detectedLng = qsParm.setLng;
+            if (qsParm[o.detectLngQS]) {
+                detectedLng = qsParm[o.detectLngQS];
             }
         }
     
         // get from cookie
-        if (!detectedLng && typeof document !== 'undefined') {
-            var c = f.cookie.read('i18next');
+        if (!detectedLng && typeof document !== 'undefined' && o.useCookie ) {
+            var c = f.cookie.read(o.cookieName);
             if (c) detectedLng = c;
         }
     
@@ -864,7 +1011,7 @@
                     }
     
                     if (missingLngs.length > 0) {
-                        sync._fetch(missingLngs, options, function(err, fetched){
+                        sync._fetch(missingLngs, options, function(err, fetched) {
                             f.extend(store, fetched);
                             sync._storeLocal(fetched);
     
@@ -927,7 +1074,9 @@
                 // load each file individual
                 f.each(ns.namespaces, function(nsIndex, nsValue) {
                     f.each(lngs, function(lngIndex, lngValue) {
-                        sync._fetchOne(lngValue, nsValue, options, function(err, data) {
+                        
+                        // Call this once our translation has returned.
+                        var loadComplete = function(err, data) {
                             if (err) {
                                 errors = errors || [];
                                 errors.push(err);
@@ -937,7 +1086,15 @@
     
                             todo--; // wait for all done befor callback
                             if (todo === 0) cb(errors, store);
-                        });
+                        };
+                        
+                        if(typeof options.customLoad == 'function'){
+                            // Use the specified custom callback.
+                            options.customLoad(lngValue, nsValue, options, loadComplete);
+                        } else {
+                            //~ // Use our inbuilt sync.
+                            sync._fetchOne(lngValue, nsValue, options, loadComplete);
+                        }
                     });
                 });
             } else {
@@ -1000,7 +1157,19 @@
                     data: payload,
                     success: function(data, status, xhr) {
                         f.log('posted missing key \'' + key + '\' to: ' + item.url);
-                        resStore[item.lng][ns][key] = defaultValue;
+    
+                        // add key to resStore
+                        var keys = key.split('.');
+                        var x = 0;
+                        var value = resStore[item.lng][ns];
+                        while (keys[x]) {
+                            if (x === keys.length - 1) {
+                                value = value[keys[x]] = defaultValue;
+                            } else {
+                                value = value[keys[x]] = value[keys[x]] || {};
+                            }
+                            x++;
+                        }
                     },
                     error : function(xhr, status, error) {
                         f.log('failed posting missing key \'' + key + '\' to: ' + item.url);
@@ -1011,6 +1180,7 @@
             }
         }
     };
+    
     // definition http://translate.sourceforge.net/wiki/l10n/pluralforms
     var pluralExtensions = {
     
@@ -1026,8 +1196,8 @@
             "af": {
                 "name": "Afrikaans", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1050,8 +1220,8 @@
             "an": {
                 "name": "Aragonese", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1078,8 +1248,8 @@
             "ast": {
                 "name": "Asturian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1093,33 +1263,33 @@
             "az": {
                 "name": "Azerbaijani", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "be": {
                 "name": "Belarusian", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2, 
+                    5
                 ], 
                 "plurals": function(n) { return Number(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
             "bg": {
                 "name": "Bulgarian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "bn": {
                 "name": "Bengali", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1141,17 +1311,17 @@
             "bs": {
                 "name": "Bosnian", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2, 
+                    5
                 ], 
                 "plurals": function(n) { return Number(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
             "ca": {
                 "name": "Catalan", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1165,27 +1335,27 @@
             "cs": {
                 "name": "Czech", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2, 
+                    5
                 ], 
                 "plurals": function(n) { return Number((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2); }
             }, 
             "csb": {
                 "name": "Kashubian", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2, 
+                    5
                 ], 
                 "plurals": function(n) { return Number(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
             "cy": {
                 "name": "Welsh", 
                 "numbers": [
-                    3, 
                     1, 
                     2, 
+                    3, 
                     8
                 ], 
                 "plurals": function(n) { return Number((n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3); }
@@ -1193,16 +1363,16 @@
             "da": {
                 "name": "Danish", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "de": {
                 "name": "German", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1216,56 +1386,56 @@
             "el": {
                 "name": "Greek", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "en": {
                 "name": "English", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "eo": {
                 "name": "Esperanto", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "es": {
                 "name": "Spanish", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "es_ar": {
                 "name": "Argentinean Spanish", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "et": {
                 "name": "Estonian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "eu": {
                 "name": "Basque", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1279,8 +1449,8 @@
             "fi": {
                 "name": "Finnish", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1295,8 +1465,8 @@
             "fo": {
                 "name": "Faroese", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1311,25 +1481,25 @@
             "fur": {
                 "name": "Friulian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "fy": {
                 "name": "Frisian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "ga": {
                 "name": "Irish", 
                 "numbers": [
-                    3, 
                     1, 
-                    2, 
+                    2,
+                    3,
                     7, 
                     11
                 ], 
@@ -1338,26 +1508,26 @@
             "gd": {
                 "name": "Scottish Gaelic", 
                 "numbers": [
-                    20, 
                     1, 
                     2, 
-                    3
+                    3,
+                    20
                 ], 
                 "plurals": function(n) { return Number((n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : (n > 2 && n < 20) ? 2 : 3); }
             }, 
             "gl": {
                 "name": "Galician", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "gu": {
                 "name": "Gujarati", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1372,57 +1542,57 @@
             "ha": {
                 "name": "Hausa", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "he": {
                 "name": "Hebrew", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "hi": {
                 "name": "Hindi", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "hr": {
                 "name": "Croatian", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2,
+                    5
                 ], 
                 "plurals": function(n) { return Number(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
             "hu": {
                 "name": "Hungarian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "hy": {
                 "name": "Armenian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "ia": {
                 "name": "Interlingua", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1436,16 +1606,16 @@
             "is": {
                 "name": "Icelandic", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n%10!=1 || n%100==11); }
             }, 
             "it": {
                 "name": "Italian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1495,8 +1665,8 @@
             "kn": {
                 "name": "Kannada", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1510,18 +1680,18 @@
             "ku": {
                 "name": "Kurdish", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "kw": {
                 "name": "Cornish", 
                 "numbers": [
-                    4, 
                     1, 
                     2, 
-                    3
+                    3,
+                    4
                 ], 
                 "plurals": function(n) { return Number((n==1) ? 0 : (n==2) ? 1 : (n == 3) ? 2 : 3); }
             }, 
@@ -1535,8 +1705,8 @@
             "lb": {
                 "name": "Letzeburgesch", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1558,9 +1728,9 @@
             "lt": {
                 "name": "Lithuanian", 
                 "numbers": [
-                    10, 
                     1, 
-                    2
+                    2,
+                    10
                 ], 
                 "plurals": function(n) { return Number(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
@@ -1576,8 +1746,8 @@
             "mai": {
                 "name": "Maithili", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1608,24 +1778,24 @@
             "mk": {
                 "name": "Macedonian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n==1 || n%10==1 ? 0 : 1); }
             }, 
             "ml": {
                 "name": "Malayalam", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "mn": {
                 "name": "Mongolian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1641,8 +1811,8 @@
             "mr": {
                 "name": "Marathi", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1656,8 +1826,8 @@
             "mt": {
                 "name": "Maltese", 
                 "numbers": [
-                    2, 
                     1, 
+                    2, 
                     11, 
                     20
                 ], 
@@ -1666,64 +1836,64 @@
             "nah": {
                 "name": "Nahuatl", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "nap": {
                 "name": "Neapolitan", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "nb": {
                 "name": "Norwegian Bokmal", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "ne": {
                 "name": "Nepali", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "nl": {
                 "name": "Dutch", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "nn": {
                 "name": "Norwegian Nynorsk", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "no": {
                 "name": "Norwegian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "nso": {
                 "name": "Northern Sotho", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1746,73 +1916,73 @@
             "pa": {
                 "name": "Punjabi", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "pap": {
                 "name": "Papiamento", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "pl": {
                 "name": "Polish", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2,
+                    5
                 ], 
                 "plurals": function(n) { return Number(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
             "pms": {
                 "name": "Piemontese", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "ps": {
                 "name": "Pashto", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "pt": {
                 "name": "Portuguese", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "pt_br": {
                 "name": "Brazilian Portuguese", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "rm": {
                 "name": "Romansh", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "ro": {
                 "name": "Romanian", 
                 "numbers": [
-                    2, 
                     1, 
+                    2,
                     20
                 ], 
                 "plurals": function(n) { return Number(n==1 ? 0 : (n===0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2); }
@@ -1820,9 +1990,9 @@
             "ru": {
                 "name": "Russian", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2, 
+                    5
                 ], 
                 "plurals": function(n) { return Number(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
@@ -1836,33 +2006,33 @@
             "sco": {
                 "name": "Scots", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "se": {
                 "name": "Northern Sami", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "si": {
                 "name": "Sinhala", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "sk": {
                 "name": "Slovak", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2, 
+                    5
                 ], 
                 "plurals": function(n) { return Number((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2); }
             }, 
@@ -1879,33 +2049,33 @@
             "so": {
                 "name": "Somali", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "son": {
                 "name": "Songhay", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "sq": {
                 "name": "Albanian", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "sr": {
                 "name": "Serbian", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2,
+                    5
                 ], 
                 "plurals": function(n) { return Number(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
@@ -1919,32 +2089,32 @@
             "sv": {
                 "name": "Swedish", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "sw": {
                 "name": "Swahili", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "ta": {
                 "name": "Tamil", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
             "te": {
                 "name": "Telugu", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -1974,8 +2144,8 @@
             "tk": {
                 "name": "Turkmen", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -2004,17 +2174,17 @@
             "uk": {
                 "name": "Ukrainian", 
                 "numbers": [
-                    5, 
                     1, 
-                    2
+                    2,
+                    5
                 ], 
                 "plurals": function(n) { return Number(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2); }
             }, 
             "ur": {
                 "name": "Urdu", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -2051,8 +2221,8 @@
             "yo": {
                 "name": "Yoruba", 
                 "numbers": [
-                    2, 
-                    1
+                    1, 
+                    2
                 ], 
                 "plurals": function(n) { return Number(n != 1); }
             }, 
@@ -2094,13 +2264,13 @@
                 if (ext) {
                     var i = ext.plurals(c);
                     var number = ext.numbers[i];
-                    if (ext.numbers.length === 2) {
+                    if (ext.numbers.length === 2 && ext.numbers[0] === 1) {
                         if (number === 2) { 
-                            number = 1;
+                            number = -1; // regular plural
                         } else if (number === 1) {
-                            number = -1;
+                            number = 1; // singular
                         }
-                    } //console.log(count + '-' + number);
+                    }//console.log(count + '-' + number);
                     return number;
                 } else {
                     return c === 1 ? '1' : '-1';
@@ -2255,6 +2425,10 @@
     i18n.init = init;
     i18n.setLng = setLng;
     i18n.preload = preload;
+    i18n.addResourceBundle = addResourceBundle;
+    i18n.loadNamespace = loadNamespace;
+    i18n.loadNamespaces = loadNamespaces;
+    i18n.setDefaultNamespace = setDefaultNamespace;
     i18n.t = translate;
     i18n.translate = translate;
     i18n.detectLanguage = f.detectLanguage;
@@ -2264,7 +2438,6 @@
     i18n.lng = lng;
     i18n.addPostProcessor = addPostProcessor;
     i18n.options = o;
-        
-    return i18n; 
 
+    return i18n;
 }));
