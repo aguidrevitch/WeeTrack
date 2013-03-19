@@ -14,6 +14,7 @@
     "Validator \"workspace update\" failed for path workspace": "Пока нельзя изменить",
     "Validator \"taken\" failed for path email": "Занят",
     "Validator \"list\" failed for path admin": "Не список",
+    "Validator \"required\" failed for path type": "Обязательный",
 
     "Unsaved changes": "Данные были изменены, но не сохранены. Сбросить изменения ?",
     "All": "Все",
@@ -41,6 +42,7 @@
     "Search for a user": "Искать пользователя",
 
     "Workspaces": "Рабочие пространства",
+    "Switch to": "Перейти к",
     "Select a workspace on the left, or": "Выберите рабочее пространство слева, или",
     "Subdomain": "Поддомен",
     "Workspace Subdomain": "Поддомен рабочего пространства",
@@ -74,8 +76,10 @@
     "Priority": "Приоритет",
     "Owner": "Владелец",
     "Add Comment": "Добавить комментарий",
+    "Add": "Добавить",
     "New Comment": "Новый комментарий",
-    "Content": "Сообщение",
+    "Type": "Тип",
+    "Message": "Сообщение",
     "Create": "Создать",
     "Save Changes": "Сохранить Изменения",
     "by": "от",

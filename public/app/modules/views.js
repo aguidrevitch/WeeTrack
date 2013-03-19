@@ -68,10 +68,10 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
                 }
             }, options);
         },
-        userListToSelect2Data: function (users) {
+        userListToSelect2Data: function (users, showOwner) {
             var data = [];
             _.each(users, function (user) {
-                if (user && user._id != this.user.id) {
+                if (showOwner || user && user._id != this.user.id) {
                     var rec = { id: user._id };
                     rec.text = user.name ? user.name : user.email;
                     data.push(rec);

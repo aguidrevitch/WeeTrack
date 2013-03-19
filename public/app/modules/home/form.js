@@ -161,7 +161,8 @@ define([
             id: "task-details",
             events: {
                 'click .edit': 'edit',
-                'click .show-form': 'toggleForm'
+                'click .show-form': 'toggleForm',
+                'click .close': 'close'
             },
             initialize: function () {
                 this.listenTo(this.model, 'sync', this.render);
@@ -195,12 +196,14 @@ define([
             edit: function () {
                 app.trigger('task:edit', this.model.id);
             },
-            close: function (callback) {
+            close: function () {
                 var form = this.getView('.transaction-form-container');
                 if (form)
-                    form.close(callback);
+                    form.close(function () {
+                        app.trigger('task:deselected');
+                    });
                 else
-                    callback(true);
+                    app.trigger('task:deselected');
             }
         });
 
@@ -228,7 +231,7 @@ define([
                 );
 
                 if (this.model.get('owner'))
-                    $("[name=owner]").select2("data", this.userListToSelect2Data([this.model.get('owner')])[0]);
+                    $("[name=owner]").select2("data", this.userListToSelect2Data([this.model.get('owner')], true)[0]);
 
                 $("[name=owner]", this.$el).on('change', function (e) {
                     $(this).data('prev', '');

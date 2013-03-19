@@ -40,19 +40,12 @@ body {
     width: 100%;
 }
 
-#left-sidebar {
-    height: 100%;
-    float: left;
-}
-#right-sidebar {
+#left-sidebar, #right-sidebar {
     height: 100%;
 }
 
 #projects, #tasks, #task-details {
     height: 100%;
-}
-
-#task-details {
     position: relative;
 }
 
@@ -62,6 +55,7 @@ body {
     text-overflow: ellipsis;
     height: 50px;
     white-space: nowrap;
+    margin: 0px;
 }
 
 #transactions {
@@ -81,10 +75,10 @@ body {
 #tasks .form-fixed,
 #task-details .form-fixed {
     padding-bottom: 10px;
-    position: fixed;
-    bottom: 0;
-
+    position: absolute;
+    bottom: 0px;
     background-color: white;
+    box-sizing: content-box;
 }
 
 #form-project-add input.span1 {
@@ -212,7 +206,9 @@ body {
 }
 
 #form-task-add input[name=owner],
-#form-task-add #s2id_owner {
+#form-task-add #s2id_owner,
+#form-transaction-add input[name=owner],
+#form-transaction-add #s2id_owner {
     width: 200px
 }
 
@@ -223,10 +219,6 @@ body {
 
 .edit, .cancel {
     margin-right: 6px;
-}
-
-#tasks {
-    position: relative;
 }
 
 #tasks .tasks {
