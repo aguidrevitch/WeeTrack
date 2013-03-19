@@ -1826,7 +1826,6 @@ the specific language governing permissions and limitations under the Apache Lic
             // TODO validate placeholder is a string if specified
 
             if (opts.element.get(0).tagName.toLowerCase() === "select") {
-                console.log(1111)
                 // install sthe selection initializer
                 opts.initSelection = function (element,callback) {
 

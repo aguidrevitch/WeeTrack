@@ -28,7 +28,6 @@ define([
             },
             logout: function () {
                 app.global.user.deauthorize();
-                app.router.navigate('/', true);
             },
             register: function () {
                 app.layout.setViews({
@@ -54,6 +53,7 @@ define([
             }).render();
             var workspacenav = app.layout.getView('.workspace-nav');
             if (workspacenav) workspacenav.remove();
+            app.router.navigate('/', {trigger: true});
         });
 
         app.on('router:unauthorized', function () {

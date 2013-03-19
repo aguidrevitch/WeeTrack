@@ -21,11 +21,19 @@ define([
                 this.route(/^(\d+)/, "task", this.home);
             },
             home: function (task_id) {
-                app.layout.setViews({
-                    "section": new Views.Layout({
-                        task_id: task_id
-                    })
-                }).render();
+                if (app.global.user.id) {
+                    if (app.global.workspaces.length) {
+                        app.layout.setViews({
+                            "section": new Views.Layout({
+                                task_id: task_id
+                            })
+                        }).render();
+                    } else {
+                        app.router.navigate('/workspace/add', { trigger: true });
+                    }
+                } else {
+                    app.router.navigate('/login', { trigger: true });
+                }
             }
         });
 

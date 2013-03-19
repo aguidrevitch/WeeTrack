@@ -49,6 +49,7 @@ define([
 
         Views.Add = Views.Form.extend({
             template: "home/form-add",
+            id: 'form-task-add-wrapper',
             events: _.extend({
                 'click .submit-form': 'saveTask'
             }, Views.Form.prototype.events),
@@ -88,6 +89,7 @@ define([
                 Views.Form.prototype.afterRender.call(this);
             },
             saveTask: function () {
+                var view = this;
                 var workspace = this.model.getWorkspace();
 
                 var task = new app.models.Task();
@@ -100,9 +102,9 @@ define([
                         task.setWorkspace(workspace);
 
                         attributes.files = [];
-                        _.each(this.uploads, function (view) {
-                            attributes.files.push(this.model);
-                        }, this);
+                        _.each(view.uploads, function (view) {
+                            attributes.files.push(view.model);
+                        });
 
                         task.save(attributes, {
                             success: _.bind(function (model) {
@@ -304,6 +306,7 @@ define([
                     var img = new Image();
                     img.onload = function () {
                         self.$el.tooltip({
+                            container: 'body',
                             html: true,
                             title: '<img src="' + self.model.data + '" width="' + img.width + '" height="' + img.height + '">',
                             trigger: 'hover',

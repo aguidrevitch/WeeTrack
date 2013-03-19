@@ -64,6 +64,8 @@ define([
                     }
 
                     window.location = location;
+                } else {
+                    app.router.navigate('/', { trigger: true });
                 }
             }
         });

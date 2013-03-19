@@ -1,4 +1,5 @@
 <% if (workspaces.length) { %>
+Select Workspace:
 <select>
     <% workspaces.each(function (w) { %>
     <option data-subdomain="<%= w.escape('subdomain') %>" value="<%= w.id %>"

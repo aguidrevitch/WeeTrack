@@ -1,6 +1,6 @@
 <% if (user.id) { %>
-<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown"><%= user.escape("name")
-    %><b class="caret"></b></a>
+<li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown"><%= user.escape("name") %><b class="caret"></b></a>
     <ul class="dropdown-menu" role="menu">
         <li><a href="/workspace"><%= t('Workspaces') %></a></li>
         <li><a href="/project"><%= t('Projects') %></a></li>

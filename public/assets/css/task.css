@@ -1,3 +1,7 @@
+body {
+    overflow: hidden;
+}
+
 #content > .row {
     position: absolute;
     top: 60px;
@@ -8,7 +12,9 @@
 
 #upload-progress {
     clear: both;
+    padding-right: 10px;
 }
+
 .upload-item {
     height: 17px;
     line-height: 17px;
@@ -21,6 +27,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     float: left;
+}
+
+.tooltip {
+    z-index: 9999;
 }
 
 #sidebar-container {
@@ -37,13 +47,6 @@
 #right-sidebar {
     height: 100%;
 }
-/*#left-sidebar, #middle-sidebar, #right-sidebar {
-    position: relative;
-    height: 100%;
-    top: 0px;
-    bottom: 0px;
-    border: 1px solid blue;
-}*/
 
 #projects, #tasks, #task-details {
     height: 100%;
@@ -58,13 +61,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     height: 50px;
-    text-wrap: nowrap;
+    white-space: nowrap;
 }
 
 #transactions {
     position: absolute;
     top: 50px;
-    bottom: 52px;
+    bottom: 70px;
     width: 100%;
     overflow: auto;
 }
@@ -136,10 +139,35 @@
     max-width: 200px;
 }
 
+#form-task-add-wrapper {
+    height: 100%;
+}
+
+#form-task-add {
+    position: relative;
+    height: 100%;
+}
+
 #form-task-add .input-xxlarge,
 #form-transaction-add .input-xxlarge
 {
-   width: 430px;
+    height: 100%;
+    width: 410px;
+}
+
+#form-task-add .scrollable {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 52px;
+    bottom: 52px;
+    overflow: auto;
+}
+
+#form-task-add .submit-group {
+    position: absolute;
+    bottom: 0px;
+    margin-bottom: 10px;
 }
 
 #form-task-add .status,
@@ -157,13 +185,13 @@
 #form-task-add .status,
 #form-transaction-add .type,
 #form-transaction-add .priority {
-    width: 240px;
+    width: 220px;
 }
 
 #form-task-add .owner,
 #form-transaction-add .status,
 #form-transaction-add .owner {
-    width: 330px;
+    width: 320px;
 }
 
 #form-task-add .control-label,
@@ -180,12 +208,12 @@
 #form-task-add select[name=status],
 #form-transaction-add select[name=status],
 #form-transaction-add select[name=type] {
-    width: 120px
+    width: 110px
 }
 
 #form-task-add input[name=owner],
 #form-task-add #s2id_owner {
-    width: 190px
+    width: 200px
 }
 
 #form-task-add textarea[name=subject] {
@@ -197,8 +225,21 @@
     margin-right: 6px;
 }
 
-.tasks .selected {
+#tasks {
+    position: relative;
+}
+
+#tasks .tasks {
+    position: absolute;
+    top: 0px;
+    bottom: 42px;
+    width: 100%;
+    overflow: auto;
+}
+
+#tasks .tasks .selected {
     background-color: #eeeeee;
     z-index: 2;
     border-color: #ddd;
 }
+
