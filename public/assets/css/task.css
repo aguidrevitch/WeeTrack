@@ -7,6 +7,7 @@ body {
     top: 60px;
     bottom: 0px;
     overflow: hidden;
+    width: 100%;
     /* min-height: 460px; */
 }
 
@@ -44,7 +45,7 @@ body {
     height: 100%;
 }
 
-#projects, #tasks, #task-details {
+#tasks, #task-details {
     height: 100%;
     position: relative;
 }
