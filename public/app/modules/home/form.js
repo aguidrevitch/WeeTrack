@@ -51,9 +51,8 @@ define([
             template: 'home/view',
             id: "task-details",
             events: {
-                'click .edit': 'edit',
                 'click .show-form': 'toggleForm',
-                'click .close': 'close'
+                'click .close-details': 'closeInternal'
             },
             initialize: function () {
                 this.listenTo(this.model, 'sync', this.render);
@@ -85,11 +84,13 @@ define([
                 }
             },
             afterRender: function () {
-                //console.log($('#transactions', this.$el).prop("scrollHeight"));
                 $('#transactions', this.$el).scrollTop($('#transactions :last', this.$el).prop("scrollHeight"));
             },
-            edit: function () {
-                app.trigger('task:edit', this.model.id);
+            closeInternal: function () {
+                this.close(function (yes) {
+                    if (yes)
+                        app.trigger('task:deselected');
+                });
             },
             close: function (callback) {
                 var form = this.getView('.transaction-form-container');
