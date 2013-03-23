@@ -144,8 +144,7 @@ body {
 }
 
 #form-task-add .input-xxlarge,
-#form-transaction-add .input-xxlarge
-{
+#form-transaction-add .input-xxlarge {
     height: 100%;
     width: 410px;
 }
@@ -170,11 +169,19 @@ body {
 #form-transaction-add .type,
 #form-transaction-add .status,
 #form-transaction-add .priority,
-#form-transaction-add .owner
-{
+#form-transaction-add .owner {
     float: left;
     min-height: 1px;
     margin-left: 0px;
+}
+
+#form-task-add .status:after,
+#form-task-add .owner:after,
+#form-transaction-add .type:after,
+#form-transaction-add .status:after,
+#form-transaction-add .priority:after,
+#form-transaction-add .owner:after {
+    clear: both;
 }
 
 #form-task-add .status,
@@ -193,7 +200,6 @@ body {
 #form-transaction-add .control-label {
     width: 110px;
 }
-
 
 #form-task-add .controls,
 #form-transaction-add .controls {
@@ -234,5 +240,13 @@ body {
     background-color: #eeeeee;
     z-index: 2;
     border-color: #ddd;
+}
+
+@media (max-width: 1200px) {
+    #form-task-add .input-xxlarge,
+    #form-transaction-add .input-xxlarge {
+        height: 100%;
+        width: 280px;
+    }
 }
 

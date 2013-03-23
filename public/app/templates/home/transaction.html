@@ -18,9 +18,9 @@
 <div class="alert alert-info">
     <%= transaction.get('creator').name %>
     <%= t('changed status from') %>
-    <strong><%= transaction.get('previousValue') %></strong>
+    <strong><%= t(transaction.get('previousValue')) %></strong>
     <%= t('to') %>
-    <strong><%= transaction.get('value') %></strong>
+    <strong><%= t(transaction.get('value')) %></strong>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
 </div>
 

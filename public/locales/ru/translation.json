@@ -89,5 +89,10 @@
     "replied": "ответил(а)",
     "commented": "добавил(а) комментарий",
     "attached": "присоеднил(а)",
+    "changed owner from": "сменил владельца с",
+    "changed status from": "сменил статус с",
+    "changed priority from": "cменил приоритет с",
+    "to": "на",
+
     "Unknown error": "Неизвестная ошибка"
 }

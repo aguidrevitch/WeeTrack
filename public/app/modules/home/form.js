@@ -193,17 +193,21 @@ define([
                     })).render();
                 }
             },
+            afterRender: function () {
+                //console.log($('#transactions', this.$el).prop("scrollHeight"));
+                $('#transactions', this.$el).scrollTop($('#transactions :last', this.$el).prop("scrollHeight"));
+            },
             edit: function () {
                 app.trigger('task:edit', this.model.id);
             },
-            close: function () {
+            close: function (callback) {
                 var form = this.getView('.transaction-form-container');
                 if (form)
-                    form.close(function () {
-                        app.trigger('task:deselected');
+                    form.close(function (yes) {
+                        callback(yes);
                     });
                 else
-                    app.trigger('task:deselected');
+                    callback(true);
             }
         });
 
@@ -264,9 +268,6 @@ define([
                         comment.save(attributes, {
                             success: function (model) {
                                 view.model.fetch();
-                                //view.model.transactions.add(model.transactions.models);
-                                //view.model.set('status', model.get('status'));
-                                //view.model.trigger('change');
                                 view.justSaved = true;
                             },
                             error: _.bind(app.views.defaultErrorHandler, this)
