@@ -47,6 +47,61 @@ define([
             }
         });
 
+        Views.View = Backbone.Layout.extend({
+            template: 'home/view',
+            id: "task-details",
+            events: {
+                'click .edit': 'edit',
+                'click .show-form': 'toggleForm',
+                'click .close': 'close'
+            },
+            initialize: function () {
+                this.listenTo(this.model, 'sync', this.render);
+                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(app.global.projects, 'sync', this.render);
+            },
+            serialize: function () {
+                return {
+                    task: this.model,
+                    projects: app.global.projects
+                };
+            },
+            beforeRender: function () {
+                this.model.transactions.each(function (transaction) {
+                    this.insertView('#transactions', new Views.Transaction({
+                        task: this.model,
+                        model: transaction
+                    }));
+                }, this);
+            },
+            toggleForm: function () {
+                var form = this.getView('.transaction-form-container');
+                if (form) {
+                    form.closeInternal();
+                } else {
+                    this.insertView('.transaction-form-container', new Views.TransactionForm({
+                        model: this.model
+                    })).render();
+                }
+            },
+            afterRender: function () {
+                //console.log($('#transactions', this.$el).prop("scrollHeight"));
+                $('#transactions', this.$el).scrollTop($('#transactions :last', this.$el).prop("scrollHeight"));
+            },
+            edit: function () {
+                app.trigger('task:edit', this.model.id);
+            },
+            close: function (callback) {
+                var form = this.getView('.transaction-form-container');
+                if (form)
+                    form.close(function (yes) {
+                        callback(yes);
+                    });
+                else
+                    callback(true);
+            }
+        });
+
         Views.Add = Views.Form.extend({
             template: "home/form-add",
             id: 'form-task-add-wrapper',
@@ -124,90 +179,6 @@ define([
                     if (yes)
                         app.trigger('task:deselected');
                 });
-            }
-        });
-
-        Views.Edit = Views.Add.extend({
-            template: 'home/form-edit',
-            events: _.extend({
-                'click .cancel': 'closeInternal'
-            }, Views.Add.prototype.events),
-            initialize: function () {
-                this.user = app.global.user;
-                this.listenTo(this.model, 'sync', this.render);
-                //this.listenTo(this.model, 'change', this.render);
-                this.listenTo($(window), 'beforeunload', this.closeInternal);
-            },
-            saveTask: function () {
-                var view = this;
-                var workspace = this.model.getWorkspace();
-                var attributes = this.$el.find('form').serializeObject();
-                this.model.save(attributes, {
-                    success: function (model) {
-                        view.isDirty = false;
-                        app.trigger('task:selected', model.id, true);
-                    },
-                    error: _.bind(app.views.defaultErrorHandler, this)
-                });
-                return false;
-            },
-            closeInternal: function () {
-                app.trigger('task:selected', this.model.id, true);
-            }
-        });
-
-        Views.View = Backbone.Layout.extend({
-            template: 'home/view',
-            id: "task-details",
-            events: {
-                'click .edit': 'edit',
-                'click .show-form': 'toggleForm',
-                'click .close': 'close'
-            },
-            initialize: function () {
-                this.listenTo(this.model, 'sync', this.render);
-                this.listenTo(this.model, 'change', this.render);
-                this.listenTo(app.global.projects, 'sync', this.render);
-            },
-            serialize: function () {
-                return {
-                    task: this.model,
-                    projects: app.global.projects
-                };
-            },
-            beforeRender: function () {
-                this.model.transactions.each(function (transaction) {
-                    this.insertView('#transactions', new Views.Transaction({
-                        task: this.model,
-                        model: transaction
-                    }));
-                }, this);
-            },
-            toggleForm: function () {
-                var form = this.getView('.transaction-form-container');
-                if (form) {
-                    form.closeInternal();
-                } else {
-                    this.insertView('.transaction-form-container', new Views.TransactionForm({
-                        model: this.model
-                    })).render();
-                }
-            },
-            afterRender: function () {
-                //console.log($('#transactions', this.$el).prop("scrollHeight"));
-                $('#transactions', this.$el).scrollTop($('#transactions :last', this.$el).prop("scrollHeight"));
-            },
-            edit: function () {
-                app.trigger('task:edit', this.model.id);
-            },
-            close: function (callback) {
-                var form = this.getView('.transaction-form-container');
-                if (form)
-                    form.close(function (yes) {
-                        callback(yes);
-                    });
-                else
-                    callback(true);
             }
         });
 

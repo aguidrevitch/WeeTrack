@@ -14,7 +14,6 @@ define([
 
         var Views = {
             Add: Form.Add,
-            Edit: Form.Edit,
             View: Form.View
         };
 
@@ -64,29 +63,6 @@ define([
                                     })
                                 });
                                 this.getView('#right-sidebar').render();
-                            }
-                        }
-                    }, this));
-                }, this);
-
-                this.listenTo(app, 'task:edit', function (id) {
-                    var task;
-                    var openedForm = this.getView('#right-sidebar');
-
-                    openedForm.close(_.bind(function (yes) {
-                        if (yes) {
-                            if (id && id != 'add') {
-                                app.router.navigate('/' + id);
-                                // existing project
-                                task = new app.models.Task({ id: id });
-                                task.setWorkspace(app.global.workspace.id);
-                                this.setViews({
-                                    "#right-sidebar": new Views.Edit({
-                                        model: task
-                                    })
-                                });
-                                this.getView('#right-sidebar').render();
-                                task.fetch();
                             }
                         }
                     }, this));

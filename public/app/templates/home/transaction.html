@@ -34,13 +34,31 @@
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
 </div>
 
-<% } else if (transaction.get('subtype') == 'owner') { %>
+<% } else if (transaction.get('subtype') == 'grant') { %>
 <div class="alert alert-info">
     <%= transaction.get('creator').name %>
-    <%= t('changed owner from') %>
-    <strong><%= (transaction.get('previousValue') || {}).name || (transaction.get('previousValue') || {}).email || 'nobody' %></strong>
-    <%= t('to') %>
-    <strong><%= (transaction.get('value') || {}).name || (transaction.get('value') || {}).email || 'nobody' %></strong>
+    <% if (transaction.get('value') == 'owner') { %>
+        <%= t('assigned to') %>
+        <strong><%= transaction.get('meta').name || transaction.get('meta').email %></strong>
+    <% } else { %>
+        <%= t('added') %>
+        <strong><%= transaction.get('meta').name || transaction.get('meta').email %></strong>
+        <%= t('as ' + {admin: 'Administrator','admincc':'User','cc':'Client'}[transaction.get('value')]) %>
+    <% } %>
+    <%= moment(new Date(transaction.get('created'))).fromNow() %>
+</div>
+
+<% } else if (transaction.get('subtype') == 'revoke') { %>
+<div class="alert alert-info">
+    <%= transaction.get('creator').name %>
+    <% if (transaction.get('value') == 'owner') { %>
+        <%= t('assigned to') %>
+        <strong>nobody</strong>
+    <% } else { %>
+        <%= t('removed') %>
+        <strong><%= transaction.get('meta').name || transaction.get('meta').email %></strong>
+        <%= t('from ' + {admin: 'Administrators','admincc':'Users','cc':'Clients'}[transaction.get('value')]) %>
+    <% } %>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
 </div>
 

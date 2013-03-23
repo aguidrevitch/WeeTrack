@@ -89,10 +89,18 @@
     "replied": "ответил(а)",
     "commented": "добавил(а) комментарий",
     "attached": "присоеднил(а)",
-    "changed owner from": "сменил владельца с",
+    "assigned to": "назначил владельцем",
     "changed status from": "сменил статус с",
     "changed priority from": "cменил приоритет с",
     "to": "на",
+    "added": "добавил(а)",
+    "as Administrator": "в список Администраторов",
+    "as User": "в список Пользователей",
+    "as Client": "в список Клиентов",
+    "removed": "удалил(а)",
+    "from Administrators": "из списка Администраторов",
+    "from Users": "из списка Пользователей",
+    "from Clients": "из списка Клиентов",
 
     "Unknown error": "Неизвестная ошибка"
 }
