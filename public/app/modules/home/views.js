@@ -89,6 +89,7 @@ define([
             initialize: function () {
                 this.user = app.global.user;
                 this.listenTo(app.global.projects, 'sync', this.render);
+                this.listenTo(this.user, 'sync', this.render);
             },
             serialize: function () {
                 return {
@@ -120,10 +121,12 @@ define([
                     text: this.user.escape('name') || this.user.escape('email')
                 });
 
-                app.global.tasks.fetch();
+                $("[name=project]", this.$el).on("change", _.bind(this.filter, this));
+                $("[name=owner]", this.$el).on("change", _.bind(this.filter, this));
+                $("[name=status]", this.$el).on("change", _.bind(this.filter, this));
+                this.filter();
             },
             filter: function () {
-                //console.log(this.$el.find('form').serializeObject());
                 app.global.tasks.setProject( this.$el.find('form [name=project]').val() );
                 app.global.tasks.setOwner( this.$el.find('form [name=owner]').select2("val") );
                 app.global.tasks.setStatus( this.$el.find('form [name=status]').val() );
