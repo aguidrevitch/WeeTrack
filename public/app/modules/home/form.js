@@ -47,62 +47,6 @@ define([
             }
         });
 
-        Views.View = Backbone.Layout.extend({
-            template: 'home/view',
-            id: "task-details",
-            events: {
-                'click .show-form': 'toggleForm',
-                'click .close-details': 'closeInternal'
-            },
-            initialize: function () {
-                this.listenTo(this.model, 'sync', this.render);
-                this.listenTo(this.model, 'change', this.render);
-                this.listenTo(app.global.projects, 'sync', this.render);
-            },
-            serialize: function () {
-                return {
-                    task: this.model,
-                    projects: app.global.projects
-                };
-            },
-            beforeRender: function () {
-                this.model.transactions.each(function (transaction) {
-                    this.insertView('#transactions', new Views.Transaction({
-                        task: this.model,
-                        model: transaction
-                    }));
-                }, this);
-            },
-            toggleForm: function () {
-                var form = this.getView('.transaction-form-container');
-                if (form) {
-                    form.closeInternal();
-                } else {
-                    this.insertView('.transaction-form-container', new Views.TransactionForm({
-                        model: this.model
-                    })).render();
-                }
-            },
-            afterRender: function () {
-                $('#transactions', this.$el).scrollTop($('#transactions :last', this.$el).prop("scrollHeight"));
-            },
-            closeInternal: function () {
-                this.close(function (yes) {
-                    if (yes)
-                        app.trigger('task:deselected');
-                });
-            },
-            close: function (callback) {
-                var form = this.getView('.transaction-form-container');
-                if (form)
-                    form.close(function (yes) {
-                        callback(yes);
-                    });
-                else
-                    callback(true);
-            }
-        });
-
         Views.Add = Views.Form.extend({
             template: "home/form-add",
             id: 'form-task-add-wrapper',
@@ -194,11 +138,20 @@ define([
             },
             serialize: function () {
                 return {
-                    task: this.model
+                    task: this.model,
+                    type: this.options.type || 'reply',
+                    text: this.quotedText()
                 };
             },
+            quotedText: function () {
+                var text = this.options.text;
+                if (text) {
+                    text = text.replace(/^/mg, '>');
+                    return text + "\n";
+                }
+                return '';
+            },
             afterRender: function () {
-
                 $("[name=owner]", this.$el).select2(
                     this.userListSelect2Options({
                         multiple: false,
@@ -214,7 +167,10 @@ define([
                 });
 
                 Views.Form.prototype.afterRender.call(this);
-                $('textarea').focus();
+                $('textarea', this.$el).focus(function () {
+                    $(this).setCursorPosition($(this).val().length);
+                });
+                $('textarea', this.$el).focus();
             },
             saveComment: function () {
                 var view = this;
@@ -255,17 +211,6 @@ define([
                     if (yes)
                         this.remove();
                 }, this));
-            }
-        });
-
-        Views.Transaction = Backbone.Layout.extend({
-            template: "home/transaction",
-            serialize: function () {
-                return {
-                    workspace: app.global.workspace,
-                    task: this.options.task,
-                    transaction: this.model
-                };
             }
         });
 

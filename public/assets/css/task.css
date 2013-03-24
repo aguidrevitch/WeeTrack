@@ -219,6 +219,10 @@ body {
     width: 200px
 }
 
+#form-transaction-add textarea[name=content] {
+    height: 80px;
+}
+
 #form-task-add textarea[name=subject] {
     font-size: 24px;
     font-weight: 600;
@@ -246,14 +250,16 @@ body {
     width: 330px;
 }
 
-#workspace-switcher {
-    text-align: justify;
-    -moz-column-count: 3;
-    -moz-column-gap: 1.5em;
-    -moz-column-rule: 1px solid #c4c8cc;
-    -webkit-column-count: 3;
-    -webkit-column-gap: 1.5em;
-    -webkit-column-rule: 1px solid #c4c8cc;
+#transactions .reply,
+#transactions .comment {
+    float: right;
+    margin-left: 8px;
+}
+
+#transactions pre {
+    border: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 @media (max-width: 1200px) {

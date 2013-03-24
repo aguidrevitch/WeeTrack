@@ -31,8 +31,9 @@
 
                 <div class="controls">
                     <select name="type">
-                        <option value="reply">Reply</option>
-                        <option value="comment">Comment</option>
+                        <% _.each({ reply: 'Reply', comment: 'Comment'}, function (key, value) { %>
+                            <option value="<%= value %>" <%= type == value ? 'selected="selected"' : '' %>><%= t(key) %></option>
+                        <% }); %>
                     </select>
                 </div>
             </div>
@@ -78,7 +79,7 @@
         <label class="control-label"><%= t('Message') %> * </label>
 
         <div class="controls">
-            <textarea name="content" class="input-xxlarge"></textarea>
+            <textarea name="content" class="input-xxlarge"><%= text || "" %></textarea>
         </div>
     </div>
     <div class="control-group">

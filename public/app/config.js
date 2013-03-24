@@ -40,6 +40,7 @@ require.config({
         select2: [ "jquery" ],
 
         "plugins/jquery.serializeObject": [ "jquery" ],
+        "plugins/jquery.setCursorPosition": [ "jquery" ],
 
         // Backbone.LayoutManager depends on Backbone.
         "plugins/backbone.layoutmanager": [ "backbone" ],

@@ -14,7 +14,7 @@ define([
 
         var Views = {
             Add: Form.Add,
-            View: Form.View
+            TransactionForm: Form.TransactionForm
         };
 
         Views.Layout = Backbone.Layout.extend({
@@ -204,6 +204,90 @@ define([
             selected: function (e) {
                 app.trigger('task:selected', $(e.target).data('id'));
                 return false;
+            }
+        });
+
+        Views.View = Backbone.Layout.extend({
+            template: 'home/view',
+            id: "task-details",
+            events: {
+                'click .show-form': 'toggleForm',
+                'click .close-details': 'closeInternal'
+            },
+            initialize: function () {
+                this.listenTo(this.model, 'sync', this.render);
+                //this.listenTo(this.model, 'change', this.render);
+                this.listenTo(app.global.projects, 'sync', this.render);
+            },
+            serialize: function () {
+                return {
+                    task: this.model,
+                    projects: app.global.projects
+                };
+            },
+            beforeRender: function () {
+                this.model.transactions.each(function (transaction) {
+                    this.insertView('#transactions', new Views.Transaction({
+                        task: this.model,
+                        model: transaction
+                    }));
+                }, this);
+            },
+            toggleForm: function () {
+                var form = this.getView('.transaction-form-container');
+                if (form) {
+                    form.closeInternal();
+                } else {
+                    this.insertView('.transaction-form-container', new Views.TransactionForm({
+                        model: this.model
+                    })).render();
+                }
+            },
+            afterRender: function () {
+                $('#transactions', this.$el).scrollTop($('#transactions :last', this.$el).prop("scrollHeight"));
+                if (this.model.transactions) {
+                    $('.reply a, .comment a', this.$el).off('click', null, null);
+                    $('.reply a, .comment a', this.$el).on("click", _.bind(function (e) {
+                        var $el = $(e.target);
+                        var transaction = this.model.transactions.findWhere({ _id: $el.data('id')}), text;
+                        if (transaction) {
+                            text = transaction.escape('value');
+                        }
+                        this.insertView('.transaction-form-container', new Views.TransactionForm({
+                            model: this.model,
+                            type: $el.data('type'),
+                            text: text
+                        })).render();
+
+                        return false;
+                    }, this));
+                }
+            },
+            closeInternal: function () {
+                this.close(function (yes) {
+                    if (yes)
+                        app.trigger('task:deselected');
+                });
+            },
+            close: function (callback) {
+                var form = this.getView('.transaction-form-container');
+                if (form)
+                    form.close(function (yes) {
+                        callback(yes);
+                    });
+                else
+                    callback(true);
+            }
+        });
+
+        Views.Transaction = Backbone.Layout.extend({
+            template: "home/transaction",
+            serialize: function () {
+                return {
+                    workspace: app.global.workspace,
+                    task: this.options.task,
+                    transaction: this.model
+                };
             }
         });
 

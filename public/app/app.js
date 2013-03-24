@@ -11,6 +11,7 @@ define([
     // Plugins.
     "plugins/backbone.layoutmanager",
     "plugins/jquery.serializeObject",
+    "plugins/jquery.setCursorPosition",
 
     // Locales
     "../locales/ru/ru"
