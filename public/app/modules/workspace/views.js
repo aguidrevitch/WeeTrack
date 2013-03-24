@@ -164,6 +164,19 @@ define([
             }
         });
 
+        Views.Switch = Backbone.Layout.extend({
+            template: "workspace/switch",
+            initialize: function () {
+                this.listenTo(app.global.workspaces, 'sync', this.render);
+            },
+            serialize: function () {
+                return {
+                    workspaces: app.global.workspaces,
+                    current: app.global.workspace
+                };
+            }
+        });
+
         return Views;
     })
 ;

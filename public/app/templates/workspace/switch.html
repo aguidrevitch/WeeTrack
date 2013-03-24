@@ -1,0 +1,14 @@
+<legend><%= t('Switch Workspace') %></legend>
+<ul class="nav nav-tabs nav-stacked workspace span3">
+    <% workspaces.each(function (workspace) { %>
+    <% if (workspace.id != current.id) { %>
+    <li>
+        <a data-bypass="true"
+                href="http://<%= workspace.escape('subdomain') %>.<%= hostname %><%= port ? ':' + port: '' %>">
+            <i class="icon-chevron-right"></i>
+            <%= workspace.escape('name') %>
+        </a>
+    </li>
+    <% } %>
+    <% }) %>
+</ul>

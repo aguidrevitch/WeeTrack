@@ -16,6 +16,7 @@ define([
             authorized: {
                 "workspace": "workspace",
                 "workspace/": "workspace",
+                "workspace/switch": "switch",
                 "workspace/:workspace": "workspace"
             },
             workspace: function (workspace_id) {
@@ -23,6 +24,11 @@ define([
                     "section": new Views.Layout({
                         workspace_id: workspace_id
                     })
+                }).render();
+            },
+            switch: function () {
+                app.layout.setViews({
+                    "section": new Views.Switch()
                 }).render();
             }
         });

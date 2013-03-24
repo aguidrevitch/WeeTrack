@@ -22,14 +22,16 @@ define([
             },
             home: function (task_id) {
                 if (app.global.user.id) {
-                    if (!app.global.workspace.id) {
-                        app.router.navigate('/workspace', { trigger: true });
-                    } else if (app.global.workspaces.length) {
-                        app.layout.setViews({
-                            "section": new Views.Layout({
-                                task_id: task_id
-                            })
-                        }).render();
+                    if (app.global.workspaces.length) {
+                        if (!app.global.workspace.id) {
+                            app.router.navigate('/workspace/switch', { trigger: true });
+                        } else {
+                            app.layout.setViews({
+                                "section": new Views.Layout({
+                                    task_id: task_id
+                                })
+                            }).render();
+                        }
                     } else {
                         app.router.navigate('/workspace/add', { trigger: true });
                     }
