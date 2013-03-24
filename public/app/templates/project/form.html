@@ -1,6 +1,6 @@
 <form class="form-horizontal">
     <legend>
-        <%= t('Settings') %>
+        <%= project.escape('name') || t('New Project') %>
         <button type="button" class="close close-form">&times;</button>
     </legend>
     <div class="control-group">

@@ -42,6 +42,7 @@
     "Search for a user": "Искать пользователя",
 
     "Workspaces": "Рабочие пространства",
+    "New Workspace": "Новое Пространство",
     "Switch to": "Перейти к",
     "Select a workspace on the left, or": "Выберите рабочее пространство слева, или",
     "Subdomain": "Поддомен",
@@ -53,6 +54,7 @@
     "Workspace saved": "Рабочее пространство сохранено",
 
     "Projects": "Проекты",
+    "New Project": "Новый Проект",
     "Project Name": "Название проекта",
     "Select a project on the left, or": "Выберите проект слева, или",
     "Please add at least one Workspace first": "Сначала создайте хотя бы одно рабочее пространство",

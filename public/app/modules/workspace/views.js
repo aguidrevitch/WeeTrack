@@ -143,13 +143,13 @@ define([
                 var workspace = new app.models.Workspace();
                 var attrs = _.extend({ _id: this.model.id }, this.$el.find('form').serializeObject());
                 workspace.save(attrs, {
-                    success: function (model) {
+                    success: _.bind(function (model) {
                         view.model.set(model.attributes);
                         view.justSaved = true;
                         view.render();
                         app.trigger('workspace:selected', model.id);
                         app.trigger('workspace:updated', view.model);
-                    },
+                    }, this),
                     error: _.bind(app.views.defaultErrorHandler, this)
                 });
                 return false;

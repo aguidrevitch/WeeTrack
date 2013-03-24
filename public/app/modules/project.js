@@ -19,14 +19,18 @@ define([
                 "project/:project_id": "project"
             },
             project: function (project_id) {
-                app.layout.setViews({
-                    "section": new Views.Layout({
-                        project_id: project_id,
-                        workspace: app.global.workspace,
-                        collection: app.global.projects,
-                        workspaces: app.global.workspaces
-                    })
-                }).render();
+                if (app.global.workspace.id) {
+                    app.layout.setViews({
+                        "section": new Views.Layout({
+                            project_id: project_id,
+                            workspace: app.global.workspace,
+                            collection: app.global.projects,
+                            workspaces: app.global.workspaces
+                        })
+                    }).render();
+                } else {
+                    app.redirect
+                }
             }
         });
 
