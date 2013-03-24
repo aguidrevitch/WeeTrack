@@ -82,10 +82,10 @@ define(['backbone', 'modules/models', 'modules/transaction'], function (Backbone
                 query.perm = this.perm;
 
             if (this.project)
-                query.project = this.project
+                query.project = this.project;
 
             if (this.owner)
-                query.owner = this.owner
+                query.owner = this.owner;
 
             if (this.status)
                 query.status = this.status;

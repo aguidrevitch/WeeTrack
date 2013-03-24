@@ -84,7 +84,7 @@ define([
         Views.Filter = app.views.Form.extend({
             template: 'home/filter',
             events: {
-                'click .submit-form': 'filter'
+                'click .my': 'setMy'
             },
             initialize: function () {
                 this.user = app.global.user;
@@ -107,29 +107,39 @@ define([
                         {id: 'new', text: t('New')},
                         {id: 'open', text: t('Open')},
                         {id: 'closed', text: t('Closed')},
-                        {id: 'resolved', text: t('Resolved')},
+                        {id: 'resolved', text: t('Resolved')}
                     ]
                 });
                 $("[name=owner]", this.$el).select2(
                     this.userListSelect2Options({
                         multiple: false,
-                        allowClear: true
+                        allowClear: true,
+                        initSelection: _.bind(function (element, callback) {
+                            callback(element.select2("data"));
+                        }, this)
                     })
                 );
-                $("[name=owner]").select2("data", {
-                    id: this.user.id,
-                    text: this.user.escape('name') || this.user.escape('email')
-                });
+
+                this.setMy();
 
                 $("[name=project]", this.$el).on("change", _.bind(this.filter, this));
                 $("[name=owner]", this.$el).on("change", _.bind(this.filter, this));
                 $("[name=status]", this.$el).on("change", _.bind(this.filter, this));
+
                 this.filter();
             },
+            setMy: function () {
+                $("[name=owner]").select2("data", {
+                    id: this.user.id,
+                    text: this.user.escape('name') || this.user.escape('email')
+                });
+                $("[name=owner]").select2("val", this.user.id, true);
+                return false;
+            },
             filter: function () {
-                app.global.tasks.setProject( this.$el.find('form [name=project]').val() );
-                app.global.tasks.setOwner( this.$el.find('form [name=owner]').select2("val") );
-                app.global.tasks.setStatus( this.$el.find('form [name=status]').val() );
+                app.global.tasks.setProject(this.$el.find('form [name=project]').val());
+                app.global.tasks.setOwner(this.$el.find('form [name=owner]').select2("val"));
+                app.global.tasks.setStatus(this.$el.find('form [name=status]').val());
                 app.global.tasks.fetch();
                 return false;
             }
