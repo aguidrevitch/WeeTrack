@@ -4,7 +4,6 @@
         util = require("util"),
         express = require("express"),
         gzippo = require('gzippo'),
-        io = require("socket.io"),
         db = require("./lib/database"),
         User = require("./lib/models/user"),
         Workspace = require("./lib/models/workspace"),
@@ -127,9 +126,6 @@
     */
 
     var server = app.listen(config.port);
-    var socket = io.listen(server);
-    socket.set("log level", 1);
-
     util.puts("Server started on port " + config.port);
 
 })();
