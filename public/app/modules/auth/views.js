@@ -87,10 +87,16 @@ define([
             login: function () {
                 this.model = this.$el.find('form').serializeObject();
                 app.global.user.authorize(this.model, {
-                    error: function (err) {
-                        if (err._modal)
-                            app.showModal(err._modal.message);
-                    }
+                    error: _.bind(function (err) {
+                        if (err._modal) {
+                            $('.alert', this.$el).html(err._modal.message);
+                            $('.alert', this.$el).alert();
+                            $('.alert', this.$el).show();
+                            setTimeout(function () {
+                                $('.alert', this.$el).fadeOut('slow');
+                            }, 2000);
+                        }
+                    }, this)
                 });
                 return false;
             },

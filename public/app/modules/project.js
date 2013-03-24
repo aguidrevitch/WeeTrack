@@ -29,7 +29,7 @@ define([
                         })
                     }).render();
                 } else {
-                    app.redirect
+                    app.router.navigate('/', { trigger: true });
                 }
             }
         });
