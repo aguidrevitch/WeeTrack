@@ -84,7 +84,8 @@ define([
         Views.Filter = app.views.Form.extend({
             template: 'home/filter',
             events: {
-                'click .my': 'setMy'
+                'click .my': 'setMy',
+                'click .clear': 'clearFilter'
             },
             initialize: function () {
                 this.user = app.global.user;
@@ -134,6 +135,13 @@ define([
                     text: this.user.escape('name') || this.user.escape('email')
                 });
                 $("[name=owner]").select2("val", this.user.id, true);
+                return false;
+            },
+            clearFilter: function () {
+                console.log(1);
+                $('[name=owner]').select2('val', ''); // wont trigger change
+                $('[name=status]').select2('val', ''); // wont trigger change
+                $('[name=project]').val('');
                 return false;
             },
             filter: function () {
