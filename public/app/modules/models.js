@@ -128,9 +128,11 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
                 this.transactions.reset(attributes.transactions);
         },
         parse: function (response) {
-            this.transactions = new Transaction.Collection();
-            this.transactions.reset(response.transactions);
-            delete response.transactions;
+            if (response && response.transactions) {
+                this.transactions = new Transaction.Collection();
+                this.transactions.reset(response.transactions);
+                delete response.transactions;
+            }
             return response;
         },
         validateOnServer: function (attributes, options) {

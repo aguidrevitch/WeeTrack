@@ -1,12 +1,12 @@
 <form id="filter-form" class="form form-horizontal">
-    <select class="input-large" name="project" placeholder="<%= t('All') %>">
+    <select class="input-large" name="project" placeholder="<%= t('Select Project') %>">
         <option value=""></option>
         <% projects.each(function (project) { %>
         <option value="<%= project.id %>"><%= project.escape('name') %></option>
         <% }) %>
     </select>
-    <input class="input-large" name="owner" placeholder="<%= t('All') %>">
+    <input class="input-large" name="owner" placeholder="<%= t('Select Owner') %>">
     <button class="btn my"><%= t('My') %></button>
-    <input class="input-xxlarge" name="status" placeholder="<%= t('All') %>">
+    <input class="input-xxlarge" name="status" placeholder="<%= t('Select Status') %>">
     <button class="btn clear"><%= t('Clear') %></button>
 </form>
