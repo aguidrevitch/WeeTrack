@@ -16,7 +16,7 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
             });
         },
         authorize: function (attrs, options) {
-            this.fetch({
+            return this.fetch({
                 data: attrs,
                 error: _.bind(function (model, res) {
                     var error = ($.parseJSON(res.responseText)).error;
@@ -35,7 +35,7 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
             });
         },
         deauthorize: function () {
-            this.destroy({
+            return this.destroy({
                 success: _.bind(function () {
                     this.set({ _id: null });
                     this.trigger('deauthorized');

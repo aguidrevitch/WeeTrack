@@ -27,7 +27,9 @@ define([
                 }).render();
             },
             logout: function () {
-                app.global.user.deauthorize();
+                app.global.user.deauthorize().done(function () {
+                    app.router.navigate('/', { trigger: true });
+                });
             },
             register: function () {
                 app.layout.setViews({
@@ -53,11 +55,14 @@ define([
             }).render();
             var workspacenav = app.layout.getView('.workspace-nav');
             if (workspacenav) workspacenav.remove();
-            app.router.navigate('/', {trigger: true});
         });
 
         app.on('router:unauthorized', function () {
-            Backbone.history.loadUrl('login');
+            console.log('auth.js router:unathorized');
+            if (location.pathname.indexOf('/login') == -1) {
+                console.log('auth.js router:unathorized redirected to login');
+                Backbone.history.loadUrl('login');
+            }
         });
 
         Auth.init = function () {

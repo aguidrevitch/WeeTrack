@@ -75,6 +75,7 @@ define([
             events: {
                 "submit form": "login"
             },
+            model: {},
             initialize: function () {
                 this.listenTo(app, 'user:authorized', function () {
                     if (location.pathname.indexOf('/login') !== 0)
@@ -84,13 +85,19 @@ define([
                 });
             },
             login: function () {
-                this.model.authorize(this.$el.find('form').serializeObject(), {
+                this.model = this.$el.find('form').serializeObject();
+                app.global.user.authorize(this.model, {
                     error: function (err) {
                         if (err._modal)
                             app.showModal(err._modal.message);
                     }
                 });
                 return false;
+            },
+            serialize: function () {
+                return {
+                    user: this.model
+                };
             }
         });
 

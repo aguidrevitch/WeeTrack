@@ -13,7 +13,7 @@ define([
         var Home = app.module();
 
         var Router = router.extend({
-            authorized: {
+            routes: {
                 "": "home"
             },
             initialize: function (options) {
@@ -32,7 +32,7 @@ define([
                         app.router.navigate('/workspace/add', { trigger: true });
                     }
                 } else {
-                    app.router.navigate('/login', { trigger: true });
+                    Backbone.history.loadUrl('login');
                 }
             }
         });

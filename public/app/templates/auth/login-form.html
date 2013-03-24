@@ -3,21 +3,21 @@
     <div class="control-group">
         <label class="control-label" for="email">Email</label>
         <div class="controls">
-            <input type="text" name="email" placeholder="<%= t('Email') %>">
+            <input type="text" name="email" placeholder="<%= t('Email') %>"  value="<%= user.email %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="password"><%= t('Password') %></label>
         <div class="controls">
-            <input type="password" name="password" placeholder="<%= t('Password') %>">
+            <input type="password" name="password" placeholder="<%= t('Password') %>" value="<%= user.password %>">
             <span class="help-inline error"></span>
         </div>
     </div>
     <div class="control-group">
         <div class="controls">
             <label class="checkbox">
-                <input type="checkbox" name="remember_me"> <%= t('Remember me') %>
+                <input type="checkbox" name="remember_me" <%= user.remember_me ? 'checked="checked"' : ''%>> <%= t('Remember me') %>
             </label>
         </div>
     </div>
