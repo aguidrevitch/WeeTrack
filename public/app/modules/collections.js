@@ -81,6 +81,15 @@ define(['backbone', 'modules/models', 'modules/transaction'], function (Backbone
             if (this.perm)
                 query.perm = this.perm;
 
+            if (this.project)
+                query.project = this.project
+
+            if (this.owner)
+                query.owner = this.owner
+
+            if (this.status)
+                query.status = this.status;
+
             if (_.keys(query).length) {
                 var qs = [];
                 _.each(query, function (value, key) {
@@ -102,6 +111,15 @@ define(['backbone', 'modules/models', 'modules/transaction'], function (Backbone
         },
         getPermission: function () {
             return this.perm;
+        },
+        setProject: function (id) {
+            this.project = id;
+        },
+        setOwner: function (id) {
+            this.owner = id;
+        },
+        setStatus: function (status) {
+            this.status = status;
         }
     });
 

@@ -34,7 +34,8 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
 
                             /* filtering tasks */
                             tasks.setWorkspace(workspace.id);
-                            tasks.fetch().done(finish);
+                            //tasks.fetch().done(finish);
+                            finish();
                         }
                     }
                 });
@@ -42,7 +43,7 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
             })();
         } else {
             projects.fetch().done(finish);
-            finish(); //workspaces.fetch().done(finish);
+            finish();
         }
     });
 

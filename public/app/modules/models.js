@@ -146,7 +146,7 @@ define(["backbone", "modules/transaction"], function (Backbone, Transaction) {
                     if (options.error) options.error(model, res);
                 }
             });
-        }
+        },
     });
 
     Models.Comment = Backbone.Model.extend({

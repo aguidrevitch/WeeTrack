@@ -77,7 +77,7 @@ define(["backbone", "plugins/backbone.layoutmanager"], function (Backbone) {
                     data.push(rec);
                 }
             }, this);
-            return(data);
+            return data;
         },
         afterRender: function () {
 

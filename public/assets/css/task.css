@@ -242,6 +242,10 @@ body {
     border-color: #ddd;
 }
 
+#filter-form .input-xxlarge {
+    width: 330px;
+}
+
 @media (max-width: 1200px) {
     #form-task-add .input-xxlarge,
     #form-transaction-add .input-xxlarge {

@@ -81,8 +81,55 @@ define([
             }
         });
 
-        Views.Filter = Backbone.Layout.extend({
-            template: 'home/filter'
+        Views.Filter = app.views.Form.extend({
+            template: 'home/filter',
+            events: {
+                'click .submit-form': 'filter'
+            },
+            initialize: function () {
+                this.user = app.global.user;
+                this.listenTo(app.global.projects, 'sync', this.render);
+            },
+            serialize: function () {
+                return {
+                    projects: app.global.projects
+                };
+            },
+            afterRender: function () {
+                $("[name=project]", this.$el).select2({
+                    allowClear: true
+                });
+                $("[name=status]", this.$el).select2({
+                    multiple: true,
+                    allowClear: true,
+                    data: [
+                        {id: 'new', text: t('New')},
+                        {id: 'open', text: t('Open')},
+                        {id: 'closed', text: t('Closed')},
+                        {id: 'resolved', text: t('Resolved')},
+                    ]
+                });
+                $("[name=owner]", this.$el).select2(
+                    this.userListSelect2Options({
+                        multiple: false,
+                        allowClear: true
+                    })
+                );
+                $("[name=owner]").select2("data", {
+                    id: this.user.id,
+                    text: this.user.escape('name') || this.user.escape('email')
+                });
+
+                app.global.tasks.fetch();
+            },
+            filter: function () {
+                //console.log(this.$el.find('form').serializeObject());
+                app.global.tasks.setProject( this.$el.find('form [name=project]').val() );
+                app.global.tasks.setOwner( this.$el.find('form [name=owner]').select2("val") );
+                app.global.tasks.setStatus( this.$el.find('form [name=status]').val() );
+                app.global.tasks.fetch();
+                return false;
+            }
         });
 
         Views.Info = Backbone.Layout.extend({

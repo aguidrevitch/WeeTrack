@@ -1,12 +1,11 @@
-<select name="project" placeholder="Select Project">
-    <option>Project</option>
-</select>
-<select name="owner" placeholder="Select Owner">
-    <option>Owner</option>
-</select>
-<select name="status" placeholder="Select Status">
-    <option value="new">New</option>
-    <option value="open">Open</option>
-    <option value="closed">Closed</option>
-    <option value="resolved">Resolved</option>
-</select>
+<form id="filter-form" class="form form-horizontal">
+    <select class="input-large" name="project" placeholder="<%= t('All') %>">
+        <option value=""></option>
+        <% projects.each(function (project) { %>
+        <option value="<%= project.id %>"><%= project.escape('name') %></option>
+        <% }) %>
+    </select>
+    <input class="input-large" name="owner" placeholder="<%= t('All') %>">
+    <input class="input-xxlarge" name="status" placeholder="<%= t('All') %>">
+    <button class="btn btn-primary submit-form"><%= t('Filter') %></button>
+</form>
