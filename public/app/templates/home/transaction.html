@@ -4,7 +4,7 @@
     <%= (transaction.get('type') == 'reply') ? t('replied') : t('commented') %>
     <%= moment(new Date(transaction.get('created'))).fromNow() %>
     <div class="well-small">
-        <pre><%= transaction.escape('value') %></pre>
+        <div class="collapsible-text"><%= transaction.escape('value') %></div>
         <div class="reply"><a data-type="reply" data-id="<%= transaction.id %>" href=""><%= t('Reply') %></a></div>
         <div class="comment"><a data-type="comment" data-id="<%= transaction.id %>" href=""><%= t('Comment') %></a></div>
     </div>

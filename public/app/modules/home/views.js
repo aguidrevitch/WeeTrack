@@ -288,6 +288,76 @@ define([
                     task: this.options.task,
                     transaction: this.model
                 };
+            },
+            buildUL: function (tree) {
+                //console.log('here');
+                var tag = $('<ul></ul>');
+                //console.log(tree);
+                for (var i = 0; i < tree.length; i++)  {
+                    var container = tree[i];
+                    //console.log(container);
+                    if (container.text || container.text === "") {
+                        //console.log("adding " + container.text);
+                        tag.append($('<li></li>').text(container.text));
+                    } else {
+                        //console.log('recursing', container);
+                        var result = this.buildUL(container.child);
+                        tag.append($('<li></li>').append(result));
+                    }
+                };
+                return tag;
+            },
+            afterRender: function () {
+                console.log('--------------------------');
+                var stripped = $('.collapsible-text', this.$el).text();
+                var lines = stripped.match(/^(.*)/mg);
+                var tree = { child: [] };
+                var container = tree;
+                var lastDepth = 0;
+                _.each(lines, function (line) {
+                    if (line.match(/^>/)) {
+                        var depth = 0;
+                        while (line.match(/^>/)) {
+                            depth++;
+                            line = line.replace(/^>/, '');
+                        }
+                        var actualDepth = depth;
+                        if (depth > lastDepth) {
+                            while (depth > lastDepth) {
+                                //console.log('adding container');
+                                var node = { parent: container, child: [] };
+                                container.child.push(node);
+                                container = node;
+                                depth--;
+                            }
+                        } else {
+                            while (depth < lastDepth) {
+                                //console.log("moving back", container.parent);
+                                container = container.parent;
+                                depth++;
+                            }
+                            if (depth - actualDepth > 1) {
+                                // console.log('here');
+                                var node = { parent: container, child: [] };
+                                container.child.push(node);
+                                container = node;
+                            }
+                        }
+                        // console.log({ line: line, lastDepth: lastDepth, actualDepth: actualDepth, depth: depth});
+                        if (!container) {
+                            container = tree;
+                        }
+                        lastDepth = actualDepth;
+                    } else {
+                        container = tree;
+                        lastDepth = 0;
+                    }
+                    container.child.push({ text: line });
+                });
+                //console.log(tree);
+                $('.collapsible-text', this.$el).html(this.buildUL(tree.child));
+                //console.log(this.buildUL(tree.child).wrap('p').parent().html());
+                //console.log(this.buildUL(tree.child).html());
             }
         });
 

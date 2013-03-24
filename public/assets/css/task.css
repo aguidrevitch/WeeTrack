@@ -256,11 +256,27 @@ body {
     margin-left: 8px;
 }
 
-#transactions pre {
-    border: 0px;
-    margin: 0px;
-    padding: 0px;
+.collapsible-text ul {
+    margin-left: 2px;
 }
+
+.collapsible-text li {
+    list-style: none;
+    border-left: 2px solid blue;
+    padding-left: 8px;
+}
+
+.collapsible-text > ul {
+    margin-left: 0px;
+}
+
+.collapsible-text > ul > li {
+    list-style: none;
+    border-left: 0px;
+    padding-left: 8px;
+}
+
+
 
 @media (max-width: 1200px) {
     #form-task-add .input-xxlarge,
