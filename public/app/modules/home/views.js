@@ -289,26 +289,21 @@ define([
                     transaction: this.model
                 };
             },
-            buildUL: function (tree) {
-                //console.log('here');
-                var tag = $('<ul></ul>');
-                //console.log(tree);
+            buildUL: function (tree, lvl) {
+                var cls = 'lvl' + lvl++,
+                    tag = $('<ul></ul>').addClass(cls);
                 for (var i = 0; i < tree.length; i++)  {
                     var container = tree[i];
-                    //console.log(container);
                     if (container.text || container.text === "") {
-                        //console.log("adding " + container.text);
-                        tag.append($('<li></li>').text(container.text));
+                        tag.append($('<li></li>').text(container.text).addClass(cls));
                     } else {
-                        //console.log('recursing', container);
-                        var result = this.buildUL(container.child);
-                        tag.append($('<li></li>').append(result));
+                        var result = this.buildUL(container.child, lvl);
+                        tag.append($('<li></li>').append(result).addClass(cls));
                     }
                 };
                 return tag;
             },
             afterRender: function () {
-                console.log('--------------------------');
                 var stripped = $('.collapsible-text', this.$el).text();
                 var lines = stripped.match(/^(.*)/mg);
                 var tree = { child: [] };
@@ -343,7 +338,6 @@ define([
                                 container = node;
                             }
                         }
-                        // console.log({ line: line, lastDepth: lastDepth, actualDepth: actualDepth, depth: depth});
                         if (!container) {
                             container = tree;
                         }
@@ -354,10 +348,7 @@ define([
                     }
                     container.child.push({ text: line });
                 });
-                //console.log(tree);
-                $('.collapsible-text', this.$el).html(this.buildUL(tree.child));
-                //console.log(this.buildUL(tree.child).wrap('p').parent().html());
-                //console.log(this.buildUL(tree.child).html());
+                $('.collapsible-text', this.$el).html(this.buildUL(tree.child, 0));
             }
         });
 

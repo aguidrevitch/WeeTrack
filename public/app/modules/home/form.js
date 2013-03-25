@@ -146,7 +146,8 @@ define([
             quotedText: function () {
                 var text = this.options.text;
                 if (text) {
-                    text = text.replace(/^/mg, '>');
+                    text = text.replace(/\r/g, '');
+                    text = text.replace(/^/mg, "&gt;");
                     return text + "\n";
                 }
                 return '';
