@@ -4,7 +4,7 @@
     <% if (workspace.id != current.id) { %>
     <li>
         <a data-bypass="true"
-                href="http://<%= workspace.escape('subdomain') %>.<%= hostname %><%= env.NODE_ENV != 'production' ? ':' + port: '' %>">
+                href="http://<%= workspace.escape('subdomain') %>.<%= hostname %><%= env != 'production' ? ':' + port: '' %>">
             <i class="icon-chevron-right"></i>
             <%= workspace.escape('name') %>
         </a>
