@@ -300,7 +300,7 @@ define([
                         var result = this.buildUL(container.child, lvl);
                         tag.append($('<li></li>').append(result).addClass(cls));
                     }
-                };
+                }
                 return tag;
             },
             afterRender: function () {
@@ -310,6 +310,7 @@ define([
                 var container = tree;
                 var lastDepth = 0;
                 _.each(lines, function (line) {
+                    var node;
                     if (line.match(/^>/)) {
                         var depth = 0;
                         while (line.match(/^>/)) {
@@ -320,7 +321,7 @@ define([
                         if (depth > lastDepth) {
                             while (depth > lastDepth) {
                                 //console.log('adding container');
-                                var node = { parent: container, child: [] };
+                                node = { parent: container, child: [] };
                                 container.child.push(node);
                                 container = node;
                                 depth--;
@@ -333,7 +334,7 @@ define([
                             }
                             if (depth - actualDepth > 1) {
                                 // console.log('here');
-                                var node = { parent: container, child: [] };
+                                node = { parent: container, child: [] };
                                 container.child.push(node);
                                 container = node;
                             }
