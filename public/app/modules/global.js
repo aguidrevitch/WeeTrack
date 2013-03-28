@@ -10,8 +10,11 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
 
     user.on('authorized', function () {
         var counter = 3;
+        var done = function () {
+            app.trigger('user:authorized', user);
+        };
         var finish = function () {
-            if (!--counter) app.trigger('user:authorized', user);
+            if (!--counter) done();
         };
 
         workspaces.fetch().done(finish);
@@ -36,14 +39,18 @@ define(["app", "lodash", "modules/models", "modules/collections"], function (app
                             tasks.setWorkspace(workspace.id);
                             //tasks.fetch().done(finish);
                             finish();
+                        } else {
+                            done();
                         }
+                    },
+                    error: function () {
+                        done();
                     }
                 });
 
             })();
         } else {
-            projects.fetch().done(finish);
-            finish();
+            done();
         }
     });
 

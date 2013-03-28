@@ -22,18 +22,18 @@ define([
             },
             home: function (task_id) {
                 if (app.global.user.id) {
-                    if (app.global.workspaces.length) {
-                        if (!app.global.workspace.id) {
+                    if (!app.global.workspace.id) {
+                        if (app.global.workspaces.length) {
                             app.router.navigate('/workspace/switch', { trigger: true });
                         } else {
-                            app.layout.setViews({
-                                "section": new Views.Layout({
-                                    task_id: task_id
-                                })
-                            }).render();
+                            app.router.navigate('/workspace/add', { trigger: true });
                         }
                     } else {
-                        app.router.navigate('/workspace/add', { trigger: true });
+                        app.layout.setViews({
+                            "section": new Views.Layout({
+                                task_id: task_id
+                            })
+                        }).render();
                     }
                 } else {
                     Backbone.history.loadUrl('login');

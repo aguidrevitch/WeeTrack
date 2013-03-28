@@ -65,10 +65,6 @@ define([
             }
         });
 
-        Auth.init = function () {
-            app.global.user.authorizeSession();
-        };
-
         // Return the module for AMD compliance.
         return Auth;
 
