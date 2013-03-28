@@ -35,8 +35,11 @@
         });
 
         app.use(express.bodyParser());
-        app.use(gzippo.staticGzip(__dirname + "/public"));
-        app.use(gzippo.compress());
+
+        if (process.env.NODE_ENV != 'production') {
+            app.use(gzippo.staticGzip(__dirname + "/public"));
+            app.use(gzippo.compress());
+        }
 
         /* modal */
         app.use(function (req, res, next) {
@@ -105,25 +108,6 @@
             }
         });
     });
-
-    /*
-    var http = require('http'),
-        httpProxy = require('http-proxy');
-
-    if (config)
-        httpProxy.createServer(function (req, res, proxy) {
-
-            var buffer = httpProxy.buffer(req);
-
-            setTimeout(function () {
-                proxy.proxyRequest(req, res, {
-                    host: 'localhost',
-                    port: config.port,
-                    buffer: buffer
-                });
-            }, 500);
-        }).listen(8000);
-    */
 
     var server = app.listen(config.port);
     util.puts("Server started on port " + config.port);
