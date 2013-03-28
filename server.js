@@ -39,6 +39,8 @@
         if (process.env.NODE_ENV != 'production') {
             app.use(gzippo.staticGzip(__dirname + "/public"));
             app.use(gzippo.compress());
+        } else {
+            app.use(express.static(__dirname + "/public"))
         }
 
         /* modal */
